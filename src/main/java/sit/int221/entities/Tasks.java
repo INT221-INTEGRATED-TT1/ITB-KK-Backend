@@ -21,8 +21,9 @@ public class Tasks {
     private String description;
     @Column(name = "assignees")
     private String assignees;
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private String status;
+    private TaskStatus status;
     @Column(name = "createdOn", nullable = false, updatable = false)
     @CreationTimestamp
     private Timestamp createdOn;

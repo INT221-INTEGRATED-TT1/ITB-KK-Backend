@@ -24,7 +24,6 @@ public class TasksService {
 
     public Tasks findTaskById(Integer taskId) {
         return tasksRepository.findById(taskId).orElseThrow(
-                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Customer number '"+ taskId + "' does not exist !!!!"));
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Task "+ taskId + " Doesn't Exist!!!"));
     }
 }
