@@ -4,9 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.entities.Tasks;
 import sit.int221.services.TasksService;
-
 import java.util.List;
-
+@CrossOrigin(origins = {"http://localhost:5173","http://localhost:5174","http://localhost:80" ,"http://ip23kp3.sit.kmutt.ac.th:80","http://ip23kp3.sit.kmutt.ac.th:1449"})
 @RestController
 @RequestMapping("/v1/tasks")
 public class TasksController {
