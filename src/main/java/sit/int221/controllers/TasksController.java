@@ -14,6 +14,7 @@ import sit.int221.exceptions.ErrorResponse;
 import sit.int221.exceptions.TaskNotFoundException;
 import sit.int221.services.ListMapper;
 import sit.int221.services.TasksService;
+<<<<<<< HEAD
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -25,9 +26,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.TimeZone;
 
+import java.util.List;
+@CrossOrigin(origins = {"http://localhost:5173","http://localhost:5174","http://localhost:80" ,"http://ip23tt1.sit.kmutt.ac.th:80","http://ip23tt1.sit.kmutt.ac.th:1449"})
 @RestController
 @RequestMapping("/v1/tasks")
-@CrossOrigin(origins = "http://localhost:5173")
 public class TasksController {
     @Autowired
     TasksService tasksService;
