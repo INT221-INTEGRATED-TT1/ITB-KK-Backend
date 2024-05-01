@@ -14,7 +14,6 @@ import sit.int221.exceptions.ErrorResponse;
 import sit.int221.exceptions.TaskNotFoundException;
 import sit.int221.services.ListMapper;
 import sit.int221.services.TasksService;
-<<<<<<< HEAD
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
