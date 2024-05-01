@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 public class Tasks {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", nullable = false, updatable = false, insertable = false)
     private Integer id;
     @Column(name = "title", length = 100, nullable = false)
     private String title;
@@ -25,11 +25,11 @@ public class Tasks {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private TaskStatus status;
-    @Column(name = "createdOn", nullable = false, updatable = false)
+    @Column(name = "createdOn", nullable = false, updatable = false, insertable = false)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssX")
     @CreationTimestamp
     private Timestamp createdOn;
-    @Column(name = "updatedOn", nullable = false, updatable = false)
+    @Column(name = "updatedOn", nullable = false, updatable = false, insertable = false)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssX")
     @UpdateTimestamp
     private Timestamp updatedOn;
