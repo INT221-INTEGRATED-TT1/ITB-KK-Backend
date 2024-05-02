@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import java.util.List;
-@CrossOrigin(origins = {"http://localhost:5173","http://localhost:5174","http://localhost:80" ,"http://ip23tt1.sit.kmutt.ac.th:80","http://ip23tt1.sit.kmutt.ac.th:1449"})
+@CrossOrigin(origins = {"http://localhost:5173","http://localhost:5174","http://localhost:80" ,"http://ip23tt1.sit.kmutt.ac.th:80","http://ip23tt1.sit.kmutt.ac.th:1449", "http://192.168.2.87:5173"})
 @RestController
 @RequestMapping("/v1/tasks")
 public class TasksController {
@@ -51,6 +51,7 @@ public class TasksController {
     }
 
     @PostMapping("")
+    @ResponseStatus(HttpStatus.CREATED)
     public TaskResDTO createTask(@RequestBody Tasks tasks){
         Tasks insertedTask = tasksService.insertTask(tasks);
         return modelMapper.map(insertedTask, TaskResDTO.class);
@@ -72,7 +73,7 @@ public class TasksController {
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
     public ResponseEntity<ErrorResponse> handleTaskNotFoundException(TaskNotFoundException ex, WebRequest request) {
         ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneOffset.UTC);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 //        OffsetDateTime offsetDateTime = OffsetDateTime.parse(zonedDateTime.format(formatter), formatter);
         ErrorResponse errorResponse = new ErrorResponse(
                 zonedDateTime.format(formatter),
