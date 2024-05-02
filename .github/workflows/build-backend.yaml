@@ -1,0 +1,12 @@
+name: Build Spring boot (BackEnd)
+
+on:
+    push:
+        branches: [ auto-deploy ]
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Build with DockerFile
+          run: docker build -t spring-boot-backend:latest .
+
