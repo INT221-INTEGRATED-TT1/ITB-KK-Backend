@@ -1,11 +1,13 @@
-package sit.int221.dtos.request;
+package sit.int221.dtos.response;
 
 import lombok.Data;
 import sit.int221.entities.TaskStatus;
+
 @Data
-public class TaskReqDTO {
+public class TaskDetailDTO {
     private Integer id;
     private String title;
+    private String description;
     private String assignees;
     private TaskStatus status;
 }

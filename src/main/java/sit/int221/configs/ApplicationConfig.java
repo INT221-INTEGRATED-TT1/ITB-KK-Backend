@@ -1,4 +1,4 @@
-package sit.int221;
+package sit.int221.configs;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
