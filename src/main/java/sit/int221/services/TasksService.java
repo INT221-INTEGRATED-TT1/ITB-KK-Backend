@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewTaskDTO;
+import sit.int221.entities.TaskStatus;
 import sit.int221.entities.Tasks;
 import sit.int221.exceptions.TaskNotFoundException;
 import sit.int221.repositories.TasksRepository;
@@ -31,8 +32,12 @@ public class TasksService {
     }
 
     public Tasks insertTask(NewTaskDTO newTaskDTO){
-
         newTaskDTO.setTitle(newTaskDTO.getTitle().trim());
+        if(newTaskDTO.getDescription() != null && !newTaskDTO.getDescription().isBlank()){newTaskDTO.setDescription(newTaskDTO.getDescription().trim());}
+        else{newTaskDTO.setDescription(null);}
+        if(newTaskDTO.getAssignees() != null && !newTaskDTO.getAssignees().isBlank()){newTaskDTO.setAssignees(newTaskDTO.getAssignees().trim());}
+        else{newTaskDTO.setAssignees(null);}
+        if(newTaskDTO.getStatus() == null || newTaskDTO.getStatus().toString().trim().isEmpty()){newTaskDTO.setStatus(TaskStatus.NO_STATUS);}
         Tasks task = modelMapper.map(newTaskDTO, Tasks.class);
         return tasksRepository.saveAndFlush(task);
     }
@@ -47,11 +52,16 @@ public class TasksService {
     public Tasks updateTask(Integer taskId, Tasks newTaskData) {
         Tasks findTasks = tasksRepository.findById(taskId).orElseThrow(
                 () -> new TaskNotFoundException("NOT FOUND"));
-        findTasks.setTitle(newTaskData.getTitle());
-        findTasks.setAssignees(newTaskData.getAssignees());
-        findTasks.setDescription(newTaskData.getDescription());
+        findTasks.setTitle(newTaskData.getTitle().trim());
+        findTasks.setAssignees(newTaskData.getAssignees().trim());
+        findTasks.setDescription(newTaskData.getDescription().trim());
         findTasks.setStatus(newTaskData.getStatus());
         tasksRepository.save(findTasks);
         return findTasks;
     }
+
+//    public boolean isEmpty(String str){
+//        if(str.trim().isEmpty() |)
+//        return true;
+//    }
 }

@@ -10,14 +10,11 @@ import sit.int221.entities.TaskStatus;
 @Data
 public class NewTaskDTO {
     @NotEmpty
-    @Size(max = 100)
+//    @Size(max = 100)
     private String title;
-    @NotBlank
-    @Size(max = 500)
+//    @Size(max = 500)
     private String description;
-    @NotBlank
-    @Size(max = 30)
+//    @Size(max = 30)
     private String assignees;
-    @NotNull
     private TaskStatus status;
 }
