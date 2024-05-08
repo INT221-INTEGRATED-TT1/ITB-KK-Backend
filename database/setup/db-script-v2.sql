@@ -1,5 +1,5 @@
 CREATE USER 'dev1'@'%' IDENTIFIED BY 'dev@sit';
-GRANT ALL privileges ON . TO 'dev1'@'%';
+GRANT ALL privileges ON *.* TO 'dev1'@'%';
 CREATE SCHEMA `task_base`;
 CREATE TABLE `task_base`.`tasks` (
   `id` INT NOT NULL AUTO_INCREMENT,
