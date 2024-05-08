@@ -5,8 +5,7 @@ USE task_base;
 SET character_set_results = 'utf8mb4';
 CREATE SCHEMA `task_base`;
 CREATE TABLE `task_base`.`tasks`
-(
-    `id`          INT NOT NULL AUTO_INCREMENT,
+(   `id`          INT NOT NULL AUTO_INCREMENT,
     `title`       VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
     `description` VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
     `assignees`   VARCHAR(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
