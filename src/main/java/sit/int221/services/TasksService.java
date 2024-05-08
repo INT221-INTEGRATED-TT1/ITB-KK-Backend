@@ -31,6 +31,8 @@ public class TasksService {
     }
 
     public Tasks insertTask(NewTaskDTO newTaskDTO){
+
+        newTaskDTO.setTitle(newTaskDTO.getTitle().trim());
         Tasks task = modelMapper.map(newTaskDTO, Tasks.class);
         return tasksRepository.saveAndFlush(task);
     }
