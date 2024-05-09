@@ -8,11 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import sit.int221.dtos.request.NewStatusDTO;
-import sit.int221.dtos.request.NewTaskDTO;
 import sit.int221.dtos.response.StatusDetailDTO;
-import sit.int221.dtos.response.TaskDetailDTO;
 import sit.int221.entities.Statuses;
-import sit.int221.entities.Tasks;
 import sit.int221.exceptions.ErrorResponse;
 import sit.int221.exceptions.StatusNotFoundException;
 import sit.int221.exceptions.TaskNotFoundException;
@@ -24,7 +21,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-@CrossOrigin(origins = {"http://localhost:5173","http://localhost:5174","http://localhost:80" ,"http://ip23tt1.sit.kmutt.ac.th","http://ip23tt1.sit.kmutt.ac.th:1449"})
+@CrossOrigin(origins = {"http://localhost:5173","http://localhost:5174","http://localhost:80" ,"http://ip23tt1.sit.kmutt.ac.th","http://ip23tt1.sit.kmutt.ac.th:1449", "http://10.0.208.95:5173/"})
 @RestController
 @RequestMapping("/v2/statuses")
 public class StatusesController {
@@ -49,13 +46,13 @@ public class StatusesController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public StatusDetailDTO createTask(@Valid @RequestBody NewStatusDTO status){
+    public StatusDetailDTO createStatus(@Valid @RequestBody NewStatusDTO status){
         Statuses insertedTask = statusesService.insertStatus(status);
         return modelMapper.map(insertedTask, StatusDetailDTO.class);
     }
 
     @PutMapping("/{statusId}")
-    public StatusDetailDTO putTask(@PathVariable Integer statusId, @RequestBody NewStatusDTO newStatus){
+    public StatusDetailDTO putStatus(@PathVariable Integer statusId, @RequestBody NewStatusDTO newStatus){
         Statuses updatedStatus = statusesService.updateStatus(statusId, newStatus);
         return modelMapper.map(updatedStatus, StatusDetailDTO.class);
     }

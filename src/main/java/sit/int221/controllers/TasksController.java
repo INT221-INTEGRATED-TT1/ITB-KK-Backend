@@ -21,7 +21,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-@CrossOrigin(origins = {"http://localhost:5173","http://localhost:5174","http://localhost:80" ,"http://ip23tt1.sit.kmutt.ac.th","http://ip23tt1.sit.kmutt.ac.th:1449"})
+@CrossOrigin(origins = {"http://localhost:5173","http://localhost:5174","http://localhost:80" ,"http://ip23tt1.sit.kmutt.ac.th","http://ip23tt1.sit.kmutt.ac.th:1449", "http://10.0.208.95:5173/"})
 @RestController
 @RequestMapping("/v1/tasks")
 public class TasksController {
@@ -32,14 +32,12 @@ public class TasksController {
     @Autowired
     ModelMapper modelMapper;
 
-//    @Tag(name = "get", description = "GET methods of Tasks APIs")
     @GetMapping("")
     public List<TaskHomeDTO> getAllTasks() {
         List<Tasks> tasksList = tasksService.getAllTasksList();
         return listMapper.mapList(tasksList, TaskHomeDTO.class, modelMapper);
     }
 
-//    @Tag(name = "get", description = "GET methods of Tasks APIs")
     @GetMapping("/{taskId}")
     public Tasks findTaskById(@PathVariable Integer taskId) {
         return tasksService.findTaskById(taskId);

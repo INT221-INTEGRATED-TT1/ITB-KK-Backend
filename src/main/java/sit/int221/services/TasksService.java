@@ -59,8 +59,4 @@ public class TasksService {
         return findTasks;
     }
 
-//    public boolean isEmpty(String str){
-//        if(str.trim().isEmpty() |)
-//        return true;
-//    }
 }

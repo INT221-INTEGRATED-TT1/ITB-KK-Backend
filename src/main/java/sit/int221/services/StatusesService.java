@@ -42,19 +42,24 @@ public class StatusesService {
         Statuses statuses = modelMapper.map(newStatusDTO, Statuses.class);
         return statusesRepository.saveAndFlush(statuses);
     }
-//
+
 //    public Tasks removeTask(Integer taskId) {
 //        Tasks findTasks = statusesRepository.findById(taskId).orElseThrow(
 //                () -> new TaskNotFoundException("NOT FOUND"));
 //        statusesRepository.deleteById(taskId);
 //        return findTasks;
 //    }
-//
+
     public Statuses updateStatus(Integer statusId, NewStatusDTO newStatus) {
         Statuses findStatus = statusesRepository.findById(statusId).orElseThrow(
                 () -> new StatusNotFoundException("NOT FOUND"));
+        if(findStatusByName(newStatus.getName()) != null){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Duplicate i sus");
+        }
         findStatus.setName(newStatus.getName().trim());
-        findStatus.setDescription(newStatus.getDescription().trim());
+        if(newStatus.getDescription() != null && !newStatus.getDescription().isBlank()){newStatus.setDescription(newStatus.getDescription().trim());}
+        else{newStatus.setDescription(null);}
+        findStatus.setColor(newStatus.getColor().trim());
         statusesRepository.save(findStatus);
         return findStatus;
     }
