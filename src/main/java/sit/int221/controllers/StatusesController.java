@@ -7,14 +7,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+import sit.int221.dtos.request.NewStatusDTO;
 import sit.int221.dtos.request.NewTaskDTO;
-import sit.int221.dtos.response.TaskHomeDTO;
+import sit.int221.dtos.response.StatusDetailDTO;
 import sit.int221.dtos.response.TaskDetailDTO;
+import sit.int221.entities.Statuses;
 import sit.int221.entities.Tasks;
 import sit.int221.exceptions.ErrorResponse;
+import sit.int221.exceptions.StatusNotFoundException;
 import sit.int221.exceptions.TaskNotFoundException;
 import sit.int221.services.ListMapper;
-import sit.int221.services.TasksService;
+import sit.int221.services.StatusesService;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -23,50 +26,42 @@ import java.util.List;
 
 @CrossOrigin(origins = {"http://localhost:5173","http://localhost:5174","http://localhost:80" ,"http://ip23tt1.sit.kmutt.ac.th","http://ip23tt1.sit.kmutt.ac.th:1449"})
 @RestController
-@RequestMapping("/v1/tasks")
-public class TasksController {
+@RequestMapping("/v2/statuses")
+public class StatusesController {
     @Autowired
-    TasksService tasksService;
+    StatusesService statusesService;
     @Autowired
     ListMapper listMapper;
     @Autowired
     ModelMapper modelMapper;
 
-//    @Tag(name = "get", description = "GET methods of Tasks APIs")
     @GetMapping("")
-    public List<TaskHomeDTO> getAllTasks() {
-        List<Tasks> tasksList = tasksService.getAllTasksList();
-        return listMapper.mapList(tasksList, TaskHomeDTO.class, modelMapper);
+    public List<StatusDetailDTO> getAllTasks() {
+        List<Statuses> statusesList = statusesService.getAllStatusesList();
+        return listMapper.mapList(statusesList, StatusDetailDTO.class, modelMapper);
     }
 
-//    @Tag(name = "get", description = "GET methods of Tasks APIs")
-    @GetMapping("/{taskId}")
-    public Tasks findTaskById(@PathVariable Integer taskId) {
-        return tasksService.findTaskById(taskId);
+    @GetMapping("/{statusId}")
+    public Statuses findStatusById(@PathVariable Integer statusId) {
+        return statusesService.findStatusById(statusId);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public TaskDetailDTO createTask(@Valid @RequestBody NewTaskDTO tasks){
-        Tasks insertedTask = tasksService.insertTask(tasks);
-        return modelMapper.map(insertedTask, TaskDetailDTO.class);
+    public StatusDetailDTO createTask(@Valid @RequestBody NewStatusDTO status){
+        Statuses insertedTask = statusesService.insertStatus(status);
+        return modelMapper.map(insertedTask, StatusDetailDTO.class);
     }
 
-    @DeleteMapping("/{taskId}")
-    public TaskHomeDTO deleteTask(@PathVariable Integer taskId){
-        Tasks deleteTask = tasksService.removeTask(taskId);
-        return modelMapper.map(deleteTask, TaskHomeDTO.class);
+    @PutMapping("/{statusId}")
+    public StatusDetailDTO putTask(@PathVariable Integer statusId, @RequestBody NewStatusDTO newStatus){
+        Statuses updatedStatus = statusesService.updateStatus(statusId, newStatus);
+        return modelMapper.map(updatedStatus, StatusDetailDTO.class);
     }
 
-    @PutMapping("/{taskId}")
-    public TaskDetailDTO putTask(@PathVariable Integer taskId, @RequestBody Tasks newTaskData){
-        Tasks updateTask = tasksService.updateTask(taskId, newTaskData);
-        return modelMapper.map(updateTask, TaskDetailDTO.class);
-    }
-
-    @ExceptionHandler(TaskNotFoundException.class)
+    @ExceptionHandler(StatusNotFoundException.class)
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    public ResponseEntity<ErrorResponse> handleTaskNotFoundException(TaskNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleStatusNotFoundException(TaskNotFoundException ex, WebRequest request) {
         ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneOffset.UTC);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         ErrorResponse errorResponse = new ErrorResponse(
@@ -77,5 +72,4 @@ public class TasksController {
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
-
 }

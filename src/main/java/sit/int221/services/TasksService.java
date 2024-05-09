@@ -15,7 +15,6 @@ import sit.int221.repositories.TasksRepository;
 import java.util.List;
 
 @Service
-
 public class TasksService {
     @Autowired
     TasksRepository tasksRepository;
