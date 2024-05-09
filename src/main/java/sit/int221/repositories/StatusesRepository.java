@@ -7,5 +7,5 @@ import java.util.List;
 
 
 public interface StatusesRepository extends JpaRepository<Statuses, Integer> {
-    Statuses findByNameContains(String name);
+    Statuses findByName(String name);
 }
