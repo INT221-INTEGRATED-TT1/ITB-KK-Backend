@@ -36,9 +36,10 @@ public class StatusesController {
     ModelMapper modelMapper;
 
     @GetMapping("")
-    public List<StatusDetailDTO> getAllTasks() {
-        List<Statuses> statusesList = statusesService.getAllStatusesList();
-        return listMapper.mapList(statusesList, StatusDetailDTO.class, modelMapper);
+    public List<Statuses> getAllTasks() {
+//        List<Statuses> statusesList = statusesService.getAllStatusesList();
+//        return listMapper.mapList(statusesList, StatusDetailDTO.class, modelMapper);
+        return statusesService.getAllStatusesList();
     }
 
     @GetMapping("/{statusId}")
