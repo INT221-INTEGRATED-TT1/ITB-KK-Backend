@@ -34,8 +34,8 @@ public class StatusesService {
 
     public Statuses insertStatus(NewStatusDTO newStatusDTO){
         newStatusDTO.setName(newStatusDTO.getName().trim());
-        if(!findStatusByName(newStatusDTO.getName()).getName().isBlank()){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        if(findStatusByName(newStatusDTO.getName()) != null){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "ชื่อซ้ำไอน้อง");
         }
         if(newStatusDTO.getDescription() != null && !newStatusDTO.getDescription().isBlank()){newStatusDTO.setDescription(newStatusDTO.getDescription().trim());}
         else{newStatusDTO.setDescription(null);}
