@@ -46,9 +46,10 @@ public class StatusesController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public StatusDetailDTO createStatus(@Valid @RequestBody NewStatusDTO status){
-        Statuses insertedTask = statusesService.insertStatus(status);
-        return modelMapper.map(insertedTask, StatusDetailDTO.class);
+    public Statuses createStatus(@Valid @RequestBody NewStatusDTO status){
+//        Statuses insertedTask = statusesService.insertStatus(status);
+//        return modelMapper.map(insertedTask, StatusDetailDTO.class);
+        return statusesService.insertStatus(status);
     }
 
     @PutMapping("/{statusId}")
