@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewStatusDTO;
 import sit.int221.entities.Statuses;
@@ -53,7 +54,11 @@ public class StatusesService {
         statusesRepository.deleteById(statusId);
     }
 
-    public void updateTasksStatus(Integer newStatus, Integer oldStatus){
+    @Transactional
+    public void updateTasksStatus(Integer oldStatus, Integer newStatus){
+        System.out.println(oldStatus);
+        System.out.println(newStatus);
+
         task2Repository.transferStatusAllBy(newStatus, oldStatus);
         removeStatus(oldStatus);
     }

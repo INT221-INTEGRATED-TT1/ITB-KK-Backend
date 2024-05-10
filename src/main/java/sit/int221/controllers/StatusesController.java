@@ -66,9 +66,9 @@ public class StatusesController {
         return Collections.emptyMap();
     }
 
-    @DeleteMapping("/{newStatusId}/{oldStatusId}")
-    public Map<String, Object> deleteStatus(@PathVariable Integer newStatusId, @PathVariable Integer oldStatusId){
-        statusesService.updateTasksStatus(newStatusId,oldStatusId);
+    @DeleteMapping("/{oldStatusId}/{newStatusId}")
+    public Map<String, Object> transferStatus(@PathVariable Integer oldStatusId, @PathVariable Integer newStatusId){
+        statusesService.updateTasksStatus(oldStatusId,newStatusId);
         return Collections.emptyMap();
     }
 
