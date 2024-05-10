@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewStatusDTO;
 import sit.int221.entities.Statuses;
+import sit.int221.entities.Tasks;
 import sit.int221.exceptions.StatusNotFoundException;
+import sit.int221.exceptions.TaskNotFoundException;
 import sit.int221.repositories.StatusesRepository;
 
 import java.util.List;
@@ -25,7 +27,7 @@ public class StatusesService {
 
     public Statuses findStatusById(Integer statusID) {
         return statusesRepository.findById(statusID).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Task "+ statusID + " Doesn't Exist!!!"));
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Status "+ statusID + " Doesn't Exist!!!"));
     }
 
     public Statuses findStatusByName(String statusName) {
@@ -43,16 +45,13 @@ public class StatusesService {
         return statusesRepository.saveAndFlush(statuses);
     }
 
-//    public Tasks removeTask(Integer taskId) {
-//        Tasks findTasks = statusesRepository.findById(taskId).orElseThrow(
-//                () -> new TaskNotFoundException("NOT FOUND"));
-//        statusesRepository.deleteById(taskId);
-//        return findTasks;
-//    }
+    public void removeStatus(Integer statusId) {
+        findStatusById(statusId);
+        statusesRepository.deleteById(statusId);
+    }
 
     public Statuses updateStatus(Integer statusId, NewStatusDTO newStatus) {
-        Statuses findStatus = statusesRepository.findById(statusId).orElseThrow(
-                () -> new StatusNotFoundException("NOT FOUND"));
+        Statuses findStatus = findStatusById(statusId);
         if((findStatusByName(newStatus.getName()) != null) && !(findStatus.getName().equals(newStatus.getName()))){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Duplicate i sus");
         }
