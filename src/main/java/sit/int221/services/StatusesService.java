@@ -53,7 +53,7 @@ public class StatusesService {
     public Statuses updateStatus(Integer statusId, NewStatusDTO newStatus) {
         Statuses findStatus = statusesRepository.findById(statusId).orElseThrow(
                 () -> new StatusNotFoundException("NOT FOUND"));
-        if(findStatusByName(newStatus.getName()) != null){
+        if((findStatusByName(newStatus.getName()) != null) && !(findStatus.getName().equals(newStatus.getName()))){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Duplicate i sus");
         }
         findStatus.setName(newStatus.getName().trim());
