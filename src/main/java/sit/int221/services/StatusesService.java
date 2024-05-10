@@ -11,6 +11,7 @@ import sit.int221.entities.Tasks;
 import sit.int221.exceptions.StatusNotFoundException;
 import sit.int221.exceptions.TaskNotFoundException;
 import sit.int221.repositories.StatusesRepository;
+import sit.int221.repositories.Task2Repository;
 
 import java.util.List;
 
@@ -18,6 +19,8 @@ import java.util.List;
 public class StatusesService {
     @Autowired
     StatusesRepository statusesRepository;
+    @Autowired
+    Task2Repository task2Repository;
     @Autowired
     ModelMapper modelMapper;
 
@@ -48,6 +51,11 @@ public class StatusesService {
     public void removeStatus(Integer statusId) {
         findStatusById(statusId);
         statusesRepository.deleteById(statusId);
+    }
+
+    public void updateTasksStatus(Integer newStatus, Integer oldStatus){
+        task2Repository.transferStatusAllBy(newStatus, oldStatus);
+        removeStatus(oldStatus);
     }
 
     public Statuses updateStatus(Integer statusId, NewStatusDTO newStatus) {

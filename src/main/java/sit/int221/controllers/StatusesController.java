@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import sit.int221.dtos.request.NewStatusDTO;
 import sit.int221.dtos.response.StatusDetailDTO;
-import sit.int221.dtos.response.TaskHomeDTO;
 import sit.int221.entities.Statuses;
-import sit.int221.entities.Tasks;
 import sit.int221.exceptions.ErrorResponse;
 import sit.int221.exceptions.StatusNotFoundException;
 import sit.int221.exceptions.TaskNotFoundException;
@@ -65,6 +63,12 @@ public class StatusesController {
     @DeleteMapping("/{statusId}")
     public Map<String, Object> deleteStatus(@PathVariable Integer statusId){
         statusesService.removeStatus(statusId);
+        return Collections.emptyMap();
+    }
+
+    @DeleteMapping("/{newStatusId}/{oldStatusId}")
+    public Map<String, Object> deleteStatus(@PathVariable Integer newStatusId, @PathVariable Integer oldStatusId){
+        statusesService.updateTasksStatus(newStatusId,oldStatusId);
         return Collections.emptyMap();
     }
 
