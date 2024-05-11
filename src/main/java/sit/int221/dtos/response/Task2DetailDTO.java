@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 
 @Data
 public class Task2DetailDTO {
+    private Integer id;
     private String title;
     private String description;
     private String assignees;
