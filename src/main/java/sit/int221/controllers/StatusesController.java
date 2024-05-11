@@ -74,7 +74,7 @@ public class StatusesController {
 
     @ExceptionHandler(StatusNotFoundException.class)
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    public ResponseEntity<ErrorResponse> handleStatusNotFoundException(TaskNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleStatusNotFoundException(StatusNotFoundException ex, WebRequest request) {
         ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneOffset.UTC);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         ErrorResponse errorResponse = new ErrorResponse(

@@ -31,7 +31,7 @@ public class StatusesService {
 
     public Statuses findStatusById(Integer statusID) {
         return statusesRepository.findById(statusID).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Status "+ statusID + " Doesn't Exist!!!"));
+                () -> new StatusNotFoundException("NOT FOUND"));
     }
 
     public Statuses findStatusByName(String statusName) {
@@ -56,9 +56,6 @@ public class StatusesService {
 
     @Transactional
     public void updateTasksStatus(Integer oldStatus, Integer newStatus){
-        System.out.println(oldStatus);
-        System.out.println(newStatus);
-
         task2Repository.transferStatusAllBy(newStatus, oldStatus);
         removeStatus(oldStatus);
     }
