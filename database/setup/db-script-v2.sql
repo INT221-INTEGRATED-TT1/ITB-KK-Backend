@@ -31,9 +31,9 @@ CREATE TABLE `task_base`.`statuses` (
 USE task_base;
 ALTER TABLE statuses AUTO_INCREMENT = 101;
 INSERT INTO statuses (statusName, statusDescription, statusColor) VALUES ('No Status',null,'#5A5A5A');
-INSERT INTO statuses (statusName, statusDescription, statusColor) VALUES ('To Do',null,'#321b00');
-INSERT INTO statuses (statusName, statusDescription, statusColor) VALUES ('Doing',null,'#102049');
-INSERT INTO statuses (statusName, statusDescription, statusColor) VALUES ('Done',null,'#043109');
+INSERT INTO statuses (statusName, statusDescription, statusColor) VALUES ('To Do',null,'#E79D13');
+INSERT INTO statuses (statusName, statusDescription, statusColor) VALUES ('Doing',null,'#0090FF');
+INSERT INTO statuses (statusName, statusDescription, statusColor) VALUES ('Done',null,'#1A9338');
 INSERT INTO tasks (title, description, assignees, status, createdOn, updatedOn) VALUES ('TaskTitle1TaskTitle2TaskTitle3TaskTitle4TaskTitle5TaskTitle6TaskTitle7TaskTitle8TaskTitle9TaskTitle0','Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti1Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti2Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti3Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti4Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti5','Assignees1Assignees2Assignees3','NO_STATUS','2024-04-22 09:00:00','2024-04-22 09:00:00');
 INSERT INTO tasks (title, description, assignees, status, createdOn, updatedOn) VALUES ('Repository',null,null,'TO_DO','2024-04-22 09:05:00','2024-04-22 14:00:00');
 INSERT INTO tasks (title, description, assignees, status, createdOn, updatedOn) VALUES ('ดาต้าเบส','ສ້າງຖານຂໍ້ມູນ','あなた、彼、彼女 (私ではありません)','DOING','2024-04-22 09:10:00','2024-04-25 00:00:00');
