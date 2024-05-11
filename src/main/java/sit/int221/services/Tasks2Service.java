@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewTask2DTO;
 import sit.int221.entities.Statuses;
@@ -19,6 +20,8 @@ public class Tasks2Service {
     @Autowired
     Task2Repository task2Repository;
     @Autowired
+    StatusesService statusesService;
+    @Autowired
     ModelMapper modelMapper;
 
     public List<Tasks2> getAllTasks2List() {
@@ -29,22 +32,25 @@ public class Tasks2Service {
         return task2Repository.findById(taskId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Task2 "+ taskId + " Doesn't Exist!!!"));
     }
-
+    @Transactional
     public Tasks2 insertTask2(NewTask2DTO tasks2){
-        tasks2.setTitle(tasks2.getTitle().trim());
+        Tasks2 newTasks2 = new Tasks2();
+        newTasks2.setTitle(tasks2.getTitle().trim());
         if(tasks2.getDescription() != null && !tasks2.getDescription().isBlank()){tasks2.setDescription(tasks2.getDescription().trim());}
         else{tasks2.setDescription(null);}
+        newTasks2.setDescription(tasks2.getDescription());
         if(tasks2.getAssignees() != null && !tasks2.getAssignees().isBlank()){tasks2.setAssignees(tasks2.getAssignees().trim());}
         else{tasks2.setAssignees(null);}
-        if(tasks2.getStatuses() == null){
-            tasks2.setStatuses(new Statuses());
-            tasks2.getStatuses().setId(101);
-            tasks2.getStatuses().setName("No Status");
-            tasks2.getStatuses().setDescription(null);
-            tasks2.getStatuses().setColor("#5A5A5A");
+        newTasks2.setAssignees(tasks2.getAssignees());
+        newTasks2.setStatuses(new Statuses());
+        if(tasks2.getStatusNo() == null || tasks2.getStatusNo() < 100){
+           throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Status I SUS");
+        } else {
+            Statuses statuses = statusesService.findStatusById(tasks2.getStatusNo());
+            newTasks2.setStatuses(statuses);
         }
-        Tasks2 task2 = modelMapper.map(tasks2, Tasks2.class);
-        return task2Repository.saveAndFlush(task2);
+        return task2Repository.saveAndFlush(newTasks2);
+
     }
 
     public Tasks2 removeTask2(Integer taskId) {
@@ -54,19 +60,17 @@ public class Tasks2Service {
         return findTasks;
     }
 
-
-    public Tasks2 updateTask2(Integer taskId, Tasks2 newTaskData) {
+    public Tasks2 updateTask2(Integer taskId, NewTask2DTO newTaskData) {
         Tasks2 findTasks = task2Repository.findById(taskId).orElseThrow(
                 () -> new TaskNotFoundException("NOT FOUND"));
         findTasks.setTitle(newTaskData.getTitle().trim());
         findTasks.setAssignees(newTaskData.getAssignees().trim());
         findTasks.setDescription(newTaskData.getDescription().trim());
-//        findTasks.setStatus(newTaskData.getStatus());
-        if(findTasks.getStatuses() != newTaskData.getStatuses()){
-            findTasks.getStatuses().setId(newTaskData.getStatuses().getId());
-            findTasks.getStatuses().setName(newTaskData.getStatuses().getName());
-            findTasks.getStatuses().setDescription(newTaskData.getStatuses().getDescription());
-            findTasks.getStatuses().setColor(newTaskData.getStatuses().getColor());
+        if(newTaskData.getStatusNo() == null || newTaskData.getStatusNo() < 100){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Status I SUS");
+        } else {
+            Statuses statuses = statusesService.findStatusById(newTaskData.getStatusNo());
+            findTasks.setStatuses(statuses);
         }
         task2Repository.save(findTasks);
         return findTasks;

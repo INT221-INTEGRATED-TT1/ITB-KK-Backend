@@ -57,7 +57,7 @@ public class Tasks2Controller {
     }
 
     @PutMapping("/{taskId}")
-    public Task2DetailDTO putTask(@PathVariable Integer taskId, @RequestBody Tasks2 newTaskData){
+    public Task2DetailDTO putTask(@PathVariable Integer taskId, @RequestBody NewTask2DTO newTaskData){
         Tasks2 updateTask = tasks2Service.updateTask2(taskId, newTaskData);
         return modelMapper.map(updateTask, Task2DetailDTO.class);
     }

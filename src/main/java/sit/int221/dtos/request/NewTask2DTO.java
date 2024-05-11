@@ -1,5 +1,6 @@
 package sit.int221.dtos.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import sit.int221.entities.Statuses;
@@ -11,5 +12,10 @@ public class NewTask2DTO {
     private String title;
     private String description;
     private String assignees;
-    private Statuses statuses;
+//    @JsonIgnore
+//    private Statuses statuses;
+//    public Integer getStatusNo(){
+//        return  statuses.getId();
+//    }
+    private Integer statusNo;
 }

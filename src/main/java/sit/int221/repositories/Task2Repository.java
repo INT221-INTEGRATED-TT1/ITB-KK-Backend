@@ -11,4 +11,8 @@ public interface Task2Repository extends JpaRepository<Tasks2, Integer> {
     @Modifying
     @Query("UPDATE Tasks2 t SET t.statuses.id = :newStatus WHERE t.statuses.id = :oldStatus")
     void transferStatusAllBy(Integer newStatus, Integer oldStatus);
+
+//    @Modifying
+//    @Query("INSERT INTO Tasks2(t2.title, t2.description, t2.assignees, t2.statusNo) " + "VALUES (:newTitle, :newDescription, :newAssignees, :newStatusNo)")
+//    Tasks2 insertTask(String newTitle, String newDescription, String newAssignees, Integer newStatusNo);
 }

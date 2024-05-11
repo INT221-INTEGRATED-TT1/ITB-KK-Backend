@@ -32,7 +32,6 @@ public class Tasks2 {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssX")
     @UpdateTimestamp
     private Timestamp updatedOn;
-//    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "statusNo")
     private Statuses statuses;
