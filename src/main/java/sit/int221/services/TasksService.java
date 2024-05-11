@@ -15,7 +15,6 @@ import sit.int221.repositories.TasksRepository;
 import java.util.List;
 
 @Service
-
 public class TasksService {
     @Autowired
     TasksRepository tasksRepository;
@@ -60,8 +59,4 @@ public class TasksService {
         return findTasks;
     }
 
-//    public boolean isEmpty(String str){
-//        if(str.trim().isEmpty() |)
-//        return true;
-//    }
 }
