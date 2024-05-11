@@ -67,12 +67,8 @@ public class TasksController {
     public ResponseEntity<ErrorResponse> handleTaskNotFoundException(TaskNotFoundException ex, WebRequest request) {
 //        ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneOffset.UTC);
 //        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-        sdf2.setTimeZone(TimeZone.getTimeZone("UTC"));
         ErrorResponse errorResponse = new ErrorResponse(
 //                zonedDateTime.format(formatter),
-                sdf2.format(timestamp),
                 HttpStatus.NOT_FOUND.value(),
                 ex.getMessage(),
                 request.getDescription(false)

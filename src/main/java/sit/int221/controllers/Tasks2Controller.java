@@ -65,11 +65,7 @@ public class Tasks2Controller {
     @ExceptionHandler(TaskNotFoundException.class)
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
     public ResponseEntity<ErrorResponse> handleTaskNotFoundException(TaskNotFoundException ex, WebRequest request) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-        sdf2.setTimeZone(TimeZone.getTimeZone("UTC"));
         ErrorResponse errorResponse = new ErrorResponse(
-                sdf2.format(timestamp),
                 HttpStatus.NOT_FOUND.value(),
                 ex.getMessage(),
                 request.getDescription(false)
