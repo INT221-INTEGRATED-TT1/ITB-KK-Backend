@@ -42,12 +42,12 @@ public class Tasks2Service {
         if(tasks2.getAssignees() != null && !tasks2.getAssignees().isBlank()){tasks2.setAssignees(tasks2.getAssignees().trim());}
         else{tasks2.setAssignees(null);}
         newTasks2.setAssignees(tasks2.getAssignees());
-        newTasks2.setStatuses(new Statuses());
+        newTasks2.setStatus(new Statuses());
         if(tasks2.getStatusNo() == null || tasks2.getStatusNo() < 100){
            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Status I SUS");
         } else {
             Statuses statuses = statusesService.findStatusById(tasks2.getStatusNo());
-            newTasks2.setStatuses(statuses);
+            newTasks2.setStatus(statuses);
         }
         return task2Repository.saveAndFlush(newTasks2);
 
@@ -70,7 +70,7 @@ public class Tasks2Service {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Status I SUS");
         } else {
             Statuses statuses = statusesService.findStatusById(newTaskData.getStatusNo());
-            findTasks.setStatuses(statuses);
+            findTasks.setStatus(statuses);
         }
         task2Repository.save(findTasks);
         return findTasks;

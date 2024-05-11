@@ -9,7 +9,7 @@ import sit.int221.entities.Tasks2;
 
 public interface Task2Repository extends JpaRepository<Tasks2, Integer> {
     @Modifying
-    @Query("UPDATE Tasks2 t SET t.statuses.id = :newStatus WHERE t.statuses.id = :oldStatus")
+    @Query("UPDATE Tasks2 t SET t.status.id = :newStatus WHERE t.status.id = :oldStatus")
     void transferStatusAllBy(Integer newStatus, Integer oldStatus);
 
 //    @Modifying
