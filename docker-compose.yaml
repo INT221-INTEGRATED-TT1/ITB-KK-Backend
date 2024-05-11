@@ -35,6 +35,23 @@ services:
       - MYSQL_URL=database
     networks:
       - test-networks
+  frontend:
+    image: title20306/frontend:latest
+    ports:
+      - 1449:1449
+    networks:
+    - default
+  proxy:
+    build: 
+      context: ./proxy
+      dockerfile: proxy.Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - default
+      - test-networks
+    
+  
 
 
 networks:
