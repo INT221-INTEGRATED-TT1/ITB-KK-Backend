@@ -47,6 +47,8 @@ services:
       dockerfile: proxy.Dockerfile
     ports:
       - "80:80"
+    restart: 
+      always
     networks:
       - default
       - test-networks
