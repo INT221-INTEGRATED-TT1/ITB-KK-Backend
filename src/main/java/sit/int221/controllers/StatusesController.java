@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import sit.int221.dtos.request.NewStatusDTO;
 import sit.int221.dtos.response.StatusDetailDTO;
+import sit.int221.dtos.response.StatusHomeCountDTO;
 import sit.int221.entities.Statuses;
 import sit.int221.exceptions.ErrorResponse;
 import sit.int221.exceptions.StatusNotFoundException;
@@ -34,12 +35,18 @@ public class StatusesController {
     ModelMapper modelMapper;
 
     @GetMapping("")
-    public List<Statuses> getAllTasks() {
+    public List<Statuses> getAllStatuses() {
 //        List<Statuses> statusesList = statusesService.getAllStatusesList();
 //        return listMapper.mapList(statusesList, StatusDetailDTO.class, modelMapper);
         return statusesService.getAllStatusesList();
     }
 
+    @GetMapping("/count")
+    public List<StatusHomeCountDTO> getAllStatusesWithCount() {
+//        List<Statuses> statusesList = statusesService.getAllStatusesList();
+//        return listMapper.mapList(statusesList, StatusDetailDTO.class, modelMapper);
+        return statusesService.getStatusWithCountTasksInUse();
+    }
     @GetMapping("/{statusId}")
     public Statuses findStatusById(@PathVariable Integer statusId) {
         return statusesService.findStatusById(statusId);
