@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewStatusDTO;
+import sit.int221.dtos.response.StatusHomeCountDTO;
 import sit.int221.entities.Statuses;
 import sit.int221.entities.Tasks;
 import sit.int221.exceptions.StatusNotFoundException;
@@ -14,6 +15,7 @@ import sit.int221.exceptions.TaskNotFoundException;
 import sit.int221.repositories.StatusesRepository;
 import sit.int221.repositories.Task2Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -66,10 +68,25 @@ public class StatusesService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Duplicate i sus");
         }
         findStatus.setName(newStatus.getName().trim());
-        if(newStatus.getDescription() != null && !newStatus.getDescription().isBlank()){newStatus.setDescription(newStatus.getDescription().trim());}
-        else{newStatus.setDescription(null);}
+        if(newStatus.getDescription() != null && !newStatus.getDescription().isBlank()){findStatus.setDescription(newStatus.getDescription().trim());}
+        else{findStatus.setDescription(null);}
         findStatus.setColor(newStatus.getColor().trim());
         statusesRepository.save(findStatus);
         return findStatus;
+    }
+
+    public List<StatusHomeCountDTO> getStatusWithCountTasksInUse(){
+        List<Statuses> statusesList = getAllStatusesList();
+        List<StatusHomeCountDTO> statusHomeCountDTOS = new ArrayList<>();
+        for (int i = 0; i < statusesList.stream().count(); i++) {
+            StatusHomeCountDTO statusHomeCountDTO = new StatusHomeCountDTO();
+            statusHomeCountDTO.setId(statusesList.get(i).getId());
+            statusHomeCountDTO.setName(statusesList.get(i).getName());
+            statusHomeCountDTO.setDescription(statusesList.get(i).getDescription());
+            statusHomeCountDTO.setColor(statusesList.get(i).getColor());
+            statusHomeCountDTO.setCount(task2Repository.countByStatus(statusesList.get(i)));
+            statusHomeCountDTOS.add(statusHomeCountDTO);
+        }
+        return statusHomeCountDTOS;
     }
 }
