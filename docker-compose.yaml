@@ -8,8 +8,8 @@ services:
       - MYSQL_ROOT_PASSWORD=mysql@sit
     volumes:
       - ./database/mysql-lib:/var/lib/mysql
-      # - ./database/my.cnf:/etc/my.cnf
-      # - ./database/setup/db-script-v2.sql:/docker-entrypoint-initdb.d/db-script-v2.sql
+      - ./database/my.cnf:/etc/my.cnf
+      - ./database/setup/db-script-v2.sql:/docker-entrypoint-initdb.d/db-script-v2.sql
     restart: on-failure
     networks:
     - test-networks

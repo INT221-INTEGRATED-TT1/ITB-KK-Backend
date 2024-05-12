@@ -68,8 +68,8 @@ public class StatusesService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Duplicate i sus");
         }
         findStatus.setName(newStatus.getName().trim());
-        if(newStatus.getDescription() != null && !newStatus.getDescription().isBlank()){newStatus.setDescription(newStatus.getDescription().trim());}
-        else{newStatus.setDescription(null);}
+        if(newStatus.getDescription() != null && !newStatus.getDescription().isBlank()){findStatus.setDescription(newStatus.getDescription().trim());}
+        else{findStatus.setDescription(null);}
         findStatus.setColor(newStatus.getColor().trim());
         statusesRepository.save(findStatus);
         return findStatus;

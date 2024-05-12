@@ -32,7 +32,7 @@ public class Tasks2Service {
         return task2Repository.findById(taskId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Task2 "+ taskId + " Doesn't Exist!!!"));
     }
-    @Transactional
+
     public Tasks2 insertTask2(NewTask2DTO tasks2){
         Tasks2 newTasks2 = new Tasks2();
         newTasks2.setTitle(tasks2.getTitle().trim());
