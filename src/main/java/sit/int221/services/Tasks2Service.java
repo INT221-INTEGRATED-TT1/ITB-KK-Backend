@@ -36,11 +36,11 @@ public class Tasks2Service {
     public Tasks2 insertTask2(NewTask2DTO tasks2){
         Tasks2 newTasks2 = new Tasks2();
         newTasks2.setTitle(tasks2.getTitle().trim());
-        if(tasks2.getDescription() != null && !tasks2.getDescription().isBlank()){tasks2.setDescription(tasks2.getDescription().trim());}
-        else{tasks2.setDescription(null);}
+        if(tasks2.getDescription() != null && !tasks2.getDescription().isBlank()){newTasks2.setDescription(tasks2.getDescription().trim());}
+        else{newTasks2.setDescription(null);}
         newTasks2.setDescription(tasks2.getDescription());
-        if(tasks2.getAssignees() != null && !tasks2.getAssignees().isBlank()){tasks2.setAssignees(tasks2.getAssignees().trim());}
-        else{tasks2.setAssignees(null);}
+        if(tasks2.getAssignees() != null && !tasks2.getAssignees().isBlank()){newTasks2.setAssignees(tasks2.getAssignees().trim());}
+        else{newTasks2.setAssignees(null);}
         newTasks2.setAssignees(tasks2.getAssignees());
         newTasks2.setStatus(new Statuses());
         if(tasks2.getStatusNo() == null || tasks2.getStatusNo() < 100){

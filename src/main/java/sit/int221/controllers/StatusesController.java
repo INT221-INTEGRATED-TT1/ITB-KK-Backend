@@ -41,7 +41,7 @@ public class StatusesController {
         return statusesService.getAllStatusesList();
     }
 
-    @GetMapping("/count")
+    @GetMapping("/statuses")
     public List<StatusHomeCountDTO> getAllStatusesWithCount() {
 //        List<Statuses> statusesList = statusesService.getAllStatusesList();
 //        return listMapper.mapList(statusesList, StatusDetailDTO.class, modelMapper);
