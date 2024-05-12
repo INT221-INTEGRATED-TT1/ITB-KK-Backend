@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-@CrossOrigin(origins = {"http://localhost:5173","https://intproj23.sit.kmutt.ac.th","http://localhost:80" ,"http://ip23tt1.sit.kmutt.ac.th","http://ip23tt1.sit.kmutt.ac.th:1449", "http://10.0.208.95:5173/"})
+@CrossOrigin(origins = {"http://localhost:5173","https://intproj23.sit.kmutt.ac.th","http://localhost:80" ,"http://ip23tt1.sit.kmutt.ac.th","http://ip23tt1.sit.kmutt.ac.th:1449", "http://intproj23.sit.kmutt.ac.th:8080"})
 @RestController
 @RequestMapping("/v2/statuses")
 public class StatusesController {
