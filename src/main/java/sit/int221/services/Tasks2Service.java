@@ -64,8 +64,10 @@ public class Tasks2Service {
         Tasks2 findTasks = task2Repository.findById(taskId).orElseThrow(
                 () -> new TaskNotFoundException("NOT FOUND"));
         findTasks.setTitle(newTaskData.getTitle().trim());
-        findTasks.setAssignees(newTaskData.getAssignees().trim());
-        findTasks.setDescription(newTaskData.getDescription().trim());
+        if(newTaskData.getAssignees() != null && !newTaskData.getAssignees().isBlank()){findTasks.setAssignees(newTaskData.getAssignees().trim());}
+        else{findTasks.setAssignees(null);}
+        if(newTaskData.getDescription() != null && !newTaskData.getDescription().isBlank()){findTasks.setDescription(newTaskData.getDescription().trim());}
+        else{findTasks.setDescription(null);}
         if(newTaskData.getStatusNo() == null || newTaskData.getStatusNo() < 100){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Status I SUS");
         } else {
