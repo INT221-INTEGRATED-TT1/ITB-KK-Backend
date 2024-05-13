@@ -38,15 +38,13 @@ public class Tasks2Service {
         newTasks2.setTitle(tasks2.getTitle().trim());
         if(tasks2.getDescription() != null && !tasks2.getDescription().isBlank()){newTasks2.setDescription(tasks2.getDescription().trim());}
         else{newTasks2.setDescription(null);}
-        newTasks2.setDescription(tasks2.getDescription());
         if(tasks2.getAssignees() != null && !tasks2.getAssignees().isBlank()){newTasks2.setAssignees(tasks2.getAssignees().trim());}
         else{newTasks2.setAssignees(null);}
-        newTasks2.setAssignees(tasks2.getAssignees());
         newTasks2.setStatus(new Statuses());
-        if(tasks2.getStatusNo() == null || tasks2.getStatusNo() < 100){
+        if(tasks2.getStatus() == null || tasks2.getStatus() < 0){
            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Status I SUS");
         } else {
-            Statuses statuses = statusesService.findStatusById(tasks2.getStatusNo());
+            Statuses statuses = statusesService.findStatusById(tasks2.getStatus());
             newTasks2.setStatus(statuses);
         }
         return task2Repository.saveAndFlush(newTasks2);
@@ -64,12 +62,14 @@ public class Tasks2Service {
         Tasks2 findTasks = task2Repository.findById(taskId).orElseThrow(
                 () -> new TaskNotFoundException("NOT FOUND"));
         findTasks.setTitle(newTaskData.getTitle().trim());
-        findTasks.setAssignees(newTaskData.getAssignees().trim());
-        findTasks.setDescription(newTaskData.getDescription().trim());
-        if(newTaskData.getStatusNo() == null || newTaskData.getStatusNo() < 100){
+        if(newTaskData.getAssignees() != null && !newTaskData.getAssignees().isBlank()){findTasks.setAssignees(newTaskData.getAssignees().trim());}
+        else{findTasks.setAssignees(null);}
+        if(newTaskData.getDescription() != null && !newTaskData.getDescription().isBlank()){findTasks.setDescription(newTaskData.getDescription().trim());}
+        else{findTasks.setDescription(null);}
+        if(newTaskData.getStatus() == null || newTaskData.getStatus() < 0){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Status I SUS");
         } else {
-            Statuses statuses = statusesService.findStatusById(newTaskData.getStatusNo());
+            Statuses statuses = statusesService.findStatusById(newTaskData.getStatus());
             findTasks.setStatus(statuses);
         }
         task2Repository.save(findTasks);
