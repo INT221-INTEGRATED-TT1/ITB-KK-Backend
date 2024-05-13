@@ -43,7 +43,7 @@ public class StatusesService {
     public Statuses insertStatus(NewStatusDTO newStatusDTO){
         newStatusDTO.setName(newStatusDTO.getName().trim());
         if(findStatusByName(newStatusDTO.getName()) != null){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Duplicate i sus");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Duplicate Status Kub");
         }
         if(newStatusDTO.getDescription() != null && !newStatusDTO.getDescription().isBlank()){newStatusDTO.setDescription(newStatusDTO.getDescription().trim());}
         else{newStatusDTO.setDescription(null);}
@@ -64,13 +64,18 @@ public class StatusesService {
 
     public Statuses updateStatus(Integer statusId, NewStatusDTO newStatus) {
         Statuses findStatus = findStatusById(statusId);
-        if((findStatusByName(newStatus.getName()) != null) && !(findStatus.getName().equals(newStatus.getName()))){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Duplicate i sus");
+        if(findStatus.getId() == 1 || findStatus.getName().equalsIgnoreCase("no status")){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't Edit No Status na kub");
         }
-        findStatus.setName(newStatus.getName().trim());
+        if((findStatusByName(newStatus.getName()) != null) && !(findStatus.getName().equals(newStatus.getName()))){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Duplicate Status Kub");
+        }
+        if(newStatus.getName() != null && !newStatus.getName().trim().isEmpty()){findStatus.setName(newStatus.getName().trim());}
+        else {throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status name do not empty kub");}
         if(newStatus.getDescription() != null && !newStatus.getDescription().isBlank()){findStatus.setDescription(newStatus.getDescription().trim());}
         else{findStatus.setDescription(null);}
-        findStatus.setColor(newStatus.getColor().trim());
+        if(newStatus.getColor() != null && !newStatus.getColor().isBlank()){findStatus.setColor(newStatus.getColor().trim());}
+        else{findStatus.setColor(null);}
         statusesRepository.save(findStatus);
         return findStatus;
     }
