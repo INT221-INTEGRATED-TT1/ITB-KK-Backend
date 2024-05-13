@@ -34,17 +34,9 @@ public class StatusesController {
     @Autowired
     ModelMapper modelMapper;
 
-    @GetMapping("")
-    public List<Statuses> getAllStatuses() {
-//        List<Statuses> statusesList = statusesService.getAllStatusesList();
-//        return listMapper.mapList(statusesList, StatusDetailDTO.class, modelMapper);
-        return statusesService.getAllStatusesList();
-    }
 
-    @GetMapping("/statuses")
+    @GetMapping("")
     public List<StatusHomeCountDTO> getAllStatusesWithCount() {
-//        List<Statuses> statusesList = statusesService.getAllStatusesList();
-//        return listMapper.mapList(statusesList, StatusDetailDTO.class, modelMapper);
         return statusesService.getStatusWithCountTasksInUse();
     }
     @GetMapping("/{statusId}")

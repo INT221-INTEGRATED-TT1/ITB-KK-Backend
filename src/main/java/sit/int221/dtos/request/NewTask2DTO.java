@@ -12,10 +12,5 @@ public class NewTask2DTO {
     private String title;
     private String description;
     private String assignees;
-//    @JsonIgnore
-//    private Statuses statuses;
-//    public Integer getStatusNo(){
-//        return  statuses.getId();
-//    }
-    private Integer statusNo;
+    private Integer status;
 }
