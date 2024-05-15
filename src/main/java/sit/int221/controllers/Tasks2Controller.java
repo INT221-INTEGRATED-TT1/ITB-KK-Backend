@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import sit.int221.dtos.request.NewTask2DTO;
 import sit.int221.dtos.response.Task2DetailDTO;
+import sit.int221.dtos.response.Task2FilterDTO;
 import sit.int221.dtos.response.Task2HomeDTO;
+import sit.int221.dtos.response.TaskHomeDTO;
 import sit.int221.entities.Tasks2;
 import sit.int221.exceptions.ErrorResponse;
 import sit.int221.exceptions.TaskNotFoundException;
@@ -21,7 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimeZone;
 
-@CrossOrigin(origins = {"http://localhost:5173","http://intproj23.sit.kmutt.ac.th","http://localhost:8080" ,"http://ip23tt1.sit.kmutt.ac.th","http://ip23tt1.sit.kmutt.ac.th:1449", "http://intproj23.sit.kmutt.ac.th:8080"})
+@CrossOrigin(origins = {"http://localhost:5173","http://intproj23.sit.kmutt.ac.th","http://localhost:8080" ,"http://ip23tt1.sit.kmutt.ac.th","http://ip23tt1.sit.kmutt.ac.th:1449", "http://intproj23.sit.kmutt.ac.th:8080", "http://10.5.5.180:5173"})
 @RestController
 @RequestMapping("/v2/tasks")
 public class Tasks2Controller {
@@ -33,9 +35,17 @@ public class Tasks2Controller {
     ModelMapper modelMapper;
 
     @GetMapping("")
-    public List<Task2HomeDTO> getAllTasks() {
-        List<Tasks2> tasksList = tasks2Service.getAllTasks2List();
-        return listMapper.mapList(tasksList, Task2HomeDTO.class, modelMapper);
+    public ResponseEntity<Object> getAllTasksSortedAndFiltered(
+            @RequestParam(defaultValue = "createdOn") String sortBy,
+            @RequestParam(defaultValue = "") String[] filterStatuses,
+            @RequestParam(defaultValue = "ASC") String direction
+    ) {
+        List<Tasks2> tasksList = tasks2Service.getFilterTasksAndSorted(sortBy, filterStatuses, direction);
+        if(!sortBy.isEmpty() && filterStatuses.length > 0 && !direction.isEmpty() ){
+            List<Task2FilterDTO> task2FilterDTOS = listMapper.mapList(tasksList, Task2FilterDTO.class, modelMapper);
+            return  ResponseEntity.ok(task2FilterDTOS);
+        }
+        return ResponseEntity.ok(listMapper.mapList(tasksList, Task2HomeDTO.class, modelMapper));
     }
 
     @GetMapping("/{taskId}")
