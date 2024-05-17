@@ -53,8 +53,6 @@ services:
       - default
       - test-networks
     
-  
-
 
 networks:
   test-networks:

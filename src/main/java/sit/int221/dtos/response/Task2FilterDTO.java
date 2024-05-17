@@ -7,9 +7,10 @@ import sit.int221.entities.Statuses;
 @Data
 public class Task2FilterDTO {
     private Integer id;
+    private String title;
     private String assignees;
     private Statuses status;
-    public String getStatus(){
-        return status.getName();
-    }
+//    public String getStatus(){
+//        return status.getName();
+//    }
 }
