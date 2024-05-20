@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+import sit.int221.dtos.request.LimitStatusMaskReq;
 import sit.int221.dtos.request.NewStatusDTO;
+import sit.int221.dtos.response.LimitStatusMaskRes;
 import sit.int221.dtos.response.StatusDetailDTO;
 import sit.int221.dtos.response.StatusHomeCountDTO;
 import sit.int221.entities.Statuses;
@@ -58,11 +60,12 @@ public class StatusesController {
         return modelMapper.map(updatedStatus, StatusDetailDTO.class);
     }
 
-    @GetMapping("/maximum-task")
-    public Statuses toggleLimitStatuses(@PathVariable Integer statusId) {
-        return statusesService.findStatusById(statusId);
+    @PatchMapping("/maximum-task")
+    public ResponseEntity<Object> toggleLimitStatus(@RequestBody LimitStatusMaskReq limitStatusMaskReq){
+        LimitStatusMaskRes limitStatusMaskRes = statusesService.toggleLimitStatusMask(limitStatusMaskReq);
+        return ResponseEntity.ok(limitStatusMaskRes);
     }
-
+    
     @DeleteMapping("/{statusId}")
     public Map<String, Object> deleteStatus(@PathVariable Integer statusId){
         statusesService.removeStatus(statusId);

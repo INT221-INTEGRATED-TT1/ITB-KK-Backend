@@ -9,13 +9,15 @@ import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewTask2DTO;
 import sit.int221.entities.Statuses;
 import sit.int221.entities.Tasks2;
+import sit.int221.exceptions.ErrorResponse;
+import sit.int221.exceptions.StatusNotExistException;
+import sit.int221.exceptions.StatusNotFoundException;
 import sit.int221.exceptions.TaskNotFoundException;
 import sit.int221.repositories.Task2Repository;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,10 +59,21 @@ public class Tasks2Service {
         }
         newTasks2.setStatus(new Statuses());
         if (tasks2.getStatus() == null || tasks2.getStatus() < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Status I SUS");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status Does not exist");
         } else {
-            Statuses statuses = statusesService.findStatusById(tasks2.getStatus());
-            newTasks2.setStatus(statuses);
+            try{
+                Statuses statuses = statusesService.findStatusById(tasks2.getStatus());
+                newTasks2.setStatus(statuses);
+            } catch (Exception e){
+                Map<String, Object> body = new HashMap<>();
+                body.put("timestamp", LocalDateTime.now().toString());
+                body.put("status", HttpStatus.BAD_REQUEST.value());
+                body.put("error", "Bad Request");
+                body.put("message", "Status Does not exist");
+                body.put("field", "status");
+                body.put("path", "/v2/tasks");
+                throw new StatusNotExistException("status", "Status Does not exist");
+            }
         }
         return task2Repository.saveAndFlush(newTasks2);
 
