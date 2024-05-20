@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-@CrossOrigin(origins = {"http://localhost:5173","http://intproj23.sit.kmutt.ac.th","http://localhost:80" ,"http://ip23tt1.sit.kmutt.ac.th","http://ip23tt1.sit.kmutt.ac.th:1449", "http://intproj23.sit.kmutt.ac.th:8080", "http://10.5.5.180:5173"})
+@CrossOrigin(origins = {"http://localhost:5173","http://intproj23.sit.kmutt.ac.th","http://localhost:80" ,"http://ip23tt1.sit.kmutt.ac.th","http://ip23tt1.sit.kmutt.ac.th:1449", "http://intproj23.sit.kmutt.ac.th:8080"})
 @RestController
 @RequestMapping("/v2/statuses")
 public class StatusesController {
@@ -49,13 +49,11 @@ public class StatusesController {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public Statuses createStatus(@Valid @RequestBody NewStatusDTO status){
-//        Statuses insertedTask = statusesService.insertStatus(status);
-//        return modelMapper.map(insertedTask, StatusDetailDTO.class);
         return statusesService.insertStatus(status);
     }
 
     @PutMapping("/{statusId}")
-    public StatusDetailDTO putStatus(@PathVariable Integer statusId, @RequestBody NewStatusDTO newStatus){
+    public StatusDetailDTO putStatus(@PathVariable Integer statusId,@Valid @RequestBody NewStatusDTO newStatus){
         Statuses updatedStatus = statusesService.updateStatus(statusId, newStatus);
         return modelMapper.map(updatedStatus, StatusDetailDTO.class);
     }
@@ -65,7 +63,7 @@ public class StatusesController {
         LimitStatusMaskRes limitStatusMaskRes = statusesService.toggleLimitStatusMask(limitStatusMaskReq);
         return ResponseEntity.ok(limitStatusMaskRes);
     }
-    
+
     @DeleteMapping("/{statusId}")
     public Map<String, Object> deleteStatus(@PathVariable Integer statusId){
         statusesService.removeStatus(statusId);
@@ -74,18 +72,9 @@ public class StatusesController {
 
     @DeleteMapping("/{oldStatusId}/{newStatusId}")
     public Map<String, Object> transferStatus(@PathVariable Integer oldStatusId, @PathVariable Integer newStatusId){
-        statusesService.updateTasksStatus(oldStatusId,newStatusId);
+        statusesService.updateTasksStatusAndDelete(oldStatusId,newStatusId);
         return Collections.emptyMap();
     }
 
-    @ExceptionHandler(StatusNotFoundException.class)
-    @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    public ResponseEntity<ErrorResponse> handleStatusNotFoundException(StatusNotFoundException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-    }
+
 }

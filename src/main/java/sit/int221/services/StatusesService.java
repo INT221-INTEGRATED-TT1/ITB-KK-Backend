@@ -13,6 +13,7 @@ import sit.int221.dtos.response.StatusHomeCountDTO;
 import sit.int221.entities.Statuses;
 import sit.int221.entities.Tasks;
 import sit.int221.exceptions.StatusNotFoundException;
+import sit.int221.exceptions.StatusUniqueException;
 import sit.int221.exceptions.TaskNotFoundException;
 import sit.int221.repositories.StatusesRepository;
 import sit.int221.repositories.Task2Repository;
@@ -42,47 +43,76 @@ public class StatusesService {
         return statusesRepository.findByName(statusName);
     }
 
-    public Statuses insertStatus(NewStatusDTO newStatusDTO){
+    public Statuses insertStatus(NewStatusDTO newStatusDTO) {
         newStatusDTO.setName(newStatusDTO.getName().trim());
-        if(findStatusByName(newStatusDTO.getName()) != null){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Duplicate Status Kub");
+        if (findStatusByName(newStatusDTO.getName()) != null) {
+            throw new StatusUniqueException("Status name must be unique");
         }
-        if(newStatusDTO.getDescription() != null && !newStatusDTO.getDescription().isBlank()){newStatusDTO.setDescription(newStatusDTO.getDescription().trim());}
-        else{newStatusDTO.setDescription(null);}
+        if (newStatusDTO.getDescription() != null && !newStatusDTO.getDescription().isBlank()) {
+            newStatusDTO.setDescription(newStatusDTO.getDescription().trim());
+        } else {
+            newStatusDTO.setDescription(null);
+        }
         Statuses statuses = modelMapper.map(newStatusDTO, Statuses.class);
         return statusesRepository.saveAndFlush(statuses);
     }
 
     public void removeStatus(Integer statusId) {
-        findStatusById(statusId);
-        statusesRepository.deleteById(statusId);
+        Statuses findStatus = findStatusById(statusId);
+        if (findStatus.getName().equalsIgnoreCase("no status")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Status cannot be deleted.");
+        } else if (findStatus.getName().equalsIgnoreCase("done")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Done cannot be deleted.");
+        }
+        try {
+            statusesRepository.deleteById(statusId);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "destination status for task transfer not specified.");
+        }
     }
 
     @Transactional
-    public void updateTasksStatus(Integer oldStatus, Integer newStatus){
-        task2Repository.transferStatusAllBy(newStatus, oldStatus);
+    public void updateTasksStatusAndDelete(Integer oldStatus, Integer newStatus) {
+        findStatusById(oldStatus);
+        if(oldStatus == newStatus){throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "destination status for task transfer must be different from current status.");}
+        try {
+            task2Repository.transferStatusAllBy(newStatus, oldStatus);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the specified status for task transfer does not exist.");
+        }
         removeStatus(oldStatus);
     }
 
     public Statuses updateStatus(Integer statusId, NewStatusDTO newStatus) {
         Statuses findStatus = findStatusById(statusId);
-        if(findStatus.getId() == 1 || findStatus.getName().equalsIgnoreCase("no status")){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't Edit No Status na kub");
+        if (findStatus.getName().equalsIgnoreCase("no status")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Status cannot be modified.");
+        } else if (findStatus.getName().equalsIgnoreCase("done")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Done cannot be modified.");
         }
-        if((findStatusByName(newStatus.getName()) != null) && !(findStatus.getName().equals(newStatus.getName()))){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Duplicate Status Kub");
+        if ((findStatusByName(newStatus.getName()) != null) && !(findStatus.getName().equals(newStatus.getName()))) {
+            throw new StatusUniqueException("Status name must be unique");
         }
-        if(newStatus.getName() != null && !newStatus.getName().trim().isEmpty()){findStatus.setName(newStatus.getName().trim());}
-        else {throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status name do not empty kub");}
-        if(newStatus.getDescription() != null && !newStatus.getDescription().isBlank()){findStatus.setDescription(newStatus.getDescription().trim());}
-        else{findStatus.setDescription(null);}
-        if(newStatus.getColor() != null && !newStatus.getColor().isBlank()){findStatus.setColor(newStatus.getColor().trim());}
-        else{findStatus.setColor(null);}
+        if (newStatus.getName() != null && !newStatus.getName().trim().isEmpty()) {
+            findStatus.setName(newStatus.getName().trim());
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status name does not empty");
+        }
+        if (newStatus.getDescription() != null && !newStatus.getDescription().isBlank()) {
+            findStatus.setDescription(newStatus.getDescription().trim());
+        } else {
+            findStatus.setDescription(null);
+        }
+        if (newStatus.getColor() != null && !newStatus.getColor().isBlank()) {
+            findStatus.setColor(newStatus.getColor().trim());
+        } else {
+            findStatus.setColor(null);
+        }
         statusesRepository.save(findStatus);
         return findStatus;
     }
 
-    public List<StatusHomeCountDTO> getStatusWithCountTasksInUse(){
+    public List<StatusHomeCountDTO> getStatusWithCountTasksInUse() {
         List<Statuses> statusesList = getAllStatusesList();
         List<StatusHomeCountDTO> statusHomeCountDTOS = new ArrayList<>();
         for (int i = 0; i < statusesList.stream().count(); i++) {
@@ -97,7 +127,7 @@ public class StatusesService {
         return statusHomeCountDTOS;
     }
 
-    public LimitStatusMaskRes toggleLimitStatusMask(LimitStatusMaskReq limitStatusMaskReq){
+    public LimitStatusMaskRes toggleLimitStatusMask(LimitStatusMaskReq limitStatusMaskReq) {
         LimitStatusMaskRes limitStatusMaskRes = new LimitStatusMaskRes();
         limitStatusMaskRes.setName("Limit Task Status");
         limitStatusMaskRes.setLimit(limitStatusMaskReq.getLimit());

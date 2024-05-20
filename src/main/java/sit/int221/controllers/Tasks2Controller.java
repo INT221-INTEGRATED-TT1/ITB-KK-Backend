@@ -72,15 +72,5 @@ public class Tasks2Controller {
         return modelMapper.map(updateTask, Task2DetailDTO.class);
     }
 
-    @ExceptionHandler(TaskNotFoundException.class)
-    @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    public ResponseEntity<ErrorResponse> handleTaskNotFoundException(TaskNotFoundException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-    }
 
 }

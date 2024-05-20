@@ -65,14 +65,7 @@ public class Tasks2Service {
                 Statuses statuses = statusesService.findStatusById(tasks2.getStatus());
                 newTasks2.setStatus(statuses);
             } catch (Exception e){
-                Map<String, Object> body = new HashMap<>();
-                body.put("timestamp", LocalDateTime.now().toString());
-                body.put("status", HttpStatus.BAD_REQUEST.value());
-                body.put("error", "Bad Request");
-                body.put("message", "Status Does not exist");
-                body.put("field", "status");
-                body.put("path", "/v2/tasks");
-                throw new StatusNotExistException("status", "Status Does not exist");
+                throw new StatusNotExistException("Status Does not exist");
             }
         }
         return task2Repository.saveAndFlush(newTasks2);
@@ -101,10 +94,14 @@ public class Tasks2Service {
             findTasks.setDescription(null);
         }
         if (newTaskData.getStatus() == null || newTaskData.getStatus() < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Status I SUS");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Status Selected");
         } else {
-            Statuses statuses = statusesService.findStatusById(newTaskData.getStatus());
-            findTasks.setStatus(statuses);
+            try {
+                Statuses statuses = statusesService.findStatusById(newTaskData.getStatus());
+                findTasks.setStatus(statuses);
+            } catch (Exception e){
+                throw new StatusNotExistException("Status Does not exist");
+            }
         }
         task2Repository.save(findTasks);
         return findTasks;
