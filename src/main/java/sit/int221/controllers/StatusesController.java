@@ -58,6 +58,11 @@ public class StatusesController {
         return modelMapper.map(updatedStatus, StatusDetailDTO.class);
     }
 
+    @GetMapping("/maximum-task")
+    public Statuses toggleLimitStatuses(@PathVariable Integer statusId) {
+        return statusesService.findStatusById(statusId);
+    }
+
     @DeleteMapping("/{statusId}")
     public Map<String, Object> deleteStatus(@PathVariable Integer statusId){
         statusesService.removeStatus(statusId);

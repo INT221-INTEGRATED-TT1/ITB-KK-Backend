@@ -5,5 +5,4 @@ import sit.int221.entities.Tasks;
 
 
 public interface TasksRepository extends JpaRepository<Tasks, Integer> {
-
 }

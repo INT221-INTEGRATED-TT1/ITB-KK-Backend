@@ -11,7 +11,6 @@ import java.util.List;
 
 
 public interface Task2Repository extends JpaRepository<Tasks2, Integer> {
-
     
     int countByStatus(Statuses statuses);
     @Modifying

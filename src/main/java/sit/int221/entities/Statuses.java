@@ -17,4 +17,6 @@ public class Statuses {
     private String description;
     @Column(name = "statusColor", length = 10)
     private String color;
+//    @Column(name = "limitMaximumTask", nullable = false)
+//    private Boolean limitMaximumTask;
 }
