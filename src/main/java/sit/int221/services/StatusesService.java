@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import sit.int221.dtos.request.LimitStatusMaskReq;
 import sit.int221.dtos.request.NewStatusDTO;
+import sit.int221.dtos.response.LimitStatusMaskRes;
 import sit.int221.dtos.response.StatusHomeCountDTO;
 import sit.int221.entities.Statuses;
 import sit.int221.entities.Tasks;
@@ -93,5 +95,13 @@ public class StatusesService {
             statusHomeCountDTOS.add(statusHomeCountDTO);
         }
         return statusHomeCountDTOS;
+    }
+
+    public LimitStatusMaskRes toggleLimitStatusMask(LimitStatusMaskReq limitStatusMaskReq){
+        LimitStatusMaskRes limitStatusMaskRes = new LimitStatusMaskRes();
+        limitStatusMaskRes.setName("Limit Task Status");
+        limitStatusMaskRes.setLimit(limitStatusMaskReq.getLimit());
+        limitStatusMaskRes.setLimitMaximumTask(limitStatusMaskReq.getLimitMaximumTask());
+        return limitStatusMaskRes;
     }
 }
