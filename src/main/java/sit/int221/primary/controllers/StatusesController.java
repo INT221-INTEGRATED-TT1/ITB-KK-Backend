@@ -1,4 +1,4 @@
-package sit.int221.controllers;
+package sit.int221.primary.controllers;
 
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -6,24 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 import sit.int221.dtos.request.LimitStatusMaskReq;
 import sit.int221.dtos.request.NewStatusDTO;
 import sit.int221.dtos.response.LimitStatusMaskRes;
 import sit.int221.dtos.response.StatusDetailDTO;
 import sit.int221.dtos.response.StatusHomeCountDTO;
-import sit.int221.entities.Statuses;
-import sit.int221.exceptions.ErrorResponse;
-import sit.int221.exceptions.StatusNotFoundException;
+import sit.int221.primary.entities.Statuses;
 import sit.int221.services.ListMapper;
 import sit.int221.services.StatusesService;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 
 @CrossOrigin(origins = {"http://localhost:5173","http://intproj23.sit.kmutt.ac.th","http://localhost:80" ,"http://ip23tt1.sit.kmutt.ac.th","http://ip23tt1.sit.kmutt.ac.th:1449", "http://intproj23.sit.kmutt.ac.th:8080"})
 @RestController

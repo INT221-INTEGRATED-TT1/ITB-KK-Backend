@@ -16,6 +16,7 @@ public class WebSecurityConfig {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeRequests(authorize -> authorize.requestMatchers("/authentications/**").permitAll()
                         .requestMatchers("/v2/tasks/**").permitAll()
+                        .requestMatchers(("/users/**")).permitAll()
 //                        .requestMatchers("/v2/statuses/**").permitAll()
                         .anyRequest().authenticated()).httpBasic(withDefaults());
         return httpSecurity.build();

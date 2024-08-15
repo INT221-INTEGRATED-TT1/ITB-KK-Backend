@@ -1,4 +1,4 @@
-package sit.int221.entities;
+package sit.int221.primary.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;

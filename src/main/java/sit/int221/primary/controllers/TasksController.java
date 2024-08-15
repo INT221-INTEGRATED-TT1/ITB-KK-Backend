@@ -1,4 +1,4 @@
-package sit.int221.controllers;
+package sit.int221.primary.controllers;
 
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -10,16 +10,13 @@ import org.springframework.web.context.request.WebRequest;
 import sit.int221.dtos.request.NewTaskDTO;
 import sit.int221.dtos.response.TaskHomeDTO;
 import sit.int221.dtos.response.TaskDetailDTO;
-import sit.int221.entities.Tasks;
+import sit.int221.primary.entities.Tasks;
 import sit.int221.exceptions.ErrorResponse;
 import sit.int221.exceptions.TaskNotFoundException;
 import sit.int221.services.ListMapper;
 import sit.int221.services.TasksService;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.TimeZone;
 
 @CrossOrigin(origins = {"http://localhost:5173","http://localhost:5174","http://localhost:80" ,"http://ip23tt1.sit.kmutt.ac.th","http://ip23tt1.sit.kmutt.ac.th:1449", "http://10.0.208.95:5173/"})
 @RestController
