@@ -1,11 +1,8 @@
 package sit.int221.dtos.request;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
-import sit.int221.entities.TaskStatus;
+import sit.int221.primary.entities.TaskStatus;
 
 @Data
 public class NewTaskDTO {

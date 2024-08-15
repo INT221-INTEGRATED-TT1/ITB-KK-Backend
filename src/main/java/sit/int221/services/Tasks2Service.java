@@ -7,18 +7,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewTask2DTO;
-import sit.int221.entities.Statuses;
-import sit.int221.entities.Tasks2;
-import sit.int221.exceptions.ErrorResponse;
+import sit.int221.primary.entities.Statuses;
+import sit.int221.primary.entities.Tasks2;
 import sit.int221.exceptions.StatusNotExistException;
-import sit.int221.exceptions.StatusNotFoundException;
 import sit.int221.exceptions.TaskNotFoundException;
-import sit.int221.repositories.Task2Repository;
+import sit.int221.primary.repositories.Task2Repository;
 
 
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class Tasks2Service {

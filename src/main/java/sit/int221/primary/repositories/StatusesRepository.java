@@ -1,13 +1,7 @@
-package sit.int221.repositories;
+package sit.int221.primary.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import sit.int221.dtos.response.StatusHomeCountDTO;
-import sit.int221.entities.Statuses;
-
-import java.util.List;
+import sit.int221.primary.entities.Statuses;
 
 
 public interface StatusesRepository extends JpaRepository<Statuses, Integer> {
