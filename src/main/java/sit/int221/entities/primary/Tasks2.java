@@ -1,4 +1,4 @@
-package sit.int221.primary.entities;
+package sit.int221.entities.primary;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
@@ -10,8 +10,8 @@ import java.sql.Timestamp;
 
 @Entity
 @Data
-@Table(name = "tasks")
-public class Tasks {
+@Table(name = "tasks2")
+public class Tasks2 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false, insertable = false)
@@ -22,9 +22,6 @@ public class Tasks {
     private String description;
     @Column(name = "assignees", length = 30)
     private String assignees;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private TaskStatus status;
     @Column(name = "createdOn", nullable = false, updatable = false, insertable = false)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssX")
     @CreationTimestamp
@@ -33,6 +30,9 @@ public class Tasks {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssX")
     @UpdateTimestamp
     private Timestamp updatedOn;
+    @ManyToOne
+    @JoinColumn(name = "statusNo")
+    private Statuses status;
 
 }
 

@@ -1,4 +1,4 @@
-package sit.int221.primary.controllers;
+package sit.int221.controllers.primary;
 
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -10,7 +10,7 @@ import org.springframework.web.context.request.WebRequest;
 import sit.int221.dtos.request.NewTaskDTO;
 import sit.int221.dtos.response.TaskHomeDTO;
 import sit.int221.dtos.response.TaskDetailDTO;
-import sit.int221.primary.entities.Tasks;
+import sit.int221.entities.primary.Tasks;
 import sit.int221.exceptions.ErrorResponse;
 import sit.int221.exceptions.TaskNotFoundException;
 import sit.int221.services.ListMapper;

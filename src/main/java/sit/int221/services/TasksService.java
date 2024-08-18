@@ -6,10 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewTaskDTO;
-import sit.int221.primary.entities.TaskStatus;
-import sit.int221.primary.entities.Tasks;
+import sit.int221.entities.primary.TaskStatus;
+import sit.int221.entities.primary.Tasks;
 import sit.int221.exceptions.TaskNotFoundException;
-import sit.int221.primary.repositories.TasksRepository;
+import sit.int221.repositories.primary.TasksRepository;
 
 
 import java.util.List;

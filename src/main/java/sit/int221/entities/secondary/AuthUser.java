@@ -1,4 +1,4 @@
-package sit.int221.secondary.entities;
+package sit.int221.entities.secondary;
 
 import lombok.Getter;
 import lombok.Setter;

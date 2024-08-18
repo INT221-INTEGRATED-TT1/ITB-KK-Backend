@@ -10,11 +10,11 @@ import sit.int221.dtos.request.LimitStatusMaskReq;
 import sit.int221.dtos.request.NewStatusDTO;
 import sit.int221.dtos.response.LimitStatusMaskRes;
 import sit.int221.dtos.response.StatusHomeCountDTO;
-import sit.int221.primary.entities.Statuses;
+import sit.int221.entities.primary.Statuses;
 import sit.int221.exceptions.StatusNotFoundException;
 import sit.int221.exceptions.StatusUniqueException;
-import sit.int221.primary.repositories.StatusesRepository;
-import sit.int221.primary.repositories.Task2Repository;
+import sit.int221.repositories.primary.StatusesRepository;
+import sit.int221.repositories.primary.Task2Repository;
 
 import java.util.ArrayList;
 import java.util.List;

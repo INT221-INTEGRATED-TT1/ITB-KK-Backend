@@ -7,7 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import sit.int221.secondary.entities.UserTest;
+import sit.int221.entities.secondary.User;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -51,7 +51,7 @@ public class JwtTokenUtil implements Serializable {
 //        claims.put("info#1", "claim-objec 1");
 //        claims.put("info#2", "claim-objec 2");
 //        claims.put("info#3", "claim-objec 3");
-        UserTest userTest = new UserTest();
+        User userTest = new User();
         claims.put("oid", userTest.getOid());
         claims.put("username", userTest.getUsername());
         claims.put("password", userTest.getPassword());

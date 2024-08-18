@@ -6,6 +6,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -55,7 +60,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-
+//    @ExceptionHandler(ResponseStatusException.class)
+//    public ResponseEntity<Object> handlerResponseStatusException(ResponseStatusException ex){
+//        Map<String, Object> body = new LinkedHashMap<>();
+//        body.put("timestamp", LocalDateTime.now());
+//        body.put("status", ex.getStatus().value());
+//        body.put("error", ex.getStatus().getReasonPhrase());
+//        body.put("message", ex.getReason());
+//        body.put("path", "/status/{id}");
+//    }
 
 
 

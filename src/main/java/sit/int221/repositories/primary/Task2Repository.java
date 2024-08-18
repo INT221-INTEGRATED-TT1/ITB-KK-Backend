@@ -1,10 +1,10 @@
-package sit.int221.primary.repositories;
+package sit.int221.repositories.primary;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import sit.int221.primary.entities.Statuses;
-import sit.int221.primary.entities.Tasks2;
+import sit.int221.entities.primary.Statuses;
+import sit.int221.entities.primary.Tasks2;
 
 
 public interface Task2Repository extends JpaRepository<Tasks2, Integer> {
