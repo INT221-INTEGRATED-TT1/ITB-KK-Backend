@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "users")
-public class User {
+public class UserTest {
     @Id
     @Size(max = 36)
     @Column(name = "oid", nullable = false, length = 36)
@@ -36,7 +36,7 @@ public class User {
     @Column(name = "email", nullable = false, length = 50)
     private String email;
 
-    @Lob
+    //    @Lob
     @Column(name = "role")
     private String role;
 
