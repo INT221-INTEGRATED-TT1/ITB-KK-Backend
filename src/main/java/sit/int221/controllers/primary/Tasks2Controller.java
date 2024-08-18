@@ -1,4 +1,4 @@
-package sit.int221.primary.controllers;
+package sit.int221.controllers.primary;
 
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -10,7 +10,7 @@ import sit.int221.dtos.request.NewTask2DTO;
 import sit.int221.dtos.response.Task2DetailDTO;
 import sit.int221.dtos.response.Task2FilterDTO;
 import sit.int221.dtos.response.Task2HomeDTO;
-import sit.int221.primary.entities.Tasks2;
+import sit.int221.entities.primary.Tasks2;
 import sit.int221.services.ListMapper;
 import sit.int221.services.Tasks2Service;
 

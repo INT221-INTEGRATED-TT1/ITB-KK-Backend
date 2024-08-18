@@ -1,7 +1,7 @@
-package sit.int221.primary.repositories;
+package sit.int221.repositories.primary;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import sit.int221.primary.entities.Statuses;
+import sit.int221.entities.primary.Statuses;
 
 
 public interface StatusesRepository extends JpaRepository<Statuses, Integer> {

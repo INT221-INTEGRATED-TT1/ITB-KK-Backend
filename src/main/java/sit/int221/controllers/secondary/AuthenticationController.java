@@ -1,4 +1,4 @@
-package sit.int221.secondary.controllers;
+package sit.int221.controllers.secondary;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,18 +28,13 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody @Valid JwtRequestUser jwtRequestUser) {
-        try {
-            UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(jwtRequestUser.getUserName());
 
-            if (!passwordEncoder.matches(jwtRequestUser.getPassword(), userDetails.getPassword())) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username or Password is incorrect");
-            }
-
-//        String token = jwtTokenUtil.generateToken(userDetails);
-
-            return ResponseEntity.ok(userDetails);
-        } catch (UsernameNotFoundException e) {
+        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(jwtRequestUser.getUserName());
+        if (!passwordEncoder.matches(jwtRequestUser.getPassword(), userDetails.getPassword()) || userDetails.getUsername() == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username or Password is incorrect");
         }
+
+        String token = jwtTokenUtil.generateToken(userDetails);
+        return ResponseEntity.ok(token);
     }
 }

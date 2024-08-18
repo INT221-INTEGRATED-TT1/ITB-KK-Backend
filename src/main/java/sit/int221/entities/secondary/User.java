@@ -1,4 +1,4 @@
-package sit.int221.secondary.entities;
+package sit.int221.entities.secondary;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "users")
-public class UserTest {
+public class User {
     @Id
     @Size(max = 36)
     @Column(name = "oid", nullable = false, length = 36)

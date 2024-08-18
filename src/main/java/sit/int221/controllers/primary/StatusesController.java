@@ -1,4 +1,4 @@
-package sit.int221.primary.controllers;
+package sit.int221.controllers.primary;
 
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -11,7 +11,7 @@ import sit.int221.dtos.request.NewStatusDTO;
 import sit.int221.dtos.response.LimitStatusMaskRes;
 import sit.int221.dtos.response.StatusDetailDTO;
 import sit.int221.dtos.response.StatusHomeCountDTO;
-import sit.int221.primary.entities.Statuses;
+import sit.int221.entities.primary.Statuses;
 import sit.int221.services.ListMapper;
 import sit.int221.services.StatusesService;
 

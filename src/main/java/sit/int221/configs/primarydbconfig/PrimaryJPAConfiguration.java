@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 @EnableTransactionManagement
 @Configuration
 @EnableJpaRepositories(
-        basePackages = "sit.int221.primary.repositories",
+        basePackages = "sit.int221.repositories.primary",
         entityManagerFactoryRef = "primaryEntityManagerFactoryBean",
         transactionManagerRef = "primaryTransactionManager"
 )
@@ -27,7 +27,7 @@ public class PrimaryJPAConfiguration {
 
         return entityManagerFactoryBuilder
                 .dataSource(dataSource)
-                .packages("sit.int221.primary.entities")
+                .packages("sit.int221.entities.primary")
                 .build();
     }
 
