@@ -30,9 +30,11 @@ public class AuthenticationController {
     public ResponseEntity<Object> login(@RequestBody @Valid JwtRequestUser jwtRequestUser) {
 
         UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(jwtRequestUser.getUserName());
-        if (!passwordEncoder.matches(jwtRequestUser.getPassword(), userDetails.getPassword()) || userDetails.getUsername() == null) {
+        if (userDetails.getUsername() == null || !passwordEncoder.matches(jwtRequestUser.getPassword(), userDetails.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username or Password is incorrect");
         }
+
+        jwtUserDetailsService.validateInputs(jwtRequestUser.getUserName(), jwtRequestUser.getPassword());
 
         String token = jwtTokenUtil.generateToken(userDetails);
         return ResponseEntity.ok(token);
