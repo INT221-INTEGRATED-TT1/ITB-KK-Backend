@@ -16,16 +16,18 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable())
-                .authorizeRequests(authorize -> authorize.requestMatchers("/authentications/**").permitAll()
-                        .requestMatchers("/v2/tasks/**").permitAll()
-                        .requestMatchers(("/users/**")).permitAll()
-                        .requestMatchers("/v2/statuses/**").permitAll()
-                        .anyRequest().authenticated()).httpBasic(withDefaults());
+                .authorizeRequests(authorize -> authorize
+//                        .requestMatchers("/authentications/**").permitAll()
+//                        .requestMatchers("/v2/tasks/**").permitAll()
+//                        .requestMatchers(("/users/**")).permitAll()
+//                        .requestMatchers("/v2/statuses/**").permitAll()
+//                        .anyRequest().authenticated()).httpBasic(withDefaults());
+                        .anyRequest().permitAll());
         return httpSecurity.build();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
     }
 }
