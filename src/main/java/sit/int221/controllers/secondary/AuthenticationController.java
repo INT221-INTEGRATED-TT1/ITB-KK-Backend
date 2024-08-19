@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
 import sit.int221.dtos.request.JwtRequestUser;
+import sit.int221.entities.secondary.User;
 import sit.int221.services.JwtUserDetailsService;
 
 @RestController
@@ -36,7 +37,8 @@ public class AuthenticationController {
 
         jwtUserDetailsService.validateInputs(jwtRequestUser.getUserName(), jwtRequestUser.getPassword());
 
-        String token = jwtTokenUtil.generateToken(userDetails);
+        User user = jwtUserDetailsService.findByUserName(userDetails.getUsername());
+        String token = jwtTokenUtil.generateToken(userDetails, user);
         return ResponseEntity.ok(token);
     }
 }
