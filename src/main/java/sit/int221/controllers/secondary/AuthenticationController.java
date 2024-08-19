@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
 import sit.int221.dtos.request.JwtRequestUser;
+import sit.int221.dtos.response.AccessTokenDTOres;
 import sit.int221.entities.secondary.User;
 import sit.int221.services.JwtUserDetailsService;
 
@@ -38,7 +38,8 @@ public class AuthenticationController {
         jwtUserDetailsService.validateInputs(jwtRequestUser.getUserName(), jwtRequestUser.getPassword());
 
         User user = jwtUserDetailsService.findByUserName(userDetails.getUsername());
-        String token = jwtTokenUtil.generateToken(userDetails, user);
-        return ResponseEntity.ok(token);
+        AccessTokenDTOres accessTokenDTOres = new AccessTokenDTOres();
+        accessTokenDTOres.setAccess_token(jwtTokenUtil.generateToken(userDetails, user));
+        return ResponseEntity.ok(accessTokenDTOres);
     }
 }
