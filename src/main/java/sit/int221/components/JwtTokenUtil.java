@@ -21,6 +21,10 @@ public class JwtTokenUtil implements Serializable {
     private String SECRET_KEY;
     @Value("#{${jwt.max-token-interval-hour}*60*60*1000}")
     private long JWT_TOKEN_VALIDITY;
+    @Value("${jwt.iss}")
+    private String JWS_ISS;
+
+
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
     public String getUsernameFromToken(String token) {
@@ -46,18 +50,17 @@ public class JwtTokenUtil implements Serializable {
         return expiration.before(new Date());
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails, User user) {
+
         Map<String, Object> claims = new HashMap<>();
-//        claims.put("info#1", "claim-objec 1");
-//        claims.put("info#2", "claim-objec 2");
-//        claims.put("info#3", "claim-objec 3");
-        User userTest = new User();
-        claims.put("oid", userTest.getOid());
-        claims.put("username", userTest.getUsername());
-        claims.put("password", userTest.getPassword());
-        claims.put("name", userTest.getName());
-        claims.put("email", userTest.getEmail());
-        claims.put("role", userTest.getRole());
+
+//        System.out.println(userDetails);
+        claims.put("name", user.getName());
+        claims.put("oid", user.getOid());
+        claims.put("email", user.getEmail());
+        claims.put("role", user.getRole());
+
+
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
@@ -65,7 +68,9 @@ public class JwtTokenUtil implements Serializable {
         return Jwts.builder().setHeaderParam("typ", "JWT").setClaims(claims).setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
-                .signWith(signatureAlgorithm, SECRET_KEY).compact();
+                .setIssuer(JWS_ISS)
+                .signWith(signatureAlgorithm, SECRET_KEY)
+                .compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {

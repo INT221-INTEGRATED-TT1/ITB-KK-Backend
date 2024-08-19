@@ -13,7 +13,9 @@ import sit.int221.entities.secondary.User;
 import sit.int221.repositories.secondary.UserRepository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
@@ -24,6 +26,8 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(userName);
+        System.out.println(user);
+
         if (user == null) {
             throw new UsernameNotFoundException(userName + " doest not exist!!");
         }
@@ -36,6 +40,11 @@ public class JwtUserDetailsService implements UserDetailsService {
 //        roles.add(grantedAuthority);
         UserDetails userDetails = new AuthUser(userName, user.getPassword());
         return userDetails;
+    }
+
+    public User findByUserName(String username) {
+        return userRepository.findByUsername(username);
+
     }
 
     public void validateInputs(String userName, String password) {
