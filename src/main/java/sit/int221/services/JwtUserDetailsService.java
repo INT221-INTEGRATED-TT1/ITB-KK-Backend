@@ -29,7 +29,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         System.out.println(user);
 
         if (user == null) {
-            throw new UsernameNotFoundException(userName + " doest not exist!!");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
         }
 //        List<GrantedAuthority> roles = new ArrayList<>();
 //        GrantedAuthority grantedAuthority = new GrantedAuthority() {
@@ -44,15 +44,14 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     public User findByUserName(String username) {
         return userRepository.findByUsername(username);
-
     }
 
     public void validateInputs(String userName, String password) {
         if (userName == null || password == null || userName.isBlank() && password.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username or password is incorrect");
         }
-        if (userName.length() > 50 | password.length() > 14) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        if (userName.length() > 50 || password.length() > 14) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username or password is incorrect");
         }
     }
 
