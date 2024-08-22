@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
 import sit.int221.dtos.request.JwtRequestUser;
-import sit.int221.dtos.response.AccessTokenDTOres;
+import sit.int221.dtos.response.AccessTokenDTORes;
 import sit.int221.entities.secondary.User;
 import sit.int221.services.JwtUserDetailsService;
 
@@ -32,13 +32,13 @@ public class AuthenticationController {
 
         UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(jwtRequestUser.getUserName());
         if (userDetails.getUsername() == null || !passwordEncoder.matches(jwtRequestUser.getPassword(), userDetails.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username or Password is incorrect");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
         }
 
         jwtUserDetailsService.validateInputs(jwtRequestUser.getUserName(), jwtRequestUser.getPassword());
 
         User user = jwtUserDetailsService.findByUserName(userDetails.getUsername());
-        AccessTokenDTOres accessTokenDTOres = new AccessTokenDTOres();
+        AccessTokenDTORes accessTokenDTOres = new AccessTokenDTORes();
         accessTokenDTOres.setAccess_token(jwtTokenUtil.generateToken(userDetails, user));
         return ResponseEntity.ok(accessTokenDTOres);
     }
