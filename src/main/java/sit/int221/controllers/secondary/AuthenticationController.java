@@ -4,6 +4,9 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,14 +29,24 @@ public class AuthenticationController {
     JwtTokenUtil jwtTokenUtil;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    AuthenticationManager authenticationManager;
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody @Valid JwtRequestUser jwtRequestUser) {
+        try {
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(jwtRequestUser.getUserName(), jwtRequestUser.getPassword());
 
-        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(jwtRequestUser.getUserName());
-        if (userDetails.getUsername() == null || !passwordEncoder.matches(jwtRequestUser.getPassword(), userDetails.getPassword())) {
+            Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
         }
+
+        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(jwtRequestUser.getUserName());
+//        if (userDetails.getUsername() == null || !passwordEncoder.matches(jwtRequestUser.getPassword(), userDetails.getPassword())) {
+//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
+//        }
 
         jwtUserDetailsService.validateInputs(jwtRequestUser.getUserName(), jwtRequestUser.getPassword());
 
