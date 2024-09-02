@@ -2,6 +2,7 @@ package sit.int221.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -60,16 +61,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-//    @ExceptionHandler(ResponseStatusException.class)
-//    public ResponseEntity<Object> handlerResponseStatusException(ResponseStatusException ex){
-//        Map<String, Object> body = new LinkedHashMap<>();
-//        body.put("timestamp", LocalDateTime.now());
-//        body.put("status", ex.getStatus().value());
-//        body.put("error", ex.getStatus().getReasonPhrase());
-//        body.put("message", ex.getReason());
-//        body.put("path", "/status/{id}");
+//    @ExceptionHandler(AuthenticationException.class)
+//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+//    public ResponseEntity<ErrorResponse> handleAuthenticationException(Exception ex, WebRequest request) {
+//        ErrorResponse errorResponse = new ErrorResponse(
+//                HttpStatus.UNAUTHORIZED.value(),
+//                ex.getMessage(),
+//                request.getDescription(false));
+//        errorResponse.addValidationError("auth", "username or password is incorrect");
+//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
 //    }
-
-
 
 }
