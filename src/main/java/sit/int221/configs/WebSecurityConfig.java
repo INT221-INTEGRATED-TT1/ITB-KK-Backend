@@ -1,5 +1,6 @@
 package sit.int221.configs;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,22 +10,20 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfigurationSource;
 import sit.int221.filters.JwtAuthFilter;
 import sit.int221.services.JwtUserDetailsService;
-
-import java.util.Collections;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
+
+
     @Autowired
     JwtAuthFilter jwtAuthFilter;
     @Autowired
@@ -34,14 +33,14 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeRequests(authorize -> authorize
-//                        .requestMatchers("/authentications/login").permitAll()
+                        .requestMatchers("/authentications/**", "/error").permitAll()
 //                        .requestMatchers("/v2/tasks/**").permitAll()
 //                        .requestMatchers(("/users/**")).permitAll()
 //                        .requestMatchers("/v2/statuses/**").permitAll()
-//                        .anyRequest().authenticated())
-//                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-//                .httpBasic(withDefaults());
-                        .anyRequest().permitAll());
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .httpBasic(withDefaults());
+//                        .anyRequest().permitAll());
         return httpSecurity.build();
     }
 
