@@ -13,13 +13,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
 import sit.int221.dtos.request.JwtRequestUser;
 import sit.int221.dtos.response.AccessTokenDTORes;
 import sit.int221.entities.secondary.User;
+import sit.int221.exceptions.AuthException;
 import sit.int221.services.JwtUserDetailsService;
 
 @RestController
@@ -49,10 +49,8 @@ public class AuthenticationController {
             return ResponseEntity.ok(accessTokenDTOres);
 
         } catch (AuthenticationException ex) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect!");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
         }
-
-
     }
 
     @GetMapping("/validate-token")
@@ -61,22 +59,24 @@ public class AuthenticationController {
         String jwtToken = null;
 
         if (requestTokenHeader != null) {
+            System.out.println(requestTokenHeader);
             if (requestTokenHeader.startsWith("Bearer ")) {
                 jwtToken = requestTokenHeader.substring(7);
                 try {
                     claims = jwtTokenUtil.getAllClaimsFromToken(jwtToken);
                 } catch (IllegalArgumentException ex) {
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No token");
+                    throw new AuthException("Invalid JWT token");
                 } catch (ExpiredJwtException ex) {
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "JWT Token has expired");
+                    throw new AuthException("JWT Token has expired");
                 } catch (MalformedJwtException ex) {
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Malformed JWT token");
+                    throw new AuthException("Malformed JWT token");
                 } catch (SignatureException ex) {
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "JWT signature not valid");
+                    throw new AuthException("JWT signature not valid");
                 }
             } else {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "JWT Token does not begin with Bearer String");
+                throw new AuthException("JWT Token does not begin with Bearer String");
             }
+
         }
         return ResponseEntity.ok(claims);
     }

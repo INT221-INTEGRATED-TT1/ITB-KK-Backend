@@ -32,13 +32,13 @@ public class JwtUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
         }
-        List<GrantedAuthority> roles = new ArrayList<>();
-        GrantedAuthority grantedAuthority = new GrantedAuthority() {
-            public String getAuthority() {
-                return user.getRole();
-            }
-        };
-        roles.add(grantedAuthority);
+//        List<GrantedAuthority> roles = new ArrayList<>();
+//        GrantedAuthority grantedAuthority = new GrantedAuthority() {
+//            public String getAuthority() {
+//                return user.getRole();
+//            }
+//        };
+//        roles.add(grantedAuthority);
         UserDetails userDetails = new AuthUser(userName, user.getPassword());
         return userDetails;
     }

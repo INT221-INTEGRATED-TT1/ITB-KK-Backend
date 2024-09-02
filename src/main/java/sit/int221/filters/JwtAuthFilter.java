@@ -16,7 +16,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 import sit.int221.components.JwtTokenUtil;
 import sit.int221.services.JwtUserDetailsService;
 
@@ -25,45 +24,33 @@ import java.io.IOException;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-
-//    HandlerExceptionResolver exceptionResolver;
-
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-//    public JwtAuthFilter(HandlerExceptionResolver exceptionResolver) {
-//        this.exceptionResolver = exceptionResolver;
-//    }
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
-//        throws ServletException, IOException
         final String requestTokenHeader = request.getHeader("Authorization");
         String username = null;
         String jwtToken = null;
-//        try {
         if (requestTokenHeader != null) {
             if (requestTokenHeader.startsWith("Bearer ")) {
-                jwtToken = requestTokenHeader.substring(7);
-                username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-
                 jwtToken = requestTokenHeader.substring(7);
                 try {
                     username = jwtTokenUtil.getUsernameFromToken(jwtToken);
                 } catch (IllegalArgumentException e) {
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+                    System.out.println("Invalid JWT token");
                 } catch (ExpiredJwtException e) {
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+                    System.out.println("JWT Token has expired");
                 } catch (MalformedJwtException e) {
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+                    System.out.println("Malformed JWT token");
                 } catch (SignatureException e) {
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+                    System.out.println("JWT signature not valid");
                 }
             } else {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "JW T Token does not begin with Bearer String");
+                System.out.println("JWT Token does not begin with Bearer String");
             }
         }
 
@@ -78,9 +65,5 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         }
         chain.doFilter(request, response);
-//        }
-//        catch (Exception ex) {
-//            exceptionResolver.resolveException(request, response, null, ex);
-//        }
     }
 }
