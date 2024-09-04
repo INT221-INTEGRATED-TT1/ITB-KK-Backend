@@ -2,43 +2,27 @@ package sit.int221.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.entities.secondary.AuthUser;
-import sit.int221.entities.secondary.Localuser;
 import sit.int221.entities.secondary.User;
-import sit.int221.repositories.secondary.LocaluserRepository;
 import sit.int221.repositories.secondary.UserRepository;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private LocaluserRepository localuserRepository;
-
-    @Autowired
-    private LocalUserService localUserService;
-
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(userName);
-//        Localuser localuser = localuserRepository.findByUsername(userName);
         System.out.println(user);
 
 //        System.out.println("Service");
-        if (user == null ) {
+        if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
         }
 //        List<GrantedAuthority> roles = new ArrayList<>();
@@ -49,7 +33,6 @@ public class JwtUserDetailsService implements UserDetailsService {
 //        };
 //        roles.add(grantedAuthority);
         UserDetails userDetails = new AuthUser(userName, user.getPassword());
-        localUserService.findNewUser(userName);
         return userDetails;
     }
 

@@ -23,4 +23,6 @@ public class AuthUser extends User implements Serializable {
     public AuthUser(String userName, String password, Collection<? extends GrantedAuthority> authorities) {
         super(userName, password, authorities);
     }
+
+
 }

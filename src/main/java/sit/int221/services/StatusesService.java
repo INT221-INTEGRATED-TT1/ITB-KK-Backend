@@ -10,7 +10,7 @@ import sit.int221.dtos.request.LimitStatusMaskReq;
 import sit.int221.dtos.request.NewStatusDTO;
 import sit.int221.dtos.response.LimitStatusMaskRes;
 import sit.int221.dtos.response.StatusHomeCountDTO;
-import sit.int221.entities.primary.Statuses;
+import sit.int221.entities.primary.Statuses2;
 import sit.int221.exceptions.StatusNotFoundException;
 import sit.int221.exceptions.StatusUniqueException;
 import sit.int221.repositories.primary.StatusesRepository;
@@ -28,20 +28,20 @@ public class StatusesService {
     @Autowired
     ModelMapper modelMapper;
 
-    public List<Statuses> getAllStatusesList() {
+    public List<Statuses2> getAllStatusesList() {
         return statusesRepository.findAll();
     }
 
-    public Statuses findStatusById(Integer statusID) {
+    public Statuses2 findStatusById(Integer statusID) {
         return statusesRepository.findById(statusID).orElseThrow(
                 () -> new StatusNotFoundException("NOT FOUND"));
     }
 
-    public Statuses findStatusByName(String statusName) {
+    public Statuses2 findStatusByName(String statusName) {
         return statusesRepository.findByName(statusName);
     }
 
-    public Statuses insertStatus(NewStatusDTO newStatusDTO) {
+    public Statuses2 insertStatus(NewStatusDTO newStatusDTO) {
         newStatusDTO.setName(newStatusDTO.getName().trim());
         if (findStatusByName(newStatusDTO.getName()) != null) {
             throw new StatusUniqueException("Status name must be unique");
@@ -51,12 +51,12 @@ public class StatusesService {
         } else {
             newStatusDTO.setDescription(null);
         }
-        Statuses statuses = modelMapper.map(newStatusDTO, Statuses.class);
-        return statusesRepository.saveAndFlush(statuses);
+        Statuses2 statuses2 = modelMapper.map(newStatusDTO, Statuses2.class);
+        return statusesRepository.saveAndFlush(statuses2);
     }
 
     public void removeStatus(Integer statusId) {
-        Statuses findStatus = findStatusById(statusId);
+        Statuses2 findStatus = findStatusById(statusId);
         if (findStatus.getName().equalsIgnoreCase("no status")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Status cannot be deleted.");
         } else if (findStatus.getName().equalsIgnoreCase("done")) {
@@ -81,8 +81,8 @@ public class StatusesService {
         removeStatus(oldStatus);
     }
 
-    public Statuses updateStatus(Integer statusId, NewStatusDTO newStatus) {
-        Statuses findStatus = findStatusById(statusId);
+    public Statuses2 updateStatus(Integer statusId, NewStatusDTO newStatus) {
+        Statuses2 findStatus = findStatusById(statusId);
         if (findStatus.getName().equalsIgnoreCase("no status")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Status cannot be modified.");
         } else if (findStatus.getName().equalsIgnoreCase("done")) {
@@ -111,15 +111,15 @@ public class StatusesService {
     }
 
     public List<StatusHomeCountDTO> getStatusWithCountTasksInUse() {
-        List<Statuses> statusesList = getAllStatusesList();
+        List<Statuses2> statuses2List = getAllStatusesList();
         List<StatusHomeCountDTO> statusHomeCountDTOS = new ArrayList<>();
-        for (int i = 0; i < statusesList.stream().count(); i++) {
+        for (int i = 0; i < statuses2List.stream().count(); i++) {
             StatusHomeCountDTO statusHomeCountDTO = new StatusHomeCountDTO();
-            statusHomeCountDTO.setId(statusesList.get(i).getId());
-            statusHomeCountDTO.setName(statusesList.get(i).getName());
-            statusHomeCountDTO.setDescription(statusesList.get(i).getDescription());
-            statusHomeCountDTO.setColor(statusesList.get(i).getColor());
-            statusHomeCountDTO.setCount(task2Repository.countByStatus(statusesList.get(i)));
+            statusHomeCountDTO.setId(statuses2List.get(i).getId());
+            statusHomeCountDTO.setName(statuses2List.get(i).getName());
+            statusHomeCountDTO.setDescription(statuses2List.get(i).getDescription());
+            statusHomeCountDTO.setColor(statuses2List.get(i).getColor());
+            statusHomeCountDTO.setCount(task2Repository.countByStatus(statuses2List.get(i)));
             statusHomeCountDTOS.add(statusHomeCountDTO);
         }
         return statusHomeCountDTOS;
