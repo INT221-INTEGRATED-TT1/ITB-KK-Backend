@@ -21,6 +21,7 @@ import sit.int221.dtos.response.AccessTokenDTORes;
 import sit.int221.entities.secondary.User;
 import sit.int221.exceptions.AuthException;
 import sit.int221.services.JwtUserDetailsService;
+import sit.int221.services.LocalUserService;
 
 @RestController
 @RequestMapping("/authentications")
@@ -31,6 +32,9 @@ public class AuthenticationController {
     JwtTokenUtil jwtTokenUtil;
     @Autowired
     AuthenticationManager authenticationManager;
+
+    @Autowired
+    LocalUserService localUserService;
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody @Valid JwtRequestUser jwtRequestUser) {
@@ -52,6 +56,12 @@ public class AuthenticationController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
         }
     }
+
+    @PostMapping("newUser")
+    public ResponseEntity<Object> newUser(@RequestParam String username) {
+        return ResponseEntity.ok(jwtUserDetailsService.loadUserByUsername(username));
+    }
+
 
     @GetMapping("/validate-token")
     public ResponseEntity<Object> validateToken(@RequestHeader("Authorization") String requestTokenHeader) {
