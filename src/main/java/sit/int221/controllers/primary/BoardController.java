@@ -1,9 +1,15 @@
 package sit.int221.controllers.primary;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import sit.int221.components.JwtTokenUtil;
 import sit.int221.dtos.request.NewBoardDTO;
+import sit.int221.dtos.response.BoardResDTO;
 import sit.int221.entities.primary.Board;
 import sit.int221.services.BoardService;
 
@@ -14,15 +20,32 @@ import java.util.List;
 public class BoardController {
     @Autowired
     BoardService boardService;
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
 
     @GetMapping("")
-    public List<Board> getAllBoards(){
-        return boardService.getAllBoards();
+    public ResponseEntity<Object> getAllBoards() {
+        return ResponseEntity.ok(boardService.getAllBoards());
     }
 
+    // แตกเพราะไปแก้ db มั้งน่าจะ
     @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Board createBoard(@RequestBody NewBoardDTO boardDTO){
-        return boardService.insertBoard(boardDTO);
+    public ResponseEntity<BoardResDTO> createBoard(@RequestHeader("Authorization") String token,
+                                                   @RequestBody NewBoardDTO boardDTO) {
+        Claims claims = null;
+        String jwtToken = null;
+        if (token != null && token.startsWith("Bearer ")) {
+            jwtToken = token.substring(7);
+            try {
+                claims = jwtTokenUtil.getAllClaimsFromToken(jwtToken);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Unable to get JWT Token");
+            } catch (ExpiredJwtException e) {
+                System.out.println("JWT Token has expired");
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "JWT Token does not begin with Bearer String");
+        }
+        return ResponseEntity.ok(boardService.insertBoard(claims, boardDTO));
     }
 }

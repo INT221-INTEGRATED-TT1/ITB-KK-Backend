@@ -1,4 +1,4 @@
-package sit.int221.dtos.request;
+package sit.int221.dtos.response;
 
 import lombok.Data;
 
