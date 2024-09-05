@@ -4,8 +4,12 @@ import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import io.jsonwebtoken.Claims;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
 import sit.int221.dtos.request.NewBoardDTO;
 import sit.int221.dtos.response.BoardResDTO;
@@ -37,7 +41,7 @@ public class BoardService {
         System.out.println(oid);
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
         Board newBoard = new Board();
-        if (newBoard.getOwnerID() == null || newBoard.getOwnerID().isEmpty()) {
+        if (newBoard.getBoardID() == null || newBoard.getBoardID().isEmpty()) {
             newBoard.setBoardID(NanoIdUtils.randomNanoId(
                     NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
                     NanoIdUtils.DEFAULT_ALPHABET, 10));
@@ -57,6 +61,7 @@ public class BoardService {
     }
 
     public BoardResDTO getBoardResDTO(User user, Board board) {
+        // Need Refactor
         OwnerBoard ownerBoard = new OwnerBoard();
         ownerBoard.setOid(user.getOid());
         ownerBoard.setName(user.getName());
@@ -67,5 +72,19 @@ public class BoardService {
         boardResDTO.setBoardName(board.getBoardName());
         boardResDTO.setOwner(ownerBoard);
         return boardResDTO;
+    }
+
+    public BoardResDTO getBoardById(Claims claims,String id){
+        String oid = (String) claims.get("oid");
+
+        Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + "not found"));
+        User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
+        if(oid.equals(board.getOwnerID()) ){
+            return getBoardResDTO(user, board) ;
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"This user cannot access this board");
+        }
+
     }
 }

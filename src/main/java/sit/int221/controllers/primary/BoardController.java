@@ -28,7 +28,26 @@ public class BoardController {
         return ResponseEntity.ok(boardService.getAllBoards());
     }
 
-    // แตกเพราะไปแก้ db มั้งน่าจะ
+    @GetMapping("/{boardId}")
+    public ResponseEntity<BoardResDTO> findBoardById(@RequestHeader("Authorization") String token,@PathVariable String boardId){
+        Claims claims = null;
+        String jwtToken = null;
+        if (token != null && token.startsWith("Bearer ")) {
+            jwtToken = token.substring(7);
+            try {
+                claims = jwtTokenUtil.getAllClaimsFromToken(jwtToken);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Unable to get JWT Token");
+            } catch (ExpiredJwtException e) {
+                System.out.println("JWT Token has expired");
+            }
+        } else {
+
+            throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "JWT Token does not begin with Bearer String");
+        }
+        return  ResponseEntity.ok(boardService.getBoardById(claims,boardId));
+    }
+
     @PostMapping("")
     public ResponseEntity<BoardResDTO> createBoard(@RequestHeader("Authorization") String token,
                                                    @RequestBody NewBoardDTO boardDTO) {
@@ -46,6 +65,12 @@ public class BoardController {
         } else {
             throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "JWT Token does not begin with Bearer String");
         }
-        return ResponseEntity.ok(boardService.insertBoard(claims, boardDTO));
+//
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(boardService.insertBoard(claims, boardDTO));
     }
+
+
+
+
 }
