@@ -10,8 +10,8 @@ import java.sql.Timestamp;
 
 @Entity
 @Data
-@Table(name = "tasks")
-public class Tasks {
+@Table(name = "tasks1")
+public class Tasks1 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false, insertable = false)

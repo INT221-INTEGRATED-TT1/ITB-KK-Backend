@@ -11,7 +11,7 @@ import sit.int221.dtos.request.NewStatusDTO;
 import sit.int221.dtos.response.LimitStatusMaskRes;
 import sit.int221.dtos.response.StatusDetailDTO;
 import sit.int221.dtos.response.StatusHomeCountDTO;
-import sit.int221.entities.primary.Statuses;
+import sit.int221.entities.primary.Statuses2;
 import sit.int221.services.ListMapper;
 import sit.int221.services.StatusesService;
 
@@ -36,19 +36,19 @@ public class StatusesController {
         return statusesService.getStatusWithCountTasksInUse();
     }
     @GetMapping("/{statusId}")
-    public Statuses findStatusById(@PathVariable Integer statusId) {
+    public Statuses2 findStatusById(@PathVariable Integer statusId) {
         return statusesService.findStatusById(statusId);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public Statuses createStatus(@Valid @RequestBody NewStatusDTO status){
+    public Statuses2 createStatus(@Valid @RequestBody NewStatusDTO status){
         return statusesService.insertStatus(status);
     }
 
     @PutMapping("/{statusId}")
     public StatusDetailDTO putStatus(@PathVariable Integer statusId,@Valid @RequestBody NewStatusDTO newStatus){
-        Statuses updatedStatus = statusesService.updateStatus(statusId, newStatus);
+        Statuses2 updatedStatus = statusesService.updateStatus(statusId, newStatus);
         return modelMapper.map(updatedStatus, StatusDetailDTO.class);
     }
 

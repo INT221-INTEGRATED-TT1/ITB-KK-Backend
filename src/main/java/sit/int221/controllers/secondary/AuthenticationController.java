@@ -53,6 +53,7 @@ public class AuthenticationController {
         }
     }
 
+
     @GetMapping("/validate-token")
     public ResponseEntity<Object> validateToken(@RequestHeader("Authorization") String requestTokenHeader) {
         Claims claims = null;

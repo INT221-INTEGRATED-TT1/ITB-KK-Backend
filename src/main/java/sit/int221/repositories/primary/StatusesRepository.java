@@ -1,11 +1,11 @@
 package sit.int221.repositories.primary;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import sit.int221.entities.primary.Statuses;
+import sit.int221.entities.primary.Statuses2;
 
 
-public interface StatusesRepository extends JpaRepository<Statuses, Integer> {
-    Statuses findByName(String name);
+public interface StatusesRepository extends JpaRepository<Statuses2, Integer> {
+    Statuses2 findByName(String name);
 
 //    @Query("SELECT NEW sit.int221.dtos.response.StatusHomeCountDTO(s.id, s.name, s.description, s.color, COUNT(t2.status.id)) " +
 //            "FROM Statuses s " +

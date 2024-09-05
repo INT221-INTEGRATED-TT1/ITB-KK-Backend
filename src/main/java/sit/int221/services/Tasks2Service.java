@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewTask2DTO;
-import sit.int221.entities.primary.Statuses;
+import sit.int221.entities.primary.Statuses2;
 import sit.int221.entities.primary.Tasks2;
 import sit.int221.exceptions.StatusNotExistException;
 import sit.int221.exceptions.TaskNotFoundException;
@@ -53,13 +53,13 @@ public class Tasks2Service {
         } else {
             newTasks2.setAssignees(null);
         }
-        newTasks2.setStatus(new Statuses());
+        newTasks2.setStatus(new Statuses2());
         if (tasks2.getStatus() == null || tasks2.getStatus() < 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status Does not exist");
         } else {
             try{
-                Statuses statuses = statusesService.findStatusById(tasks2.getStatus());
-                newTasks2.setStatus(statuses);
+                Statuses2 statuses2 = statusesService.findStatusById(tasks2.getStatus());
+                newTasks2.setStatus(statuses2);
             } catch (Exception e){
                 throw new StatusNotExistException("Status Does not exist");
             }
@@ -93,8 +93,8 @@ public class Tasks2Service {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Status Selected");
         } else {
             try {
-                Statuses statuses = statusesService.findStatusById(newTaskData.getStatus());
-                findTasks.setStatus(statuses);
+                Statuses2 statuses2 = statusesService.findStatusById(newTaskData.getStatus());
+                findTasks.setStatus(statuses2);
             } catch (Exception e){
                 throw new StatusNotExistException("Status Does not exist");
             }

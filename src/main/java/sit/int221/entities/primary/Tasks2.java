@@ -32,7 +32,7 @@ public class Tasks2 {
     private Timestamp updatedOn;
     @ManyToOne
     @JoinColumn(name = "statusNo")
-    private Statuses status;
+    private Statuses2 status;
 
 }
 

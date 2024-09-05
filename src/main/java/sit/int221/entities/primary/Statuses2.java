@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "statuses")
-public class Statuses {
+@Table(name = "statuses2")
+public class Statuses2 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "statusNo", nullable = false, updatable = false, insertable = false)
@@ -17,6 +17,7 @@ public class Statuses {
     private String description;
     @Column(name = "statusColor", length = 10)
     private String color;
+
 //    @Column(name = "limitMaximumTask", nullable = false)
 //    private Boolean limitMaximumTask;
 }
