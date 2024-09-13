@@ -31,8 +31,13 @@ public class BoardService {
     @Autowired
     private UserRepository userRepository;
 
-    public List<Board> getAllBoards() {
-        return boardRepository.findAll();
+    public List<Board> getAllBoards(Claims claims) {
+        String oid = (String) claims.get("oid");
+
+//        Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + "not found"));
+        return boardRepository.findAllByOwnerID(oid);
+
+
     }
 
     public BoardResDTO insertBoard(Claims claims, NewBoardDTO boardDTO) {

@@ -10,7 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
 import sit.int221.dtos.request.NewBoardDTO;
 import sit.int221.dtos.response.BoardResDTO;
-import sit.int221.entities.primary.Board;
 import sit.int221.services.BoardService;
 import sit.int221.utils.AuthorizationUtil;
 
@@ -29,7 +28,7 @@ public class BoardController {
     @GetMapping("")
     public ResponseEntity<Object> getAllBoards(@RequestHeader("Authorization") String token) {
         Claims claims = authorizationUtil.validateToken(token);
-        return ResponseEntity.ok(boardService.getAllBoards());
+        return ResponseEntity.ok(boardService.getAllBoards(claims));
     }
 
     @GetMapping("/{boardId}")
