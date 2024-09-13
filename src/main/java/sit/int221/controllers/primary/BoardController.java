@@ -1,6 +1,7 @@
 package sit.int221.controllers.primary;
 
 import io.jsonwebtoken.Claims;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,9 +10,12 @@ import sit.int221.components.JwtTokenUtil;
 import sit.int221.dtos.request.NewBoardDTO;
 import sit.int221.dtos.request.NewTask3DTO;
 import sit.int221.dtos.response.BoardResDTO;
+import sit.int221.dtos.response.Task2DetailDTO;
+import sit.int221.dtos.response.TaskDetail3DTO;
 import sit.int221.entities.primary.Tasks3;
 import sit.int221.services.BoardService;
 import sit.int221.services.AuthorizationService;
+import sit.int221.services.ListMapper;
 import sit.int221.services.Tasks3Service;
 
 @RestController
@@ -25,6 +29,10 @@ public class BoardController {
     AuthorizationService authorizationService;
     @Autowired
     Tasks3Service tasks3Service;
+    @Autowired
+    ListMapper listMapper;
+    @Autowired
+    ModelMapper modelMapper;
 
     @GetMapping("")
     public ResponseEntity<Object> getAllBoards(@RequestHeader("Authorization") String token) {
@@ -65,4 +73,21 @@ public class BoardController {
         authorizationService.validateToken(token);
         return tasks3Service.createNewTaskByBoardId(boardId, task3DTO);
     }
+
+    @GetMapping("/{boardId}/tasks/{taskId}")
+    public TaskDetail3DTO getTaskById(@RequestHeader("Authorization") String token , @PathVariable String boardId, @PathVariable Integer taskId){
+        authorizationService.validateToken(token);
+        Tasks3 findTasks3 = tasks3Service.findTask3ById(boardId, taskId);
+        return modelMapper.map(findTasks3, TaskDetail3DTO.class);
+    }
+//    @PutMapping("/{boardId}/tasks/{taskId}")
+//    public ResponseEntity<Object> updateTaskById(@RequestHeader("Authorization") String token , @PathVariable String boardId, @PathVariable Integer taskId){
+//        authorizationService.validateToken(token);
+//        return ResponseEntity.ok(tasks3Service.getAllTaskByBoardId(boardId));
+//    }
+//    @DeleteMapping("/{boardId}/tasks/{taskId}")
+//    public ResponseEntity<Object> deleteTaskById(@RequestHeader("Authorization") String token , @PathVariable String boardId, @PathVariable Integer taskId){
+//        authorizationService.validateToken(token);
+//        return ResponseEntity.ok(tasks3Service.getAllTaskByBoardId(boardId));
+//    }
 }

@@ -46,7 +46,7 @@ public class Board {
     private Timestamp updateOn;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board", fetch = FetchType.EAGER)
     private Set<Tasks3> tasks3s = new LinkedHashSet<>();
 
 }
