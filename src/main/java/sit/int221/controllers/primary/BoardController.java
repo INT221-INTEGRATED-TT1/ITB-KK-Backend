@@ -12,6 +12,7 @@ import sit.int221.dtos.request.NewBoardDTO;
 import sit.int221.dtos.response.BoardResDTO;
 import sit.int221.entities.primary.Board;
 import sit.int221.services.BoardService;
+import sit.int221.utils.AuthorizationUtil;
 
 import java.util.List;
 
@@ -22,49 +23,31 @@ public class BoardController {
     BoardService boardService;
     @Autowired
     JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    AuthorizationUtil authorizationUtil;
 
     @GetMapping("")
-    public ResponseEntity<Object> getAllBoards() {
+    public ResponseEntity<Object> getAllBoards(@RequestHeader("Authorization") String token) {
+        Claims claims = authorizationUtil.validateToken(token);
         return ResponseEntity.ok(boardService.getAllBoards());
     }
 
     @GetMapping("/{boardId}")
     public ResponseEntity<BoardResDTO> findBoardById(@RequestHeader("Authorization") String token,@PathVariable String boardId){
-        Claims claims = null;
-        String jwtToken = null;
-        if (token != null && token.startsWith("Bearer ")) {
-            jwtToken = token.substring(7);
-            try {
-                claims = jwtTokenUtil.getAllClaimsFromToken(jwtToken);
-            } catch (IllegalArgumentException e) {
-                System.out.println("Unable to get JWT Token");
-            } catch (ExpiredJwtException e) {
-                System.out.println("JWT Token has expired");
-            }
-        } else {
 
-            throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "JWT Token does not begin with Bearer String");
-        }
+        // Call Method validateToken for check token from user
+
+        Claims claims = authorizationUtil.validateToken(token);
+
+
+
         return  ResponseEntity.ok(boardService.getBoardById(claims,boardId));
     }
 
     @PostMapping("")
     public ResponseEntity<BoardResDTO> createBoard(@RequestHeader("Authorization") String token,
                                                    @RequestBody NewBoardDTO boardDTO) {
-        Claims claims = null;
-        String jwtToken = null;
-        if (token != null && token.startsWith("Bearer ")) {
-            jwtToken = token.substring(7);
-            try {
-                claims = jwtTokenUtil.getAllClaimsFromToken(jwtToken);
-            } catch (IllegalArgumentException e) {
-                System.out.println("Unable to get JWT Token");
-            } catch (ExpiredJwtException e) {
-                System.out.println("JWT Token has expired");
-            }
-        } else {
-            throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "JWT Token does not begin with Bearer String");
-        }
+        Claims claims = authorizationUtil.validateToken(token);
 //
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(boardService.insertBoard(claims, boardDTO));
