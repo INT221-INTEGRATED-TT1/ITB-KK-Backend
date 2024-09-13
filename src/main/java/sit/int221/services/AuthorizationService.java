@@ -1,4 +1,4 @@
-package sit.int221.utils;
+package sit.int221.services;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -9,7 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
 
 @Component
-public class AuthorizationUtil {
+public class AuthorizationService {
     @Autowired
     JwtTokenUtil jwtTokenUtil;
     String jwtToken;

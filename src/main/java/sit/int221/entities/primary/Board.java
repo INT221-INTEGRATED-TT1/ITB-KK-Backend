@@ -46,7 +46,7 @@ public class Board {
     private Timestamp updateOn;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "boardID")
+    @OneToMany(mappedBy = "board")
     private Set<Tasks3> tasks3s = new LinkedHashSet<>();
 
 }
