@@ -31,7 +31,6 @@ public class Tasks3Service {
     public List<Tasks3> getAllTaskByBoardId(String boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new ItemNotFoundException("Board id " + boardId + "not found"));
         return tasks3Repository.findAllByBoard(board);
-
     }
 
     public Tasks3 createNewTaskByBoardId(String boardId, NewTask3DTO tasks3) {

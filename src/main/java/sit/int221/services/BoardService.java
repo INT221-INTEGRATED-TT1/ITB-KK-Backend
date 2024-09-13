@@ -36,8 +36,18 @@ public class BoardService {
 
 //        Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + "not found"));
         return boardRepository.findAllByOwnerID(oid);
+    }
 
+    public BoardResDTO getBoardById(Claims claims, String id) {
+        String oid = (String) claims.get("oid");
 
+        Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + "not found"));
+        User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
+        if (oid.equals(board.getOwnerID())) {
+            return getBoardResDTO(user, board);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "This user cannot access this board");
+        }
     }
 
     public BoardResDTO insertBoard(Claims claims, NewBoardDTO boardDTO) {
@@ -51,13 +61,6 @@ public class BoardService {
                     NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
                     NanoIdUtils.DEFAULT_ALPHABET, 10));
         }
-//        newBoard.setBoardName(boardDTO.getBoardName().trim());
-//        if (boardDTO.getBoardName() != null && !boardDTO.getBoardName().isBlank()) {
-//            newBoard.setBoardName(boardDTO.getBoardName().trim());
-//        } else {
-//            newBoard.setBoardName(null);
-//        }
-
         newBoard.setOwnerID(oid);
         newBoard.setBoardName(boardDTO.getBoardName());
         Board createdBoard = boardRepository.saveAndFlush(newBoard);
@@ -79,17 +82,5 @@ public class BoardService {
         return boardResDTO;
     }
 
-    public BoardResDTO getBoardById(Claims claims,String id){
-        String oid = (String) claims.get("oid");
 
-        Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + "not found"));
-        User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
-        if(oid.equals(board.getOwnerID()) ){
-            return getBoardResDTO(user, board) ;
-        }
-        else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"This user cannot access this board");
-        }
-
-    }
 }
