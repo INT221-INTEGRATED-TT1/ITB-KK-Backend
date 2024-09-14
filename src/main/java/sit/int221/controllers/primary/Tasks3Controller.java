@@ -52,8 +52,6 @@ public class Tasks3Controller {
         authorizationService.validateToken(token);
         Tasks3 updateTask = tasks3Service.updateTask3(boardId, taskId, newTaskData);
         return modelMapper.map(updateTask, TaskDetail3DTO.class);
-
-//        return ResponseEntity.ok(tasks3Service.getAllTaskByBoardId(boardId));
     }
 
     @DeleteMapping("/{boardId}/tasks/{taskId}")

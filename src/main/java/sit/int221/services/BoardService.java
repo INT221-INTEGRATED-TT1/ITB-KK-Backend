@@ -23,8 +23,6 @@ public class BoardService {
     @Autowired
     private BoardRepository boardRepository;
     @Autowired
-    ModelMapper modelMapper;
-    @Autowired
     private UserRepository userRepository;
 
     public List<Board> getAllBoards(Claims claims) {

@@ -83,7 +83,7 @@ public class Tasks3Service {
     }
 
 
-    public Tasks3 updateTask3(String boardId,Integer taskId, NewTask3DTO newTaskData) {
+    public Tasks3 updateTask3(String boardId, Integer taskId, NewTask3DTO newTaskData) {
 //        Tasks3 tasks3Update = tasks3Repository.findById(taskId).orElseThrow(() -> new ItemNotFoundException("Task id " + taskId + " not found"));
 
         Board board = getBoardId(boardId);
@@ -108,7 +108,7 @@ public class Tasks3Service {
             try {
                 Statuses3 statuses3 = statuses3Service.findStatusById(newTaskData.getStatus3());
                 tasks3Update.setStatuses3(statuses3);
-            } catch (Exception e){
+            } catch (Exception e) {
                 throw new StatusNotExistException("Status Does not exist");
             }
         }
