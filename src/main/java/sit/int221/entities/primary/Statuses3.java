@@ -34,18 +34,10 @@ public class Statuses3 {
     @Column(name = "statusColor", length = 10)
     private String statusColor;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "boardID", nullable = false)
-    private Board boardID;
-
-    @NotNull
-    @Column(name = "createOn", nullable = false)
-    private Instant createOn;
-
-    @NotNull
-    @Column(name = "updateOn", nullable = false)
-    private Instant updateOn;
+//    @NotNull
+//    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+//    @JoinColumn(name = "boardID", nullable = false)
+//    private Board boardID;
 
     @JsonIgnore
     @OneToMany(mappedBy = "statuses3")

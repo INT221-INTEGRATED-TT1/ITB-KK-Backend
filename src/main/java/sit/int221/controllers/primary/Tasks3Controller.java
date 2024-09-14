@@ -2,6 +2,7 @@ package sit.int221.controllers.primary;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.dtos.request.NewTask3DTO;
@@ -30,25 +31,34 @@ public class Tasks3Controller {
     }
 
     @PostMapping("/{boardId}/tasks")
-    public Tasks3 createTaskWithBoardId(@RequestHeader("Authorization") String token, @PathVariable String boardId, @RequestBody NewTask3DTO task3DTO) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public TaskDetail3DTO createTaskWithBoardId(@RequestHeader("Authorization") String token, @PathVariable String boardId, @RequestBody NewTask3DTO task3DTO) {
         authorizationService.validateToken(token);
-        return tasks3Service.createNewTaskByBoardId(boardId, task3DTO);
+        Tasks3 tasks3 =  tasks3Service.createNewTaskByBoardId(boardId, task3DTO);
+        return modelMapper.map(tasks3, TaskDetail3DTO.class);
     }
 
     @GetMapping("/{boardId}/tasks/{taskId}")
     public TaskDetail3DTO getTaskById(@RequestHeader("Authorization") String token, @PathVariable String boardId, @PathVariable Integer taskId) {
         authorizationService.validateToken(token);
-        Tasks3 findTasks3 = tasks3Service.findTask3ById(boardId, taskId);
-        return modelMapper.map(findTasks3, TaskDetail3DTO.class);
+        Tasks3 findTasks3ById = tasks3Service.findTask3ById(boardId, taskId);
+        return modelMapper.map(findTasks3ById, TaskDetail3DTO.class);
     }
-//    @PutMapping("/{boardId}/tasks/{taskId}")
-//    public ResponseEntity<Object> updateTaskById(@RequestHeader("Authorization") String token , @PathVariable String boardId, @PathVariable Integer taskId){
-//        authorizationService.validateToken(token);
+
+    @PutMapping("/{boardId}/tasks/{taskId}")
+    public TaskDetail3DTO updateTaskById(@RequestHeader("Authorization") String token, @PathVariable String boardId,
+                                         @PathVariable Integer taskId,
+                                         @RequestBody NewTask3DTO newTaskData) {
+        authorizationService.validateToken(token);
+        Tasks3 updateTask = tasks3Service.updateTask3(boardId, taskId, newTaskData);
+        return modelMapper.map(updateTask, TaskDetail3DTO.class);
+
 //        return ResponseEntity.ok(tasks3Service.getAllTaskByBoardId(boardId));
-//    }
-//    @DeleteMapping("/{boardId}/tasks/{taskId}")
-//    public ResponseEntity<Object> deleteTaskById(@RequestHeader("Authorization") String token , @PathVariable String boardId, @PathVariable Integer taskId){
-//        authorizationService.validateToken(token);
-//        return ResponseEntity.ok(tasks3Service.getAllTaskByBoardId(boardId));
-//    }
+    }
+
+    @DeleteMapping("/{boardId}/tasks/{taskId}")
+    public Tasks3 deleteTaskById(@RequestHeader("Authorization") String token, @PathVariable String boardId, @PathVariable Integer taskId) {
+        authorizationService.validateToken(token);
+        return tasks3Service.removeTask3ById(boardId, taskId);
+    }
 }

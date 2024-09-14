@@ -5,12 +5,8 @@ import io.jsonwebtoken.Claims;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
-import sit.int221.components.JwtTokenUtil;
 import sit.int221.dtos.request.NewBoardDTO;
 import sit.int221.dtos.response.BoardResDTO;
 import sit.int221.dtos.response.OwnerBoard;
@@ -73,7 +69,6 @@ public class BoardService {
         OwnerBoard ownerBoard = new OwnerBoard();
         ownerBoard.setOid(user.getOid());
         ownerBoard.setName(user.getName());
-//        System.out.println(ownerBoard.getName());
 
         BoardResDTO boardResDTO = new BoardResDTO();
         boardResDTO.setBoardID(board.getBoardID());

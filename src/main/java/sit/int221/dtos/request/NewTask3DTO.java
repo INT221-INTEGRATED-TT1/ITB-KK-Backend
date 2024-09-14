@@ -15,5 +15,5 @@ public class NewTask3DTO {
     private String description;
     @Size(max = 30)
     private String assignees;
-    private Integer status3Id;
+    private Integer status3;
 }
