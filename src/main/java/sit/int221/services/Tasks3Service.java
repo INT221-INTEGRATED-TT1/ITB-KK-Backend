@@ -44,6 +44,9 @@ public class Tasks3Service {
             newTasks3.setAssignees(null);
         }
         newTasks3.setStatuses3(new Statuses3());
+        if(tasks3.getTitle() == null || tasks3.getTitle().isBlank()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         if (tasks3.getStatus3() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status Does not exist");
         } else {

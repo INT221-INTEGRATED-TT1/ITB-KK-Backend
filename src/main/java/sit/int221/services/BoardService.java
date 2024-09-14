@@ -55,6 +55,9 @@ public class BoardService {
                     NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
                     NanoIdUtils.DEFAULT_ALPHABET, 10));
         }
+        if(boardDTO.getBoardName() == null || boardDTO.getBoardName().isBlank() || boardDTO.getBoardName().length() > 120){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         newBoard.setOwnerID(oid);
         newBoard.setBoardName(boardDTO.getBoardName());
         Board createdBoard = boardRepository.saveAndFlush(newBoard);
