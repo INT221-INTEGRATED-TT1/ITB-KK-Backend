@@ -4,12 +4,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewStatus3DTO;
 import sit.int221.dtos.response.Status3HomeCountDTO;
-import sit.int221.dtos.response.StatusHomeCountDTO;
 import sit.int221.entities.primary.Board;
-import sit.int221.entities.primary.Statuses2;
 import sit.int221.entities.primary.Statuses3;
 import sit.int221.exceptions.ItemNotFoundException;
 import sit.int221.exceptions.StatusNotFoundException;
@@ -36,12 +35,12 @@ public class Statuses3Service {
 
     public Statuses3 findStatusById(String boardId, Integer statusId) {
         Board board = getBoardId(boardId);
-        Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Task id " + statusId + " not found"));
+        Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Status id " + statusId + " not found"));
         return checkStatusesThatBelongsToBoard(statuses3Id, board.getBoardID());
     }
 
     public Statuses3 findStatusByOnlyId(Integer statusId) {
-        return statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Task id " + statusId + " not found"));
+        return statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Status id " + statusId + " not found"));
     }
 
 //    public Statuses3 findStatusByName(String statusName) {
@@ -54,7 +53,7 @@ public class Statuses3Service {
 
     public Statuses3 checkStatusesThatBelongsToBoard(Statuses3 statuses3, String boardId) {
         if (!statuses3.getBoardId().getBoardID().equals(boardId)) {
-            throw new ItemNotFoundException("Task id " + statuses3.getStatusID() + " does not belong to Board id " + boardId);
+            throw new ItemNotFoundException("Status id " + statuses3.getStatusID() + " does not belong to Board id " + boardId);
         }
         return statuses3;
     }
@@ -79,7 +78,7 @@ public class Statuses3Service {
 
     public Statuses3 removeStatus(String boardId, Integer statusId) {
         Board board = getBoardId(boardId);
-        Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Task id " + statusId + " not found"));
+        Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Status id " + statusId + " not found"));
         checkStatusesThatBelongsToBoard(statuses3Id, board.getBoardID());
         Statuses3 findStatus = findStatusByOnlyId(statusId);
         if (findStatus.getStatusName().equalsIgnoreCase("no status")) {
@@ -95,26 +94,41 @@ public class Statuses3Service {
         return statuses3Id;
     }
 
-//    @Transactional
-//    public void updateTasksStatusAndDelete(String boardId, Integer oldStatus, Integer newStatus) {
-//        Board board = getBoardId(boardId);
-//        Statuses3 statuses3Id = statuses3Repository.findById(oldStatus).orElseThrow(() -> new StatusNotFoundException("Task id " + statusId + " not found"));
-//        return checkStatusesThatBelongsToBoard(statuses3Id, board.getBoardID());
-//        findStatusByOnlyId(oldStatus);
-//        if (oldStatus == newStatus) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "destination status for task transfer must be different from current status.");
-//        }
-//        try {
-//            task3Repository.transferStatusAllBy(newStatus, oldStatus);
-//        } catch (Exception e) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the specified status for task transfer does not exist.");
-//        }
-//        removeStatus(oldStatus);
-//    }
+    public void removeOldStatus(Integer statusId) {
+        Statuses3 findStatus = findStatusByOnlyId(statusId);
+        if (findStatus.getStatusName().equalsIgnoreCase("no status")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Status cannot be deleted.");
+        } else if (findStatus.getStatusName().equalsIgnoreCase("done")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Done cannot be deleted.");
+        }
+        try {
+            statuses3Repository.deleteById(statusId);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "destination status for task transfer not specified.");
+        }
+    }
+
+    @Transactional(transactionManager = "primaryTransactionManager")
+    public Statuses3 updateTasksStatusAndDelete(String boardId, Integer oldStatus, Integer newStatus) {
+        Board board = getBoardId(boardId);
+        Statuses3 statuses3Id = statuses3Repository.findById(oldStatus).orElseThrow(() -> new StatusNotFoundException("Status id " + oldStatus + " not found"));
+        checkStatusesThatBelongsToBoard(statuses3Id, board.getBoardID());
+        findStatusByOnlyId(oldStatus);
+        if (oldStatus == newStatus) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "destination status for task transfer must be different from current status.");
+        }
+        try {
+            task3Repository.transferStatusAllBy(newStatus, oldStatus);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the specified status for task transfer does not exist.");
+        }
+        removeOldStatus(oldStatus);
+        return statuses3Id;
+    }
 
     public Statuses3 updateStatus(String boardId, Integer statusId, NewStatus3DTO newStatus) {
         Board board = getBoardId(boardId);
-        Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Task id " + statusId + " not found"));
+        Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Status id " + statusId + " not found"));
         checkStatusesThatBelongsToBoard(statuses3Id, board.getBoardID());
         Statuses3 findStatus = findStatusByOnlyId(statusId);
         if (findStatus.getStatusName().equalsIgnoreCase("no status")) {
@@ -122,10 +136,6 @@ public class Statuses3Service {
         } else if (findStatus.getStatusName().equalsIgnoreCase("done")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Done cannot be modified.");
         }
-//        if ((findStatusByName(newStatus.getName()) != null) && !(findStatus.getStatusName().equals(newStatus.getName()))) {
-//            throw new StatusUniqueException("Status name must be unique");
-//        }
-
         if (statuses3Repository.existsByStatusNameAndBoardId(newStatus.getName(), board)) {
             throw new StatusUniqueException("Status name must be unique within the board");
         }
