@@ -51,7 +51,7 @@ public class Tasks3Service {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status Does not exist");
         } else {
             try {
-                Statuses3 statuses3 = statuses3Service.findStatusById(tasks3.getStatus3());
+                Statuses3 statuses3 = statuses3Service.findStatusByOnlyId(tasks3.getStatus3());
                 newTasks3.setStatuses3(statuses3);
             } catch (Exception e) {
                 throw new StatusNotExistException("Status Does not exist");
@@ -73,18 +73,6 @@ public class Tasks3Service {
         tasks3Repository.deleteById(tasks3Delete.getTaskID());
         return checkTasksThatBelongsToBoard(tasks3Delete, board.getBoardID());
     }
-
-    public Board getBoardId(String boardId) {
-        return boardRepository.findById(boardId).orElseThrow(() -> new ItemNotFoundException("Board id " + boardId + " not found"));
-    }
-
-    public Tasks3 checkTasksThatBelongsToBoard(Tasks3 tasks3, String boardId) {
-        if (!tasks3.getBoard().getBoardID().equals(boardId)) {
-            throw new ItemNotFoundException("Task id " + tasks3.getTaskID() + " does not belong to Board id " + boardId);
-        }
-        return tasks3;
-    }
-
 
     public Tasks3 updateTask3(String boardId, Integer taskId, NewTask3DTO newTaskData) {
 //        Tasks3 tasks3Update = tasks3Repository.findById(taskId).orElseThrow(() -> new ItemNotFoundException("Task id " + taskId + " not found"));
@@ -109,7 +97,7 @@ public class Tasks3Service {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Status Selected");
         } else {
             try {
-                Statuses3 statuses3 = statuses3Service.findStatusById(newTaskData.getStatus3());
+                Statuses3 statuses3 = statuses3Service.findStatusByOnlyId(newTaskData.getStatus3());
                 tasks3Update.setStatuses3(statuses3);
             } catch (Exception e) {
                 throw new StatusNotExistException("Status Does not exist");
@@ -118,4 +106,16 @@ public class Tasks3Service {
         tasks3Repository.save(tasks3Update);
         return tasks3Update;
     }
+
+    public Board getBoardId(String boardId) {
+        return boardRepository.findById(boardId).orElseThrow(() -> new ItemNotFoundException("Board id " + boardId + " not found"));
+    }
+
+    public Tasks3 checkTasksThatBelongsToBoard(Tasks3 tasks3, String boardId) {
+        if (!tasks3.getBoard().getBoardID().equals(boardId)) {
+            throw new ItemNotFoundException("Task id " + tasks3.getTaskID() + " does not belong to Board id " + boardId);
+        }
+        return tasks3;
+    }
+
 }

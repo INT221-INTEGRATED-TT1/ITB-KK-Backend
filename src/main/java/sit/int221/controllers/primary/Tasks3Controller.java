@@ -39,10 +39,10 @@ public class Tasks3Controller {
     }
 
     @GetMapping("/{boardId}/tasks/{taskId}")
-    public TaskDetail3DTO getTaskById(@RequestHeader("Authorization") String token, @PathVariable String boardId, @PathVariable Integer taskId) {
+    public Tasks3 getTaskById(@RequestHeader("Authorization") String token, @PathVariable String boardId, @PathVariable Integer taskId) {
         authorizationService.validateToken(token);
         Tasks3 findTasks3ById = tasks3Service.findTask3ById(boardId, taskId);
-        return modelMapper.map(findTasks3ById, TaskDetail3DTO.class);
+        return modelMapper.map(findTasks3ById, Tasks3.class);
     }
 
     @PutMapping("/{boardId}/tasks/{taskId}")

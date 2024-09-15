@@ -49,4 +49,7 @@ public class Board {
     @OneToMany(mappedBy = "board", fetch = FetchType.EAGER)
     private Set<Tasks3> tasks3s = new LinkedHashSet<>();
 
+//    @JsonIgnore
+//    @OneToMany(mappedBy = "boardId", fetch = FetchType.EAGER)
+//    private Set<Statuses3> statuses3s = new LinkedHashSet<>();
 }

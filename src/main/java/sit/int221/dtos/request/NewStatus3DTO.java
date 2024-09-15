@@ -14,5 +14,8 @@ public class NewStatus3DTO {
     @Size(max = 200)
     private String description;
     private String color;
-
+//    @NotNull
+//    @NotEmpty
+//    @Size(min = 10, max = 10)
+//    private String boardId;
 }

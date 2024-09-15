@@ -34,13 +34,13 @@ public class Statuses3 {
     @Column(name = "statusColor", length = 10)
     private String statusColor;
 
-//    @NotNull
-//    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-//    @JoinColumn(name = "boardID", nullable = false)
-//    private Board boardID;
-
     @JsonIgnore
     @OneToMany(mappedBy = "statuses3")
     private Set<Tasks3> tasks3s = new LinkedHashSet<>();
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "boardID", nullable = false)
+    private Board boardId;
 
 }

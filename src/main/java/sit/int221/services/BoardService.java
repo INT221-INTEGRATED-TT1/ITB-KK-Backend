@@ -27,15 +27,13 @@ public class BoardService {
 
     public List<Board> getAllBoards(Claims claims) {
         String oid = (String) claims.get("oid");
-
-//        Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + "not found"));
         return boardRepository.findAllByOwnerID(oid);
     }
 
     public BoardResDTO getBoardById(Claims claims, String id) {
         String oid = (String) claims.get("oid");
 
-        Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + "not found"));
+        Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + " not found"));
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
         if (oid.equals(board.getOwnerID())) {
             return getBoardResDTO(user, board);
