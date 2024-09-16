@@ -85,7 +85,7 @@ public class Statuses3Service {
 
     public NewStatus3DTO insertDefault(String boardId) {
         // Default Status
-        String[] defaultStatus = {"No Status", "To Do", "In Progress", "Done"};
+        String[] defaultStatus = {"No Status", "To Do", "Doing", "Done"};
         String[] defaultColor = {"#5A5A5A", "#0090FF", "#E9EB87", "#1A9338"};
         String[] defaultDescription = {"A status has not been assigned", "The task is included in the project", "The task is being worked on", "The task has been completed"};
 //        if(defaultStatus.length != defaultColor.length || defaultColor.length != defaultDescription.length){

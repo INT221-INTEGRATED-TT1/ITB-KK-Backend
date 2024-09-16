@@ -25,7 +25,7 @@ public class Board {
     @Column(name = "boardID", nullable = false, length = 45)
     private String boardID;
 
-    @Size(max = 100)
+    @Size(max = 120)
     @NotNull
     @Column(name = "boardName", nullable = false, length = 100)
     private String boardName;
