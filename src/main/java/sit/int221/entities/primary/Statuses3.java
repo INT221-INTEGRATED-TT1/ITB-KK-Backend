@@ -17,9 +17,9 @@ import java.util.Set;
 @Table(name = "statuses")
 public class Statuses3 {
     @Id
-    @Size(max = 45)
-    @Column(name = "statusID", nullable = false, length = 45)
-    private String statusID;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "statusID", nullable = false, length = 45, updatable = false, insertable = false)
+    private Integer statusID;
 
     @Size(max = 50)
     @NotNull
@@ -34,21 +34,13 @@ public class Statuses3 {
     @Column(name = "statusColor", length = 10)
     private String statusColor;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "boardID", nullable = false)
-    private Board boardID;
-
-    @NotNull
-    @Column(name = "createOn", nullable = false)
-    private Instant createOn;
-
-    @NotNull
-    @Column(name = "updateOn", nullable = false)
-    private Instant updateOn;
-
     @JsonIgnore
-    @OneToMany(mappedBy = "statusID")
+    @OneToMany(mappedBy = "statuses3")
     private Set<Tasks3> tasks3s = new LinkedHashSet<>();
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "boardID", nullable = false)
+    private Board boardId;
 
 }

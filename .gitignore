@@ -31,3 +31,5 @@ build/
 /database/mysql-lib/*
 ### VS Code ###
 .vscode/
+
+/src/main/resources/application.properties
