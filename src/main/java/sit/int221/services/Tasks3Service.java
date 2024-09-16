@@ -2,6 +2,7 @@ package sit.int221.services;
 
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,6 +14,7 @@ import sit.int221.exceptions.TaskNotFoundException;
 import sit.int221.repositories.primary.BoardRepository;
 import sit.int221.repositories.primary.Tasks3Repository;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -26,11 +28,18 @@ public class Tasks3Service {
     @Autowired
     AuthorizationService authorizationService;
 
-    public List<Tasks3> getAllTaskByBoardId(Claims claims, String boardId) {
-        Board board = authorizationService.getBoardId(boardId);
-        authorizationService.checkIdThatBelongsToUser(claims, boardId);
-        return tasks3Repository.findAllByBoard(board);
+
+public List<Tasks3> getFilterTasksAndSorted(Claims claims, String sortBy, String[] filterStatuses, String direction,String boardId) {
+    Sort sort = direction.equalsIgnoreCase("ASC") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+    Board board = authorizationService.getBoardId(boardId);
+    authorizationService.checkIdThatBelongsToUser(claims, boardId);
+    List<Tasks3> allTasksSorted = tasks3Repository.findAllByBoard(board,sort);
+    if (filterStatuses.length > 0) {
+        List<String> filterStatusList = Arrays.asList(filterStatuses);
+        return allTasksSorted.stream().filter(tasks3 -> filterStatusList.contains(tasks3.getStatuses3().getStatusName())).toList();
     }
+    return allTasksSorted;
+}
     
     public Tasks3 createNewTaskByBoardId(Claims claims, String boardId, NewTask3DTO tasks3) {
         authorizationService.checkIdThatBelongsToUser(claims, boardId);

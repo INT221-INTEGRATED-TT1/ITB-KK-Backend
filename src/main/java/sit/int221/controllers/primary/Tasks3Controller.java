@@ -26,10 +26,13 @@ public class Tasks3Controller {
     ModelMapper modelMapper;
 
     @GetMapping("/{boardId}/tasks")
-    public ResponseEntity<Object> getAllTaskByBoardId(@RequestHeader("Authorization") String token, @PathVariable String boardId) {
-       Claims claims = authorizationService.validateToken(token);
-        return ResponseEntity.ok(tasks3Service.getAllTaskByBoardId(claims, boardId));
+    public ResponseEntity<Object> getAllTaskByBoardId(@RequestHeader("Authorization") String token, @PathVariable String boardId,@RequestParam(defaultValue = "createOn") String sortBy,
+                                                          @RequestParam(defaultValue = "") String[] filterStatuses,
+                                                          @RequestParam(defaultValue = "ASC") String direction) {
+        Claims claims = authorizationService.validateToken(token);
+        return ResponseEntity.ok(tasks3Service.getFilterTasksAndSorted(claims, sortBy,filterStatuses,direction,boardId)); 
     }
+
 
     @PostMapping("/{boardId}/tasks")
     @ResponseStatus(HttpStatus.CREATED)
