@@ -82,12 +82,21 @@ public class Statuses3Service {
         statuses3.setBoardId(authorizationService.getBoardId(boardId));
         return statuses3Repository.saveAndFlush(statuses3);
     }
-    public NewStatus3DTO insertDefault(String boardId){
-        String[] defaultStatus = {"No Status","To Do","Doing","Done"};
+
+    public NewStatus3DTO insertDefault(String boardId) {
+        // Default Status
+        String[] defaultStatus = {"No Status", "To Do", "In Progress", "Done"};
+        String[] defaultColor = {"#5A5A5A", "#0090FF", "#E9EB87", "#1A9338"};
+        String[] defaultDescription = {"A status has not been assigned", "The task is included in the project", "The task is being worked on", "The task has been completed"};
+//        if(defaultStatus.length != defaultColor.length || defaultColor.length != defaultDescription.length){
+//            throw new RuntimeException("Status name not belongs to color and description");
+//        }
         NewStatus3DTO newStatus3DTO = new NewStatus3DTO();
 
-        for(String status : defaultStatus){
-            newStatus3DTO.setName(status);
+        for (int i = 0; i < 4; i++) {
+            newStatus3DTO.setName(defaultStatus[i]);
+            newStatus3DTO.setColor(defaultColor[i]);
+            newStatus3DTO.setDescription(defaultDescription[i]);
             Statuses3 statuses3 = modelMapper.map(newStatus3DTO, Statuses3.class);
             statuses3.setBoardId(authorizationService.getBoardId(boardId));
             statuses3Repository.saveAndFlush(statuses3);
