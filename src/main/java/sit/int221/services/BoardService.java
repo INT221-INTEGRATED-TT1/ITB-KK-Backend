@@ -28,6 +28,8 @@ public class BoardService {
     private UserRepository userRepository;
     @Autowired
     AuthorizationService authorizationService;
+    @Autowired
+    Statuses3Service statuses3Service;
 
     public List<Board> getAllBoards(Claims claims) {
         String oid = (String) claims.get("oid");
@@ -69,6 +71,8 @@ public class BoardService {
         newBoard.setOwnerID(oid);
         newBoard.setBoardName(boardDTO.getBoardName());
         Board createdBoard = boardRepository.saveAndFlush(newBoard);
+        statuses3Service.insertDefault(createdBoard.getBoardID());
+
         return getBoardResDTO(user, createdBoard);
 
     }

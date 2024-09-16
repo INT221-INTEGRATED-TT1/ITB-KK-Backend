@@ -82,6 +82,18 @@ public class Statuses3Service {
         statuses3.setBoardId(authorizationService.getBoardId(boardId));
         return statuses3Repository.saveAndFlush(statuses3);
     }
+    public NewStatus3DTO insertDefault(String boardId){
+        String[] defaultStatus = {"No Status","To Do","Doing","Done"};
+        NewStatus3DTO newStatus3DTO = new NewStatus3DTO();
+
+        for(String status : defaultStatus){
+            newStatus3DTO.setName(status);
+            Statuses3 statuses3 = modelMapper.map(newStatus3DTO, Statuses3.class);
+            statuses3.setBoardId(authorizationService.getBoardId(boardId));
+            statuses3Repository.saveAndFlush(statuses3);
+        }
+        return newStatus3DTO;
+    }
 
     public Statuses3 removeStatus(Claims claims, String boardId, Integer statusId) {
         authorizationService.checkIdThatBelongsToUser(claims, boardId);
