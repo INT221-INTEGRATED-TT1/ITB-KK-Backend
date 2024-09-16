@@ -8,15 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.components.JwtTokenUtil;
 import sit.int221.dtos.request.NewBoardDTO;
-import sit.int221.dtos.request.NewTask3DTO;
 import sit.int221.dtos.response.BoardResDTO;
-import sit.int221.dtos.response.Task2DetailDTO;
-import sit.int221.dtos.response.TaskDetail3DTO;
-import sit.int221.entities.primary.Tasks3;
 import sit.int221.services.BoardService;
 import sit.int221.services.AuthorizationService;
-import sit.int221.services.ListMapper;
-import sit.int221.services.Tasks3Service;
 
 @RestController
 @RequestMapping("/v3/boards")
