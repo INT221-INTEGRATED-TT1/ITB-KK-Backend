@@ -1,5 +1,6 @@
 package sit.int221.services;
 
+import io.jsonwebtoken.Claims;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,28 +28,36 @@ public class Statuses3Service {
     @Autowired
     BoardRepository boardRepository;
     @Autowired
+    AuthorizationService authorizationService;
+    @Autowired
     ModelMapper modelMapper;
 
-//    public List<Statuses3> getAllStatusesList() {
-//        return statuses3Repository.findAll();
-//    }
+    public List<Status3HomeCountDTO> getAllStatusesWithCountTasksInUse(Claims claims, String boardId) {
+        authorizationService.checkIdThatBelongsToUser(claims, boardId);
+        Board board = authorizationService.getBoardId(boardId);
+        List<Statuses3> statuses3List = statuses3Repository.findAllByBoardId(board);
+        List<Status3HomeCountDTO> statusHomeCountDTOS = new ArrayList<>();
+        for (int i = 0; i < statuses3List.stream().count(); i++) {
+            Status3HomeCountDTO status3HomeCountDTO = new Status3HomeCountDTO();
+            status3HomeCountDTO.setId(statuses3List.get(i).getStatusID());
+            status3HomeCountDTO.setName(statuses3List.get(i).getStatusName());
+            status3HomeCountDTO.setDescription(statuses3List.get(i).getStatusDescription());
+            status3HomeCountDTO.setColor(statuses3List.get(i).getStatusColor());
+            status3HomeCountDTO.setCount(task3Repository.countByStatuses3(statuses3List.get(i)));
+            statusHomeCountDTOS.add(status3HomeCountDTO);
+        }
+        return statusHomeCountDTOS;
+    }
 
-    public Statuses3 findStatusById(String boardId, Integer statusId) {
-        Board board = getBoardId(boardId);
+    public Statuses3 findStatusById(Claims claims, String boardId, Integer statusId) {
+        authorizationService.checkIdThatBelongsToUser(claims, boardId);
+        Board board = authorizationService.getBoardId(boardId);
         Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Status id " + statusId + " not found"));
         return checkStatusesThatBelongsToBoard(statuses3Id, board.getBoardID());
     }
 
     public Statuses3 findStatusByOnlyId(Integer statusId) {
         return statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Status id " + statusId + " not found"));
-    }
-
-//    public Statuses3 findStatusByName(String statusName) {
-//        return statuses3Repository.findByStatusName(statusName);
-//    }
-
-    public Board getBoardId(String boardId) {
-        return boardRepository.findById(boardId).orElseThrow(() -> new ItemNotFoundException("Board id " + boardId + " not found"));
     }
 
     public Statuses3 checkStatusesThatBelongsToBoard(Statuses3 statuses3, String boardId) {
@@ -58,12 +67,10 @@ public class Statuses3Service {
         return statuses3;
     }
 
-    public Statuses3 insertStatus(String boardId, NewStatus3DTO newStatusDTO) {
+    public Statuses3 insertStatus(Claims claims, String boardId, NewStatus3DTO newStatusDTO) {
+        authorizationService.checkIdThatBelongsToUser(claims, boardId);
         newStatusDTO.setName(newStatusDTO.getName().trim());
-//        if (findStatusByName(newStatusDTO.getName()) != null) {
-//            throw new StatusUniqueException("Status name must be unique");
-//        }
-        if (statuses3Repository.existsByStatusNameAndBoardId(newStatusDTO.getName(), getBoardId(boardId))) {
+        if (statuses3Repository.existsByStatusNameAndBoardId(newStatusDTO.getName(), authorizationService.getBoardId(boardId))) {
             throw new StatusUniqueException("Status name must be unique within the board");
         }
         if (newStatusDTO.getDescription() != null && !newStatusDTO.getDescription().isBlank()) {
@@ -72,12 +79,13 @@ public class Statuses3Service {
             newStatusDTO.setDescription(null);
         }
         Statuses3 statuses3 = modelMapper.map(newStatusDTO, Statuses3.class);
-        statuses3.setBoardId(getBoardId(boardId));
+        statuses3.setBoardId(authorizationService.getBoardId(boardId));
         return statuses3Repository.saveAndFlush(statuses3);
     }
 
-    public Statuses3 removeStatus(String boardId, Integer statusId) {
-        Board board = getBoardId(boardId);
+    public Statuses3 removeStatus(Claims claims, String boardId, Integer statusId) {
+        authorizationService.checkIdThatBelongsToUser(claims, boardId);
+        Board board = authorizationService.getBoardId(boardId);
         Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Status id " + statusId + " not found"));
         checkStatusesThatBelongsToBoard(statuses3Id, board.getBoardID());
         Statuses3 findStatus = findStatusByOnlyId(statusId);
@@ -109,8 +117,9 @@ public class Statuses3Service {
     }
 
     @Transactional(transactionManager = "primaryTransactionManager")
-    public Statuses3 updateTasksStatusAndDelete(String boardId, Integer oldStatus, Integer newStatus) {
-        Board board = getBoardId(boardId);
+    public Statuses3 updateTasksStatusAndDelete(Claims claims, String boardId, Integer oldStatus, Integer newStatus) {
+        authorizationService.checkIdThatBelongsToUser(claims, boardId);
+        Board board = authorizationService.getBoardId(boardId);
         Statuses3 statuses3Id = statuses3Repository.findById(oldStatus).orElseThrow(() -> new StatusNotFoundException("Status id " + oldStatus + " not found"));
         checkStatusesThatBelongsToBoard(statuses3Id, board.getBoardID());
         findStatusByOnlyId(oldStatus);
@@ -126,8 +135,9 @@ public class Statuses3Service {
         return statuses3Id;
     }
 
-    public Statuses3 updateStatus(String boardId, Integer statusId, NewStatus3DTO newStatus) {
-        Board board = getBoardId(boardId);
+    public Statuses3 updateStatus(Claims claims, String boardId, Integer statusId, NewStatus3DTO newStatus) {
+        authorizationService.checkIdThatBelongsToUser(claims, boardId);
+        Board board = authorizationService.getBoardId(boardId);
         Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Status id " + statusId + " not found"));
         checkStatusesThatBelongsToBoard(statuses3Id, board.getBoardID());
         Statuses3 findStatus = findStatusByOnlyId(statusId);
@@ -156,22 +166,6 @@ public class Statuses3Service {
         }
         statuses3Repository.save(findStatus);
         return findStatus;
-    }
-
-    public List<Status3HomeCountDTO> getStatusWithCountTasksInUse(String boardId) {
-        Board board = getBoardId(boardId);
-        List<Statuses3> statuses3List = statuses3Repository.findAllByBoardId(board);
-        List<Status3HomeCountDTO> statusHomeCountDTOS = new ArrayList<>();
-        for (int i = 0; i < statuses3List.stream().count(); i++) {
-            Status3HomeCountDTO status3HomeCountDTO = new Status3HomeCountDTO();
-            status3HomeCountDTO.setId(statuses3List.get(i).getStatusID());
-            status3HomeCountDTO.setName(statuses3List.get(i).getStatusName());
-            status3HomeCountDTO.setDescription(statuses3List.get(i).getStatusDescription());
-            status3HomeCountDTO.setColor(statuses3List.get(i).getStatusColor());
-            status3HomeCountDTO.setCount(task3Repository.countByStatuses3(statuses3List.get(i)));
-            statusHomeCountDTOS.add(status3HomeCountDTO);
-        }
-        return statusHomeCountDTOS;
     }
 
 //    public LimitStatusMaskRes toggleLimitStatusMask(LimitStatusMaskReq limitStatusMaskReq) {
