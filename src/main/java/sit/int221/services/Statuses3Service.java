@@ -3,11 +3,13 @@ package sit.int221.services;
 import io.jsonwebtoken.Claims;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewStatus3DTO;
+import sit.int221.dtos.request.NewStatusDTO;
 import sit.int221.dtos.response.Status3HomeCountDTO;
 import sit.int221.entities.primary.Board;
 import sit.int221.entities.primary.Statuses3;
@@ -81,6 +83,16 @@ public class Statuses3Service {
         Statuses3 statuses3 = modelMapper.map(newStatusDTO, Statuses3.class);
         statuses3.setBoardId(authorizationService.getBoardId(boardId));
         return statuses3Repository.saveAndFlush(statuses3);
+    }
+    public void insertDefault(String boardId){
+        String[] defaultStatus = {"No Status","To Do","Doing","Done"};
+        Statuses3 new_status = new Statuses3();
+        for(String status : defaultStatus){
+            new_status.setStatusName(status);
+            new_status.setBoardId(authorizationService.getBoardId(boardId));
+            statuses3Repository.saveAndFlush(new_status);
+        }
+
     }
 
     public Statuses3 removeStatus(Claims claims, String boardId, Integer statusId) {
