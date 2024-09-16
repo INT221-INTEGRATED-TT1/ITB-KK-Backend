@@ -25,10 +25,18 @@ public class Tasks3Controller {
     ModelMapper modelMapper;
 
     @GetMapping("/{boardId}/tasks")
-    public ResponseEntity<Object> getAllTaskByBoardId(@RequestHeader("Authorization") String token, @PathVariable String boardId) {
+//    public ResponseEntity<Object> getAllTaskByBoardId(@RequestHeader("Authorization") String token, @PathVariable String boardId) {
+//        authorizationService.validateToken(token);
+//        return ResponseEntity.ok(tasks3Service.getAllTaskByBoardId(boardId));
+//    }
+        public ResponseEntity<Object> getAllTaskByBoardId(@RequestHeader("Authorization") String token, @PathVariable String boardId,@RequestParam(defaultValue = "createOn") String sortBy,
+                                                          @RequestParam(defaultValue = "") String[] filterStatuses,
+                                                          @RequestParam(defaultValue = "ASC") String direction) {
         authorizationService.validateToken(token);
-        return ResponseEntity.ok(tasks3Service.getAllTaskByBoardId(boardId));
+        return ResponseEntity.ok(tasks3Service.getFilterTasksAndSorted(sortBy,filterStatuses,direction,boardId));
+
     }
+
 
     @PostMapping("/{boardId}/tasks")
     @ResponseStatus(HttpStatus.CREATED)
