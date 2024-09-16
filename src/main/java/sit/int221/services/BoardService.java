@@ -17,6 +17,8 @@ import sit.int221.repositories.primary.BoardRepository;
 import sit.int221.repositories.secondary.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BoardService {
@@ -24,6 +26,8 @@ public class BoardService {
     private BoardRepository boardRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    AuthorizationService authorizationService;
 
     public List<Board> getAllBoards(Claims claims) {
         String oid = (String) claims.get("oid");
@@ -43,17 +47,23 @@ public class BoardService {
     }
 
     public BoardResDTO insertBoard(Claims claims, NewBoardDTO boardDTO) {
-
         String oid = (String) claims.get("oid");
         System.out.println(oid);
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
+        String nanoId = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
+                NanoIdUtils.DEFAULT_ALPHABET, 10);
+        while (boardRepository.findById(nanoId).isPresent()) {
+            nanoId = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
+                    NanoIdUtils.DEFAULT_ALPHABET, 10);
+        }
         Board newBoard = new Board();
         if (newBoard.getBoardID() == null || newBoard.getBoardID().isEmpty()) {
             newBoard.setBoardID(NanoIdUtils.randomNanoId(
                     NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
                     NanoIdUtils.DEFAULT_ALPHABET, 10));
         }
-        if(boardDTO.getBoardName() == null || boardDTO.getBoardName().isBlank() || boardDTO.getBoardName().length() > 120){
+
+        if (boardDTO.getBoardName() == null || boardDTO.getBoardName().isBlank() || boardDTO.getBoardName().length() > 120) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         newBoard.setOwnerID(oid);
