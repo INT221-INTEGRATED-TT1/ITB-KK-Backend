@@ -28,6 +28,8 @@ public class BoardService {
     private UserRepository userRepository;
     @Autowired
     AuthorizationService authorizationService;
+    @Autowired
+    Statuses3Service statuses3Service;
 
     public List<Board> getAllBoards(Claims claims) {
         String oid = (String) claims.get("oid");
@@ -64,11 +66,13 @@ public class BoardService {
         }
 
         if (boardDTO.getBoardName() == null || boardDTO.getBoardName().isBlank() || boardDTO.getBoardName().length() > 120) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "you must need to insert board name or board name is more than 120 character");
         }
         newBoard.setOwnerID(oid);
         newBoard.setBoardName(boardDTO.getBoardName());
         Board createdBoard = boardRepository.saveAndFlush(newBoard);
+        statuses3Service.insertDefault(createdBoard.getBoardID());
+
         return getBoardResDTO(user, createdBoard);
 
     }
