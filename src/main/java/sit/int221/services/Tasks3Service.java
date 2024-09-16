@@ -1,6 +1,6 @@
 package sit.int221.services;
 
-import org.modelmapper.ModelMapper;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,15 +23,19 @@ public class Tasks3Service {
     Statuses3Service statuses3Service;
     @Autowired
     BoardRepository boardRepository;
+    @Autowired
+    AuthorizationService authorizationService;
 
-    public List<Tasks3> getAllTaskByBoardId(String boardId) {
-        Board board = getBoardId(boardId);
+    public List<Tasks3> getAllTaskByBoardId(Claims claims, String boardId) {
+        Board board = authorizationService.getBoardId(boardId);
+        authorizationService.checkIdThatBelongsToUser(claims, boardId);
         return tasks3Repository.findAllByBoard(board);
     }
-
-    public Tasks3 createNewTaskByBoardId(String boardId, NewTask3DTO tasks3) {
+    
+    public Tasks3 createNewTaskByBoardId(Claims claims, String boardId, NewTask3DTO tasks3) {
+        authorizationService.checkIdThatBelongsToUser(claims, boardId);
         Tasks3 newTasks3 = new Tasks3();
-        newTasks3.setBoard(getBoardId(boardId));
+        newTasks3.setBoard(authorizationService.getBoardId(boardId));
         newTasks3.setTaskTitle(tasks3.getTitle().trim());
         if (tasks3.getDescription() != null && !tasks3.getDescription().isBlank()) {
             newTasks3.setDescription(tasks3.getDescription().trim());
@@ -44,7 +48,7 @@ public class Tasks3Service {
             newTasks3.setAssignees(null);
         }
         newTasks3.setStatuses3(new Statuses3());
-        if(tasks3.getTitle() == null || tasks3.getTitle().isBlank()){
+        if (tasks3.getTitle() == null || tasks3.getTitle().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         if (tasks3.getStatus3() == null) {
@@ -60,24 +64,24 @@ public class Tasks3Service {
         return tasks3Repository.saveAndFlush(newTasks3);
     }
 
-    public Tasks3 findTask3ById(String boardId, Integer taskId) {
-        Board board = getBoardId(boardId);
+    public Tasks3 findTask3ById(Claims claims, String boardId, Integer taskId) {
+        Board board = authorizationService.getBoardId(boardId);
+        authorizationService.checkIdThatBelongsToUser(claims, boardId);
         Tasks3 tasks3Id = tasks3Repository.findById(taskId).orElseThrow(() -> new ItemNotFoundException("Task id " + taskId + " not found"));
         return checkTasksThatBelongsToBoard(tasks3Id, board.getBoardID());
     }
 
-    public Tasks3 removeTask3ById(String boardId, Integer taskId) {
-
-        Board board = getBoardId(boardId);
+    public Tasks3 removeTask3ById(Claims claims, String boardId, Integer taskId) {
+        Board board = authorizationService.getBoardId(boardId);
+        authorizationService.checkIdThatBelongsToUser(claims, boardId);
         Tasks3 tasks3Delete = tasks3Repository.findById(taskId).orElseThrow(() -> new ItemNotFoundException("Task id " + taskId + " not found"));
         tasks3Repository.deleteById(tasks3Delete.getTaskID());
         return checkTasksThatBelongsToBoard(tasks3Delete, board.getBoardID());
     }
 
-    public Tasks3 updateTask3(String boardId, Integer taskId, NewTask3DTO newTaskData) {
-//        Tasks3 tasks3Update = tasks3Repository.findById(taskId).orElseThrow(() -> new ItemNotFoundException("Task id " + taskId + " not found"));
-
-        Board board = getBoardId(boardId);
+    public Tasks3 updateTask3(Claims claims, String boardId, Integer taskId, NewTask3DTO newTaskData) {
+        authorizationService.checkIdThatBelongsToUser(claims, boardId);
+        Board board = authorizationService.getBoardId(boardId);
         Tasks3 tasks3Update = tasks3Repository.findById(taskId).orElseThrow(
                 () -> new TaskNotFoundException("Task id " + taskId + " not found"));
         checkTasksThatBelongsToBoard(tasks3Update, board.getBoardID());
@@ -105,10 +109,6 @@ public class Tasks3Service {
         }
         tasks3Repository.save(tasks3Update);
         return tasks3Update;
-    }
-
-    public Board getBoardId(String boardId) {
-        return boardRepository.findById(boardId).orElseThrow(() -> new ItemNotFoundException("Board id " + boardId + " not found"));
     }
 
     public Tasks3 checkTasksThatBelongsToBoard(Tasks3 tasks3, String boardId) {

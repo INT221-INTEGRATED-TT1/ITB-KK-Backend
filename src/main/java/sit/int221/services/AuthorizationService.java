@@ -9,7 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
+import sit.int221.entities.primary.Board;
 import sit.int221.exceptions.AuthException;
+import sit.int221.exceptions.ItemNotFoundException;
+import sit.int221.repositories.primary.BoardRepository;
 
 @Component
 public class AuthorizationService {
@@ -17,6 +20,10 @@ public class AuthorizationService {
     JwtTokenUtil jwtTokenUtil;
     String jwtToken;
     Claims claims;
+    //    @Autowired
+//    Tasks3Service tasks3Service;
+    @Autowired
+    BoardRepository boardRepository;
 
     public Claims validateToken(String token) {
         if (token != null && token.startsWith("Bearer ")) {
@@ -29,15 +36,29 @@ public class AuthorizationService {
             } catch (ExpiredJwtException e) {
                 System.out.println("JWT Token has expired");
                 throw new AuthException("JWT Token has expired");
-            }catch (MalformedJwtException e){
+            } catch (MalformedJwtException e) {
                 throw new AuthException("Malformed JWT token");
-            } catch (SignatureException e){
+            } catch (SignatureException e) {
                 throw new AuthException("JWT signature not valid");
             }
         } else {
-
             throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "JWT Token does not begin with Bearer String");
         }
         return claims;
     }
+
+    public void checkIdThatBelongsToUser(Claims claims, String boardId) {
+        String oid = (String) claims.get("oid");
+        Board board = getBoardId(boardId);
+        if (!board.getOwnerID().equals(oid)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Owner id " + oid +
+                    " doest not belong to " + board.getOwnerID());
+        }
+    }
+
+    public Board getBoardId(String boardId){
+        return boardRepository.findById(boardId).orElseThrow(() ->
+                new ItemNotFoundException("Board id " + boardId + " not found"));
+    }
+
 }
