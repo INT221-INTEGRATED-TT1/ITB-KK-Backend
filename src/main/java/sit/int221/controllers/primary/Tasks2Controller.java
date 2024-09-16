@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.dtos.request.NewTask2DTO;
+import sit.int221.dtos.request.NewTask3DTO;
 import sit.int221.dtos.response.Task2DetailDTO;
 import sit.int221.dtos.response.Task2FilterDTO;
 import sit.int221.dtos.response.Task2HomeDTO;
