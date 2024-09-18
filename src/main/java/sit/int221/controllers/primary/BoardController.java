@@ -1,6 +1,7 @@
 package sit.int221.controllers.primary;
 
 import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import sit.int221.services.AuthorizationService;
 @CrossOrigin(origins = {"http://localhost:5173", "http://intproj23.sit.kmutt.ac.th", "http://localhost:80", "http://ip23tt1.sit.kmutt.ac.th", "http://ip23tt1.sit.kmutt.ac.th:1449", "http://intproj23.sit.kmutt.ac.th:8080"})
 @RestController
 @RequestMapping("/v3/boards")
+@Slf4j
 public class BoardController {
     @Autowired
     BoardService boardService;
@@ -36,9 +38,11 @@ public class BoardController {
         return ResponseEntity.ok(boardService.getBoardById(claims, boardId));
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
     public ResponseEntity<BoardResDTO> createBoard(@RequestHeader("Authorization") String token,
                                                    @RequestBody NewBoardDTO boardDTO) {
+        log.info("debug");
         Claims claims = authorizationService.validateToken(token);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(boardService.insertBoard(claims, boardDTO));

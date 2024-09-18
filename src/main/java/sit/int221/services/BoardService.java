@@ -2,6 +2,7 @@ package sit.int221.services;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class BoardService {
     @Autowired
     private BoardRepository boardRepository;
@@ -48,9 +50,10 @@ public class BoardService {
         }
     }
 
+
     public BoardResDTO insertBoard(Claims claims, NewBoardDTO boardDTO) {
         String oid = (String) claims.get("oid");
-        System.out.println(oid);
+//        System.out.println(oid);
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
         String nanoId = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
                 NanoIdUtils.DEFAULT_ALPHABET, 10);
@@ -65,7 +68,7 @@ public class BoardService {
                     NanoIdUtils.DEFAULT_ALPHABET, 10));
         }
 
-        if (boardDTO.getBoardName() == null || boardDTO.getBoardName().isBlank() || boardDTO.getBoardName().length() > 120) {
+        if (boardDTO.getBoardName() == null || boardDTO.getBoardName().isEmpty() || boardDTO.getBoardName().length() > 120) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "you must need to insert board name or board name is more than 120 character");
         }
         newBoard.setOwnerID(oid);
