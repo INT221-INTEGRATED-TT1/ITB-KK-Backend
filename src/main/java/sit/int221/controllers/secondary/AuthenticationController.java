@@ -22,6 +22,7 @@ import sit.int221.entities.secondary.User;
 import sit.int221.exceptions.AuthException;
 import sit.int221.services.AuthorizationService;
 import sit.int221.services.JwtUserDetailsService;
+import sit.int221.services.LocalUserService;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:5173", "http://intproj23.sit.kmutt.ac.th", "http://localhost:80", "http://ip23tt1.sit.kmutt.ac.th", "http://ip23tt1.sit.kmutt.ac.th:1449", "http://intproj23.sit.kmutt.ac.th:8080"})
@@ -35,23 +36,30 @@ public class AuthenticationController {
     AuthenticationManager authenticationManager;
     @Autowired
     AuthorizationService authorizationService;
+    @Autowired
+    LocalUserService localUserService;
+
 
     @PostMapping("")
     public ResponseEntity<Object> login(@RequestBody @Valid JwtRequestUser jwtRequestUser) {
         try {
+            jwtUserDetailsService.validateInputs(jwtRequestUser.getUserName(), jwtRequestUser.getPassword());
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(jwtRequestUser.getUserName(), jwtRequestUser.getPassword());
 
             // authenticate the user
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
+
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            jwtUserDetailsService.validateInputs(jwtRequestUser.getUserName(), jwtRequestUser.getPassword());
             User user = jwtUserDetailsService.findByUserName(userDetails.getUsername());
             AccessTokenDTORes accessTokenDTOres = new AccessTokenDTORes();
+            if (!localUserService.checkLocalUser(jwtRequestUser.getUserName())) {
+                localUserService.insertLocalUser(jwtRequestUser.getUserName());
+                accessTokenDTOres.setAccess_token(jwtTokenUtil.generateToken(userDetails, user));
+            }
             accessTokenDTOres.setAccess_token(jwtTokenUtil.generateToken(userDetails, user));
             return ResponseEntity.ok(accessTokenDTOres);
-
         } catch (AuthenticationException ex) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
         }

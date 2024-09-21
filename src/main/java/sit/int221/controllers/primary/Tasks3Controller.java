@@ -27,7 +27,7 @@ public class Tasks3Controller {
     ModelMapper modelMapper;
 
     @GetMapping("/{boardId}/tasks")
-    public ResponseEntity<Object> getAllTaskByBoardId(@RequestHeader("Authorization") String token, @PathVariable String boardId,@RequestParam(defaultValue = "createOn") String sortBy,
+    public ResponseEntity<Object> getAllTaskByBoardId(@RequestHeader("Authorization") String token, @PathVariable String boardId,@RequestParam(defaultValue = "createdOn") String sortBy,
                                                           @RequestParam(defaultValue = "") String[] filterStatuses,
                                                           @RequestParam(defaultValue = "ASC") String direction) {
         Claims claims = authorizationService.validateToken(token);

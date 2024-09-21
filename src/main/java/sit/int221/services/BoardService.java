@@ -35,7 +35,7 @@ public class BoardService {
 
     public List<Board> getAllBoards(Claims claims) {
         String oid = (String) claims.get("oid");
-        return boardRepository.findAllByOwnerID(oid);
+        return boardRepository.findAllByOwnerId(oid);
     }
 
     public BoardResDTO getBoardById(Claims claims, String id) {
@@ -43,7 +43,7 @@ public class BoardService {
 
         Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + " not found"));
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
-        if (oid.equals(board.getOwnerID())) {
+        if (oid.equals(board.getId())) {
             return getBoardResDTO(user, board);
         } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "This user cannot access this board");
@@ -62,19 +62,20 @@ public class BoardService {
                     NanoIdUtils.DEFAULT_ALPHABET, 10);
         }
         Board newBoard = new Board();
-        if (newBoard.getBoardID() == null || newBoard.getBoardID().isEmpty()) {
-            newBoard.setBoardID(NanoIdUtils.randomNanoId(
+        if (newBoard.getId() == null || newBoard.getId().isEmpty()) {
+            newBoard.setId(NanoIdUtils.randomNanoId(
                     NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
                     NanoIdUtils.DEFAULT_ALPHABET, 10));
         }
 
-        if (boardDTO.getBoardName() == null || boardDTO.getBoardName().isEmpty() || boardDTO.getBoardName().length() > 120) {
+        if (boardDTO.getName() == null || boardDTO.getName().isEmpty() || boardDTO.getName().length() > 120) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "you must need to insert board name or board name is more than 120 character");
         }
-        newBoard.setOwnerID(oid);
-        newBoard.setBoardName(boardDTO.getBoardName());
+//        oid must use from localUsersDB
+        newBoard.setOwnerId(oid);
+        newBoard.setName(boardDTO.getName());
         Board createdBoard = boardRepository.saveAndFlush(newBoard);
-        statuses3Service.insertDefault(createdBoard.getBoardID());
+        statuses3Service.insertDefault(createdBoard.getId());
 
         return getBoardResDTO(user, createdBoard);
 
@@ -87,8 +88,8 @@ public class BoardService {
         ownerBoard.setName(user.getName());
 
         BoardResDTO boardResDTO = new BoardResDTO();
-        boardResDTO.setBoardID(board.getBoardID());
-        boardResDTO.setBoardName(board.getBoardName());
+        boardResDTO.setBoardId(board.getId());
+        boardResDTO.setName(board.getName());
         boardResDTO.setOwner(ownerBoard);
         return boardResDTO;
     }
