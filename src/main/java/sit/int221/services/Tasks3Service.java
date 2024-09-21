@@ -36,7 +36,7 @@ public List<Tasks3> getFilterTasksAndSorted(Claims claims, String sortBy, String
     List<Tasks3> allTasksSorted = tasks3Repository.findAllByBoard(board,sort);
     if (filterStatuses.length > 0) {
         List<String> filterStatusList = Arrays.asList(filterStatuses);
-        return allTasksSorted.stream().filter(tasks3 -> filterStatusList.contains(tasks3.getStatuses3().getStatusName())).toList();
+        return allTasksSorted.stream().filter(tasks3 -> filterStatusList.contains(tasks3.getStatuses3().getName())).toList();
     }
     return allTasksSorted;
 }
@@ -45,7 +45,7 @@ public List<Tasks3> getFilterTasksAndSorted(Claims claims, String sortBy, String
         authorizationService.checkIdThatBelongsToUser(claims, boardId);
         Tasks3 newTasks3 = new Tasks3();
         newTasks3.setBoard(authorizationService.getBoardId(boardId));
-        newTasks3.setTaskTitle(tasks3.getTitle().trim());
+        newTasks3.setTitle(tasks3.getTitle().trim());
         if (tasks3.getDescription() != null && !tasks3.getDescription().isBlank()) {
             newTasks3.setDescription(tasks3.getDescription().trim());
         } else {
@@ -77,15 +77,15 @@ public List<Tasks3> getFilterTasksAndSorted(Claims claims, String sortBy, String
         Board board = authorizationService.getBoardId(boardId);
         authorizationService.checkIdThatBelongsToUser(claims, boardId);
         Tasks3 tasks3Id = tasks3Repository.findById(taskId).orElseThrow(() -> new ItemNotFoundException("Task id " + taskId + " not found"));
-        return checkTasksThatBelongsToBoard(tasks3Id, board.getBoardID());
+        return checkTasksThatBelongsToBoard(tasks3Id, board.getId());
     }
 
     public Tasks3 removeTask3ById(Claims claims, String boardId, Integer taskId) {
         Board board = authorizationService.getBoardId(boardId);
         authorizationService.checkIdThatBelongsToUser(claims, boardId);
         Tasks3 tasks3Delete = tasks3Repository.findById(taskId).orElseThrow(() -> new ItemNotFoundException("Task id " + taskId + " not found"));
-        tasks3Repository.deleteById(tasks3Delete.getTaskID());
-        return checkTasksThatBelongsToBoard(tasks3Delete, board.getBoardID());
+        tasks3Repository.deleteById(tasks3Delete.getId());
+        return checkTasksThatBelongsToBoard(tasks3Delete, board.getId());
     }
 
     public Tasks3 updateTask3(Claims claims, String boardId, Integer taskId, NewTask3DTO newTaskData) {
@@ -93,9 +93,9 @@ public List<Tasks3> getFilterTasksAndSorted(Claims claims, String sortBy, String
         Board board = authorizationService.getBoardId(boardId);
         Tasks3 tasks3Update = tasks3Repository.findById(taskId).orElseThrow(
                 () -> new TaskNotFoundException("Task id " + taskId + " not found"));
-        checkTasksThatBelongsToBoard(tasks3Update, board.getBoardID());
+        checkTasksThatBelongsToBoard(tasks3Update, board.getId());
 
-        tasks3Update.setTaskTitle(newTaskData.getTitle().trim());
+        tasks3Update.setTitle(newTaskData.getTitle().trim());
         if (newTaskData.getAssignees() != null && !newTaskData.getAssignees().isBlank()) {
             tasks3Update.setAssignees(newTaskData.getAssignees().trim());
         } else {
@@ -121,8 +121,8 @@ public List<Tasks3> getFilterTasksAndSorted(Claims claims, String sortBy, String
     }
 
     public Tasks3 checkTasksThatBelongsToBoard(Tasks3 tasks3, String boardId) {
-        if (!tasks3.getBoard().getBoardID().equals(boardId)) {
-            throw new ItemNotFoundException("Task id " + tasks3.getTaskID() + " does not belong to Board id " + boardId);
+        if (!tasks3.getBoard().getId().equals(boardId)) {
+            throw new ItemNotFoundException("Task id " + tasks3.getId() + " does not belong to Board id " + boardId);
         }
         return tasks3;
     }

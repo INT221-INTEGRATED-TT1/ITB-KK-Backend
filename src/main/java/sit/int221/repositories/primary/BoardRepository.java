@@ -6,6 +6,6 @@ import sit.int221.entities.primary.Board;
 import java.util.List;
 
 public interface BoardRepository extends JpaRepository<Board, String> {
-List<Board> findAllByOwnerID(String ownerId);
+List<Board> findAllByOwnerId(String ownerId);
 
 }

@@ -19,13 +19,13 @@ import java.time.Instant;
 public class Tasks3 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "taskID", nullable = false, length = 45, updatable = false, insertable = false)
-    private Integer taskID;
+    @Column(name = "taskId", nullable = false, length = 45, updatable = false, insertable = false)
+    private Integer id;
 
     @Size(max = 100)
     @NotNull
-    @Column(name = "taskTitle", nullable = false, length = 100)
-    private String taskTitle;
+    @Column(name = "title", nullable = false, length = 100)
+    private String title;
 
     @Size(max = 500)
     @Column(name = "description", length = 500)
@@ -37,22 +37,22 @@ public class Tasks3 {
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "boardID", nullable = false)
+    @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
-    @Column(name = "createOn", nullable = false)
+    @Column(name = "created_on", nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssX")
     @CreationTimestamp
-    private Timestamp createOn;
+    private Timestamp createdOn;
 
-    @Column(name = "updateOn", nullable = false)
+    @Column(name = "updated_on", nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssX")
     @UpdateTimestamp
-    private Timestamp updateOn;
+    private Timestamp updated;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "statusID", nullable = false)
+    @JoinColumn(name = "status_id", nullable = false)
     private Statuses3 statuses3;
 
 }

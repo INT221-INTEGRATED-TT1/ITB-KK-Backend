@@ -39,10 +39,10 @@ public class Statuses3Service {
         List<Status3HomeCountDTO> statusHomeCountDTOS = new ArrayList<>();
         for (int i = 0; i < statuses3List.stream().count(); i++) {
             Status3HomeCountDTO status3HomeCountDTO = new Status3HomeCountDTO();
-            status3HomeCountDTO.setId(statuses3List.get(i).getStatusID());
-            status3HomeCountDTO.setName(statuses3List.get(i).getStatusName());
-            status3HomeCountDTO.setDescription(statuses3List.get(i).getStatusDescription());
-            status3HomeCountDTO.setColor(statuses3List.get(i).getStatusColor());
+            status3HomeCountDTO.setId(statuses3List.get(i).getId());
+            status3HomeCountDTO.setName(statuses3List.get(i).getName());
+            status3HomeCountDTO.setDescription(statuses3List.get(i).getDescription());
+            status3HomeCountDTO.setColor(statuses3List.get(i).getColor());
             status3HomeCountDTO.setCount(task3Repository.countByStatuses3(statuses3List.get(i)));
             statusHomeCountDTOS.add(status3HomeCountDTO);
         }
@@ -53,7 +53,7 @@ public class Statuses3Service {
         authorizationService.checkIdThatBelongsToUser(claims, boardId);
         Board board = authorizationService.getBoardId(boardId);
         Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Status id " + statusId + " not found"));
-        return checkStatusesThatBelongsToBoard(statuses3Id, board.getBoardID());
+        return checkStatusesThatBelongsToBoard(statuses3Id, board.getId());
     }
 
     public Statuses3 findStatusByOnlyId(Integer statusId) {
@@ -61,8 +61,8 @@ public class Statuses3Service {
     }
 
     public Statuses3 checkStatusesThatBelongsToBoard(Statuses3 statuses3, String boardId) {
-        if (!statuses3.getBoardId().getBoardID().equals(boardId)) {
-            throw new ItemNotFoundException("Status id " + statuses3.getStatusID() + " does not belong to Board id " + boardId);
+        if (!statuses3.getBoardId().getId().equals(boardId)) {
+            throw new ItemNotFoundException("Status id " + statuses3.getId() + " does not belong to Board id " + boardId);
         }
         return statuses3;
     }
@@ -70,7 +70,7 @@ public class Statuses3Service {
     public Statuses3 insertStatus(Claims claims, String boardId, NewStatus3DTO newStatusDTO) {
         authorizationService.checkIdThatBelongsToUser(claims, boardId);
         newStatusDTO.setName(newStatusDTO.getName().trim());
-        if (statuses3Repository.existsByStatusNameAndBoardId(newStatusDTO.getName(), authorizationService.getBoardId(boardId))) {
+        if (statuses3Repository.existsByNameAndBoardId(newStatusDTO.getName(), authorizationService.getBoardId(boardId))) {
             throw new StatusUniqueException("Status name must be unique within the board");
         }
         if (newStatusDTO.getDescription() != null && !newStatusDTO.getDescription().isBlank()) {
@@ -83,14 +83,11 @@ public class Statuses3Service {
         return statuses3Repository.saveAndFlush(statuses3);
     }
 
-    public NewStatus3DTO insertDefault(String boardId) {
+    public void insertDefault(String boardId) {
         // Default Status
         String[] defaultStatus = {"No Status", "To Do", "Doing", "Done"};
         String[] defaultColor = {"#5A5A5A", "#0090FF", "#E9EB87", "#1A9338"};
         String[] defaultDescription = {"A status has not been assigned", "The task is included in the project", "The task is being worked on", "The task has been completed"};
-//        if(defaultStatus.length != defaultColor.length || defaultColor.length != defaultDescription.length){
-//            throw new RuntimeException("Status name not belongs to color and description");
-//        }
         NewStatus3DTO newStatus3DTO = new NewStatus3DTO();
 
         for (int i = 0; i < 4; i++) {
@@ -101,18 +98,17 @@ public class Statuses3Service {
             statuses3.setBoardId(authorizationService.getBoardId(boardId));
             statuses3Repository.saveAndFlush(statuses3);
         }
-        return newStatus3DTO;
     }
 
     public Statuses3 removeStatus(Claims claims, String boardId, Integer statusId) {
         authorizationService.checkIdThatBelongsToUser(claims, boardId);
         Board board = authorizationService.getBoardId(boardId);
         Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Status id " + statusId + " not found"));
-        checkStatusesThatBelongsToBoard(statuses3Id, board.getBoardID());
+        checkStatusesThatBelongsToBoard(statuses3Id, board.getId());
         Statuses3 findStatus = findStatusByOnlyId(statusId);
-        if (findStatus.getStatusName().equalsIgnoreCase("no status")) {
+        if (findStatus.getName().equalsIgnoreCase("no status")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Status cannot be deleted.");
-        } else if (findStatus.getStatusName().equalsIgnoreCase("done")) {
+        } else if (findStatus.getName().equalsIgnoreCase("done")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Done cannot be deleted.");
         }
         try {
@@ -125,9 +121,9 @@ public class Statuses3Service {
 
     public void removeOldStatus(Integer statusId) {
         Statuses3 findStatus = findStatusByOnlyId(statusId);
-        if (findStatus.getStatusName().equalsIgnoreCase("no status")) {
+        if (findStatus.getName().equalsIgnoreCase("no status")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Status cannot be deleted.");
-        } else if (findStatus.getStatusName().equalsIgnoreCase("done")) {
+        } else if (findStatus.getName().equalsIgnoreCase("done")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Done cannot be deleted.");
         }
         try {
@@ -142,7 +138,7 @@ public class Statuses3Service {
         authorizationService.checkIdThatBelongsToUser(claims, boardId);
         Board board = authorizationService.getBoardId(boardId);
         Statuses3 statuses3Id = statuses3Repository.findById(oldStatus).orElseThrow(() -> new StatusNotFoundException("Status id " + oldStatus + " not found"));
-        checkStatusesThatBelongsToBoard(statuses3Id, board.getBoardID());
+        checkStatusesThatBelongsToBoard(statuses3Id, board.getId());
         findStatusByOnlyId(oldStatus);
         if (oldStatus == newStatus) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "destination status for task transfer must be different from current status.");
@@ -160,30 +156,30 @@ public class Statuses3Service {
         authorizationService.checkIdThatBelongsToUser(claims, boardId);
         Board board = authorizationService.getBoardId(boardId);
         Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Status id " + statusId + " not found"));
-        checkStatusesThatBelongsToBoard(statuses3Id, board.getBoardID());
+        checkStatusesThatBelongsToBoard(statuses3Id, board.getId());
         Statuses3 findStatus = findStatusByOnlyId(statusId);
-        if (findStatus.getStatusName().equalsIgnoreCase("no status")) {
+        if (findStatus.getName().equalsIgnoreCase("no status")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Status cannot be modified.");
-        } else if (findStatus.getStatusName().equalsIgnoreCase("done")) {
+        } else if (findStatus.getName().equalsIgnoreCase("done")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Done cannot be modified.");
         }
-        if (statuses3Repository.existsByStatusNameAndBoardId(newStatus.getName(), board)) {
+        if (statuses3Repository.existsByNameAndBoardId(newStatus.getName(), board)) {
             throw new StatusUniqueException("Status name must be unique within the board");
         }
         if (newStatus.getName() != null && !newStatus.getName().trim().isEmpty()) {
-            findStatus.setStatusName(newStatus.getName().trim());
+            findStatus.setName(newStatus.getName().trim());
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status name does not empty");
         }
         if (newStatus.getDescription() != null && !newStatus.getDescription().isBlank()) {
-            findStatus.setStatusDescription(newStatus.getDescription().trim());
+            findStatus.setDescription(newStatus.getDescription().trim());
         } else {
-            findStatus.setStatusDescription(null);
+            findStatus.setDescription(null);
         }
         if (newStatus.getColor() != null && !newStatus.getColor().isBlank()) {
-            findStatus.setStatusColor(newStatus.getColor().trim());
+            findStatus.setColor(newStatus.getColor().trim());
         } else {
-            findStatus.setStatusColor(null);
+            findStatus.setColor(null);
         }
         statuses3Repository.save(findStatus);
         return findStatus;

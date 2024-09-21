@@ -15,16 +15,16 @@ import sit.int221.repositories.secondary.UserRepository;
 public class JwtUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private UserRepository userRepository;
+    UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(userName);
         System.out.println(user);
 
-//        System.out.println("Service");
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
         }
+
 //        List<GrantedAuthority> roles = new ArrayList<>();
 //        GrantedAuthority grantedAuthority = new GrantedAuthority() {
 //            public String getAuthority() {
@@ -39,6 +39,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     public User findByUserName(String username) {
         return userRepository.findByUsername(username);
     }
+
 
     public void validateInputs(String userName, String password) {
         if (userName == null || password == null || userName.isBlank() && password.isBlank()) {

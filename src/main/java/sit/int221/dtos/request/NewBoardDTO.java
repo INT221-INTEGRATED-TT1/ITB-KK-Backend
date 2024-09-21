@@ -12,5 +12,5 @@ public class NewBoardDTO {
     @Size(min = 0, max = 120)
     @NotNull
     @NotBlank
-    private String boardName;
+    private String name;
 }
