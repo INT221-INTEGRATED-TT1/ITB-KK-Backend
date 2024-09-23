@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class BoardResDTO {
-    private String boardId;
+    private String id;
     private String name;
     private OwnerBoard owner;
 }

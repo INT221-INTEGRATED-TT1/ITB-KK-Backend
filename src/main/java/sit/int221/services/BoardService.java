@@ -88,7 +88,7 @@ public class BoardService {
         ownerBoard.setName(user.getName());
 
         BoardResDTO boardResDTO = new BoardResDTO();
-        boardResDTO.setBoardId(board.getId());
+        boardResDTO.setId(board.getId());
         boardResDTO.setName(board.getName());
         boardResDTO.setOwner(ownerBoard);
         return boardResDTO;
