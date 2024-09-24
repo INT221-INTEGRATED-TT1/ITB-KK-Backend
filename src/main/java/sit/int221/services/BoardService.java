@@ -32,6 +32,9 @@ public class BoardService {
     AuthorizationService authorizationService;
     @Autowired
     Statuses3Service statuses3Service;
+    @Autowired
+    ModelMapper modelMapper;
+
 
     public List<Board> getAllBoards(Claims claims) {
         String oid = (String) claims.get("oid");
@@ -81,6 +84,22 @@ public class BoardService {
         statuses3Service.insertDefault(createdBoard.getId());
 
         return getBoardResDTO(user, createdBoard);
+
+    }
+    public BoardResDTO removeBoardById(Claims claims, String id){
+        Optional<Board> board = boardRepository.findById(id);
+        if(board.isPresent() == false){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Board ID: " + id +  "cannot delete");
+        }
+        if(claims.get("oid") == board.get().getOwnerId()){
+            boardRepository.deleteById(id);
+            return modelMapper.map(board,BoardResDTO.class);
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Unauthorize Cannot Delete Board ID: " +id);
+        }
+
+
 
     }
 
