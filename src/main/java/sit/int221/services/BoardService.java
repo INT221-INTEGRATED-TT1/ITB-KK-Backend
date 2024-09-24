@@ -88,18 +88,9 @@ public class BoardService {
     }
     public BoardResDTO removeBoardById(Claims claims, String id){
         Optional<Board> board = boardRepository.findById(id);
-        if(board.isPresent() == false){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Board ID: " + id +  "cannot delete");
-        }
-        if(claims.get("oid") == board.get().getOwnerId()){
-            boardRepository.deleteById(id);
-            return modelMapper.map(board,BoardResDTO.class);
-        }
-        else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Unauthorize Cannot Delete Board ID: " +id);
-        }
-
-
+        authorizationService.checkIdThatBelongsToUser(claims,id);
+        boardRepository.deleteById(id);
+        return modelMapper.map(board,BoardResDTO.class);
 
     }
 
