@@ -43,7 +43,10 @@ public class BoardService {
 
         Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + " not found"));
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
-        if (oid.equals(board.getId())) {
+        System.out.println("user" + user);
+        System.out.println("boardID " + board);
+        System.out.println(oid);
+        if (oid.equals(board.getOwnerId())) {
             return getBoardResDTO(user, board);
         } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "This user cannot access this board");
