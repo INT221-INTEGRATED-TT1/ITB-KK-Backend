@@ -3,6 +3,7 @@ package sit.int221.services;
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import sit.int221.repositories.primary.BoardRepository;
 import sit.int221.repositories.secondary.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -80,12 +82,14 @@ public class BoardService {
         return getBoardResDTO(user, createdBoard);
 
     }
-    public BoardResDTO removeBoardById(Claims claims, String id){
-        Optional<Board> board = boardRepository.findById(id);
-        authorizationService.checkIdThatBelongsToUser(claims,id);
-        boardRepository.deleteById(id);
-        return modelMapper.map(board,BoardResDTO.class);
 
+    public BoardResDTO removeBoardById(Claims claims, String boardId) {
+        Board board = authorizationService.getBoardId(boardId);
+        String oid = (String) claims.get("oid");
+        User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
+        authorizationService.checkIdThatBelongsToUser(claims, boardId);
+        boardRepository.deleteById(boardId);
+        return getBoardResDTO(user, board);
     }
 
     public BoardResDTO getBoardResDTO(User user, Board board) {
@@ -105,8 +109,7 @@ public class BoardService {
 
     public Board updateVisibility(Claims claims, String boardId, EditVisibilityDTO newVisibility) {
         authorizationService.checkIdThatBelongsToUser(claims, boardId);
-        Board updateBoardVisibility = boardRepository.findById(boardId).orElseThrow(()
-                -> new TaskNotFoundException("Board id " + boardId + " not found"));
+        Board updateBoardVisibility = boardRepository.findById(boardId).orElseThrow(() -> new TaskNotFoundException("Board id " + boardId + " not found"));
         updateBoardVisibility.setVisibility(newVisibility.getVisibility().toUpperCase());
         return boardRepository.save(updateBoardVisibility);
     }
