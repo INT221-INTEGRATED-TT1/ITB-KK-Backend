@@ -27,6 +27,11 @@ public class Board {
     @Column(name = "name", nullable = false, length = 120)
     private String name;
 
+    @Size(max = 45)
+    @NotNull
+    @Column(name = "visibility", nullable = false, length = 45)
+    private String visibility;
+
     @Size(max = 36)
     @NotNull
     @Column(name = "owner_id", nullable = false)
