@@ -31,6 +31,9 @@ public class BoardService {
     AuthorizationService authorizationService;
     @Autowired
     Statuses3Service statuses3Service;
+    @Autowired
+    ModelMapper modelMapper;
+
 
     public List<Board> getAllBoards(Claims claims) {
         String oid = (String) claims.get("oid");
@@ -75,6 +78,13 @@ public class BoardService {
         statuses3Service.insertDefault(createdBoard.getId());
 
         return getBoardResDTO(user, createdBoard);
+
+    }
+    public BoardResDTO removeBoardById(Claims claims, String id){
+        Optional<Board> board = boardRepository.findById(id);
+        authorizationService.checkIdThatBelongsToUser(claims,id);
+        boardRepository.deleteById(id);
+        return modelMapper.map(board,BoardResDTO.class);
 
     }
 

@@ -30,6 +30,7 @@ public class BoardController {
     ModelMapper modelMapper;
 
 
+
     @GetMapping("")
     public ResponseEntity<Object> getAllBoards(@RequestHeader("Authorization") String token) {
         Claims claims = authorizationService.validateToken(token);
@@ -51,6 +52,12 @@ public class BoardController {
         Claims claims = authorizationService.validateToken(token);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(boardService.insertBoard(claims, boardDTO));
+    }
+    @DeleteMapping("/{boardId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<BoardResDTO> deleteBoardById(@RequestHeader("Authorization") String token,@PathVariable String boardId){
+        Claims claims = authorizationService.validateToken(token);
+        return ResponseEntity.ok(boardService.removeBoardById(claims,boardId));
     }
 
     @PatchMapping("/{boardId}")
