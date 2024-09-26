@@ -2,6 +2,8 @@ package sit.int221.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,11 +13,16 @@ import sit.int221.entities.secondary.AuthUser;
 import sit.int221.entities.secondary.User;
 import sit.int221.repositories.secondary.UserRepository;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
 
     @Autowired
     UserRepository userRepository;
+
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(userName);
@@ -25,15 +32,16 @@ public class JwtUserDetailsService implements UserDetailsService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
         }
 
-//        List<GrantedAuthority> roles = new ArrayList<>();
+        List<GrantedAuthority> authorities = new LinkedList<>();
 //        GrantedAuthority grantedAuthority = new GrantedAuthority() {
+//            @Override
 //            public String getAuthority() {
 //                return user.getRole();
 //            }
 //        };
 //        roles.add(grantedAuthority);
-        UserDetails userDetails = new AuthUser(userName, user.getPassword());
-        return userDetails;
+        authorities.add(new SimpleGrantedAuthority("owner"));
+        return new AuthUser(userName, user.getPassword(), authorities);
     }
 
     public User findByUserName(String username) {

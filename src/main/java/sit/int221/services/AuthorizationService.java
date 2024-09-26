@@ -51,7 +51,7 @@ public class AuthorizationService {
         String oid = (String) claims.get("oid");
         Board board = getBoardId(boardId);
         if (!board.getOwnerId().equals(oid)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Owner id " + oid +
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Owner id " + oid +
                     " doest not belong to " + board.getOwnerId());
         }
     }
