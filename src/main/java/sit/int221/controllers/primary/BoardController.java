@@ -6,7 +6,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.InvalidCsrfTokenException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
 import sit.int221.dtos.request.EditVisibilityDTO;
 import sit.int221.dtos.request.NewBoardDTO;
@@ -30,11 +32,18 @@ public class BoardController {
     ModelMapper modelMapper;
 
 
-
     @GetMapping("")
     public ResponseEntity<Object> getAllBoards(@RequestHeader("Authorization") String token) {
-        Claims claims = authorizationService.validateToken(token);
-        return ResponseEntity.ok(boardService.getAllBoards(claims));
+
+        try {
+
+            Claims claims = authorizationService.validateToken(token);
+            return ResponseEntity.ok(boardService.getAllBoards(claims));
+
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
     }
 
     @GetMapping("/{boardId}")
@@ -53,11 +62,12 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(boardService.insertBoard(claims, boardDTO));
     }
+
     @DeleteMapping("/{boardId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<BoardResDTO> deleteBoardById(@RequestHeader("Authorization") String token,@PathVariable String boardId){
+    public ResponseEntity<BoardResDTO> deleteBoardById(@RequestHeader("Authorization") String token, @PathVariable String boardId) {
         Claims claims = authorizationService.validateToken(token);
-        return ResponseEntity.ok(boardService.removeBoardById(claims,boardId));
+        return ResponseEntity.ok(boardService.removeBoardById(claims, boardId));
     }
 
     @PatchMapping("/{boardId}")
