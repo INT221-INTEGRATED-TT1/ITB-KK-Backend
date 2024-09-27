@@ -5,4 +5,5 @@ import lombok.Data;
 @Data
 public class AccessTokenDTORes {
     private String access_token;
+    private String refresh_token;
 }

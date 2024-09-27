@@ -57,8 +57,10 @@ public class AuthenticationController {
             if (!localUserService.checkLocalUser(jwtRequestUser.getUserName())) {
                 localUserService.insertLocalUser(jwtRequestUser.getUserName());
                 accessTokenDTOres.setAccess_token(jwtTokenUtil.generateToken(userDetails, user));
+                accessTokenDTOres.setRefresh_token(jwtTokenUtil.generateRefreshToken(userDetails,user));
             }
             accessTokenDTOres.setAccess_token(jwtTokenUtil.generateToken(userDetails, user));
+            accessTokenDTOres.setRefresh_token(jwtTokenUtil.generateRefreshToken(userDetails,user));
             return ResponseEntity.ok(accessTokenDTOres);
         } catch (AuthenticationException ex) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
