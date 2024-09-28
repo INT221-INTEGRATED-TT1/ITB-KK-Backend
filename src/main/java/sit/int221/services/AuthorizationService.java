@@ -47,6 +47,29 @@ public class AuthorizationService {
         return claims;
     }
 
+    public Claims validateRefreshToken(String token) {
+        if (token != null ) {
+            jwtToken = token;
+            System.out.println(token);
+            try {
+                claims = jwtTokenUtil.getAllClaimsFromToken(jwtToken);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Unable to get JWT Token");
+                throw new AuthException("Invalid JWT token");
+            } catch (ExpiredJwtException e) {
+                System.out.println("JWT Token has expired");
+                throw new AuthException("JWT Token has expired");
+            } catch (MalformedJwtException e) {
+                throw new AuthException("Malformed JWT token");
+            } catch (SignatureException e) {
+                throw new AuthException("JWT signature not valid");
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "JWT Token does not begin with Bearer String");
+        }
+        return claims;
+    }
+
     public void checkIdThatBelongsToUser(Claims claims, String boardId) {
         String oid = (String) claims.get("oid");
         Board board = getBoardId(boardId);

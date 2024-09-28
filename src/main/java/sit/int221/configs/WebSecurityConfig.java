@@ -36,7 +36,9 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeRequests(authorize -> authorize
-                        .requestMatchers("/login", "/error").permitAll()
+                        .requestMatchers("/login", "/token" ,  "/error").permitAll()
+
+
                         .requestMatchers(HttpMethod.GET).hasAnyAuthority("anonymous", "owner")
                         .anyRequest().hasAuthority("owner"))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
