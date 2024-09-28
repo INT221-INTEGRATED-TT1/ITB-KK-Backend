@@ -46,11 +46,16 @@ public class BoardService {
         String oid = (String) claims.get("oid");
         Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + " not found"));
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
-        if (oid.equals(board.getOwnerId())) {
+        if(oid.equals(board.getOwnerId())){
             return getBoardResDTO(user, board);
         } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "This user cannot access this board");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access board: board visibility is PRIVATE");
         }
+    }
+    public BoardResDTO getBoardById(String id) {
+        Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + " not found"));
+        User user = userRepository.findById(board.getOwnerId()).orElseThrow(() -> new ItemNotFoundException("User id " + board.getOwnerId() + " DOES NOT EXIST!!!"));
+        return getBoardResDTO(user, board);
     }
 
 
@@ -77,7 +82,9 @@ public class BoardService {
         newBoard.setOwnerId(oid);
         newBoard.setName(boardDTO.getName());
         Board createdBoard = boardRepository.saveAndFlush(newBoard);
-        statuses3Service.insertDefault(createdBoard.getId());
+
+        // create default statuses
+        statuses3Service.insertDefaultStatus(createdBoard.getId());
 
         return getBoardResDTO(user, createdBoard);
 
@@ -93,11 +100,9 @@ public class BoardService {
     }
 
     public BoardResDTO getBoardResDTO(User user, Board board) {
-        // Need Refactor
         OwnerBoard ownerBoard = new OwnerBoard();
         ownerBoard.setOid(user.getOid());
         ownerBoard.setName(user.getName());
-
 
         BoardResDTO boardResDTO = new BoardResDTO();
         boardResDTO.setId(board.getId());
@@ -109,7 +114,11 @@ public class BoardService {
 
     public Board updateVisibility(Claims claims, String boardId, EditVisibilityDTO newVisibility) {
         authorizationService.checkIdThatBelongsToUser(claims, boardId);
-        Board updateBoardVisibility = boardRepository.findById(boardId).orElseThrow(() -> new TaskNotFoundException("Board id " + boardId + " not found"));
+        if (!newVisibility.getVisibility().equalsIgnoreCase("PUBLIC") &&
+                !newVisibility.getVisibility().equalsIgnoreCase("PRIVATE")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Visibility must be either 'PUBLIC' or 'PRIVATE'");
+        }
+        Board updateBoardVisibility = boardRepository.findById(boardId).orElseThrow(() -> new ItemNotFoundException("Board id " + boardId + " not found"));
         updateBoardVisibility.setVisibility(newVisibility.getVisibility().toUpperCase());
         return boardRepository.save(updateBoardVisibility);
     }

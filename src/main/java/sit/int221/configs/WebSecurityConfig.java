@@ -37,10 +37,13 @@ public class WebSecurityConfig {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeRequests(authorize -> authorize
                         .requestMatchers("/login", "/error").permitAll()
-                        .requestMatchers(HttpMethod.GET).hasAnyAuthority("anonymous", "owner")
-                        .anyRequest().hasAuthority("owner"))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-//                .httpBasic(withDefaults());
+                        .requestMatchers(HttpMethod.GET).permitAll() // Allow all GET requests for everyone
+//                        .requestMatchers("/v3/boards/*","/v3/boards/*/tasks", "/v3/boards/*/statuses",
+//                                "/v3/boards/*/tasks/*", "/v3/boards/*/statuses/*").permitAll()
+                        .anyRequest().hasAuthority("ROLE_OWNER")) // All other requests require ROLE_OWNER
+//                        .anyRequest().authenticated())
+                .httpBasic(withDefaults());
+        httpSecurity.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
 

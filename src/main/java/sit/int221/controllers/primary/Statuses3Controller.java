@@ -6,9 +6,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewStatus3DTO;
 import sit.int221.dtos.response.Status3DetailDTO;
 import sit.int221.dtos.response.Status3HomeCountDTO;
+import sit.int221.entities.primary.Board;
 import sit.int221.entities.primary.Statuses3;
 import sit.int221.services.AuthorizationService;
 import sit.int221.services.ListMapper;
@@ -32,13 +34,23 @@ public class Statuses3Controller {
 
 
     @GetMapping("/{boardId}/statuses")
-    public List<Status3HomeCountDTO> getAllStatusesWithCount(@RequestHeader("Authorization") String token, @PathVariable String boardId) {
+    public List<Status3HomeCountDTO> getAllStatusesWithCount(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable String boardId) {
+        Board board = authorizationService.getBoardId(boardId);
+        if (board.getVisibility().equalsIgnoreCase("PUBLIC")) {
+            return statuses3Service.getAllStatusesWithCountTasksInUse(boardId);
+        }
+        authorizationService.validateClaims(token);
         Claims claims = authorizationService.validateToken(token);
         return statuses3Service.getAllStatusesWithCountTasksInUse(claims, boardId);
     }
 
     @GetMapping("/{boardId}/statuses/{statusId}")
-    public Statuses3 findStatusById(@RequestHeader("Authorization") String token, @PathVariable String boardId, @PathVariable Integer statusId) {
+    public Statuses3 findStatusById(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable String boardId, @PathVariable Integer statusId) {
+        Board board = authorizationService.getBoardId(boardId);
+        if (board.getVisibility().equalsIgnoreCase("PUBLIC")) {
+            return statuses3Service.findStatusById(boardId, statusId);
+        }
+        authorizationService.validateClaims(token);
         Claims claims = authorizationService.validateToken(token);
         return statuses3Service.findStatusById(claims, boardId, statusId);
     }

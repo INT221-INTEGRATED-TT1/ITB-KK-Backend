@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
+import sit.int221.repositories.primary.BoardRepository;
 import sit.int221.services.JwtUserDetailsService;
 
 import java.io.IOException;
@@ -42,6 +43,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String requestTokenHeader = request.getHeader("Authorization");
         String username = null;
         String jwtToken = null;
+
+        String requestURI = request.getRequestURI();
+        if (requestURI.equals("/login")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String method = request.getMethod();
+        boolean isPublicGetEndpoint = method.equalsIgnoreCase("GET") &&
+                (requestURI.matches("/v3/boards/[A-Za-z0-9]+") ||
+                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/statuses(/\\d+)?") ||
+                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/tasks(/\\d+)?"));
+
+        // If the endpoint is public GET, allow access without token
+        if (isPublicGetEndpoint) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         if (requestTokenHeader != null) {
             if (requestTokenHeader.startsWith("Bearer ")) {
                 jwtToken = requestTokenHeader.substring(7);
@@ -61,8 +81,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         }
 
-//        List<GrantedAuthority> grantedAuthorities = new LinkedList<>();
-//        grantedAuthorities.add(new SimpleGrantedAuthority("owner"));
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
             if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {

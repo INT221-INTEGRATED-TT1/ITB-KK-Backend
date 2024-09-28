@@ -26,21 +26,14 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(userName);
-        System.out.println(user);
+//        System.out.println(user);
 
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
         }
 
         List<GrantedAuthority> authorities = new LinkedList<>();
-//        GrantedAuthority grantedAuthority = new GrantedAuthority() {
-//            @Override
-//            public String getAuthority() {
-//                return user.getRole();
-//            }
-//        };
-//        roles.add(grantedAuthority);
-        authorities.add(new SimpleGrantedAuthority("owner"));
+        authorities.add(new SimpleGrantedAuthority("ROLE_OWNER"));
         return new AuthUser(userName, user.getPassword(), authorities);
     }
 
