@@ -53,12 +53,12 @@ public class AuthorizationService {
     public Claims validateRefreshToken(String token) {
         if (token != null ) {
             jwtToken = token;
-            System.out.println(token);
+            System.out.println("This is refresh token:" + token);
             try {
                 claims = jwtTokenUtil.getAllClaimsFromToken(jwtToken);
                 System.out.println("This is Refresh Token Subject" + claims.getSubject());
                 if(userRepository.existsByUsername(claims.getSubject()) == false){
-                    throw new AuthException("Invalid Username");
+                    throw new AuthException("user not exist !");
                 }
             } catch (IllegalArgumentException e) {
                 System.out.println("Unable to get Refresh Token");
