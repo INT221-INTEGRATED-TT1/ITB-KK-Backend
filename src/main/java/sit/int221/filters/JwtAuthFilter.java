@@ -56,7 +56,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         requestURI.matches("/v3/boards/[A-Za-z0-9]+/statuses(/\\d+)?") ||
                         requestURI.matches("/v3/boards/[A-Za-z0-9]+/tasks(/\\d+)?"));
 
-        // If the endpoint is public GET, allow access without token
+//         If the endpoint is public GET, allow access without token
         if (isPublicGetEndpoint) {
             chain.doFilter(request, response);
             return;
