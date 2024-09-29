@@ -27,18 +27,18 @@ public class RefreshTokenController {
     ModelMapper modelMapper;
     @Autowired
     JwtUserDetailsService jwtUserDetailsService;
-    @GetMapping("")
-    public void getNewAccessToken(@RequestHeader String refresh_token){
-        System.out.println("This is Refresh token" + refresh_token);
+    @PostMapping ("")
+    public ResponseEntity<RefreshTokenDTORes> getNewAccessToken(@RequestHeader("x-refresh-token") String refresh_token){
         Claims claims = authorizationService.validateRefreshToken(refresh_token);
         User user = jwtUserDetailsService.findByUserName(claims.getSubject());
-        System.out.println("This is user " + user);
+        System.out.println("This is claim" + claims.getSubject());
 
-//        User user = modelMapper.map(claims,User.class);
-//        String newAccessToken = jwtTokenUtil.generateAccessTokenByRefreshToken(user);
-//        RefreshTokenDTORes response = new RefreshTokenDTORes();
-//        response.setAccess_token(newAccessToken);
-//        return ResponseEntity.ok(response);
+
+
+        String newAccessToken = jwtTokenUtil.generateAccessTokenByRefreshToken(user);
+        RefreshTokenDTORes response = new RefreshTokenDTORes();
+        response.setAccess_token(newAccessToken);
+        return ResponseEntity.ok(response);
 
 
 
