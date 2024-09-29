@@ -72,29 +72,6 @@ public class AuthenticationController {
     public ResponseEntity<Object> validateToken(@RequestHeader("Authorization") String requestTokenHeader) {
 
         Claims claims = authorizationService.validateToken(requestTokenHeader);
-//        Claims claims = null;
-//        String jwtToken = null;
-//
-//        if (requestTokenHeader != null) {
-//            System.out.println(requestTokenHeader);
-//            if (requestTokenHeader.startsWith("Bearer ")) {
-//                jwtToken = requestTokenHeader.substring(7);
-//                try {
-//                    claims = jwtTokenUtil.getAllClaimsFromToken(jwtToken);
-//                } catch (IllegalArgumentException ex) {
-//                    throw new AuthException("Invalid JWT token");
-//                } catch (ExpiredJwtException ex) {
-//                    throw new AuthException("JWT Token has expired");
-//                } catch (MalformedJwtException ex) {
-//                    throw new AuthException("Malformed JWT token");
-//                } catch (SignatureException ex) {
-//                    throw new AuthException("JWT signature not valid");
-//                }
-//            } else {
-//                throw new AuthException("JWT Token does not begin with Bearer String");
-//            }
-//        }
-
         return ResponseEntity.ok(claims);
     }
 }

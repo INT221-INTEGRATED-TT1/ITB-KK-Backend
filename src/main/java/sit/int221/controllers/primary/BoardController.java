@@ -36,22 +36,24 @@ public class BoardController {
 
 
     @GetMapping("")
-    public ResponseEntity<Object> getAllBoards(@RequestHeader("Authorization") String token) {
-
+    public ResponseEntity<Object> getAllBoards(@RequestHeader(value = "Authorization" , required = false) String token) {
         try {
-
             Claims claims = authorizationService.validateToken(token);
             return ResponseEntity.ok(boardService.getAllBoards(claims));
-
         } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-
     }
 
     @GetMapping("/{boardId}")
-    public ResponseEntity<BoardResDTO> findBoardById(@RequestHeader("Authorization") String token, @PathVariable String boardId) {
+    public ResponseEntity<BoardResDTO> findBoardById(@RequestHeader(value = "Authorization" , required = false) String token, @PathVariable String boardId) {
+        Board board = authorizationService.getBoardId(boardId);
+
         // Call Method validateToken for check token from user
+        if (board.getVisibility().equalsIgnoreCase("PUBLIC")) {
+            return ResponseEntity.ok(boardService.getBoardById(boardId));
+        }
+        authorizationService.validateClaims(token);
         Claims claims = authorizationService.validateToken(token);
         return ResponseEntity.ok(boardService.getBoardById(claims, boardId));
     }
@@ -60,7 +62,6 @@ public class BoardController {
     @PostMapping("")
     public ResponseEntity<BoardResDTO> createBoard(@RequestHeader("Authorization") String token,
                                                    @RequestBody NewBoardDTO boardDTO) {
-        log.info("debug");
         Claims claims = authorizationService.validateToken(token);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(boardService.insertBoard(claims, boardDTO));

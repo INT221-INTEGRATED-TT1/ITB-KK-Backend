@@ -23,7 +23,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
 
 
@@ -36,13 +35,11 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeRequests(authorize -> authorize
-                        .requestMatchers("/login", "/token" ,  "/error").permitAll()
-
-
-                        .requestMatchers(HttpMethod.GET).hasAnyAuthority("anonymous", "owner")
-                        .anyRequest().hasAuthority("owner"))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-//                .httpBasic(withDefaults());
+                        .requestMatchers("/login", "/error").permitAll()
+                        .requestMatchers(HttpMethod.GET).permitAll() // Allow all GET requests for everyone
+                        .anyRequest().hasAuthority("ROLE_OWNER")) // All other requests require ROLE_OWNER
+                .httpBasic(withDefaults());
+        httpSecurity.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
 
