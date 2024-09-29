@@ -53,13 +53,13 @@ public class AuthorizationService {
 
 
     public Claims validateRefreshToken(String token) {
-        if (token != null ) {
+        if (token != null) {
             jwtToken = token;
             System.out.println("This is refresh token:" + token);
             try {
                 claims = jwtTokenUtil.getAllClaimsFromToken(jwtToken);
                 System.out.println("This is Refresh Token Subject" + claims.getSubject());
-                if(userRepository.existsByUsername(claims.getSubject()) == false){
+                if (userRepository.existsByUsername(claims.getSubject()) == false) {
                     throw new AuthException("user not exist !");
                 }
             } catch (IllegalArgumentException e) {
@@ -77,6 +77,7 @@ public class AuthorizationService {
             throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "JWT Token does not begin with Bearer String");
         }
         return claims;
+    }
 
     public void validateClaims(String token) {
         if (token == null || !token.startsWith("Bearer ")) {
@@ -97,7 +98,6 @@ public class AuthorizationService {
         } catch (SignatureException e) {
             throw new AuthException("JWT signature not valid");
         }
-
     }
 
     public void checkIdThatBelongsToUser(Claims claims, String boardId) {

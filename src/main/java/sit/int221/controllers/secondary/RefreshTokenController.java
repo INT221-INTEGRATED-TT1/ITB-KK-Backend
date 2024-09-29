@@ -34,18 +34,9 @@ public class RefreshTokenController {
         User user = jwtUserDetailsService.findByUserName(claims.getSubject());
         System.out.println("This is claim" + claims.getSubject());
 
-
-
         String newAccessToken = jwtTokenUtil.generateAccessTokenByRefreshToken(user);
         RefreshTokenDTORes response = new RefreshTokenDTORes();
         response.setAccess_token(newAccessToken);
         return ResponseEntity.ok(response);
-
-
-
-
-
-
     }
-
 }
