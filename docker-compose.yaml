@@ -9,7 +9,7 @@ services:
     volumes:
       - ./database/mysql-lib:/var/lib/mysql
       - ./database/my.cnf:/etc/my.cnf
-      - ./database/setup/db-script-v3.sql:/docker-entrypoint-initdb.d/db-script-v2.sql
+      - ./database/setup/db-script-v3.1.sql:/docker-entrypoint-initdb.d/db-script-v2.sql
     restart: on-failure
     networks:
     - test-networks
@@ -47,6 +47,9 @@ services:
       dockerfile: proxy.Dockerfile
     ports:
       - "80:80"
+      - "443:443"
+
+      
     restart: 
       always
     networks:
