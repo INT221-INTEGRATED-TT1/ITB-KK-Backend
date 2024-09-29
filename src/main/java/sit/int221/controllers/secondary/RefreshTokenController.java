@@ -29,6 +29,7 @@ public class RefreshTokenController {
     JwtUserDetailsService jwtUserDetailsService;
     @PostMapping ("")
     public ResponseEntity<RefreshTokenDTORes> getNewAccessToken(@RequestHeader("x-refresh-token") String refresh_token){
+        System.out.println(refresh_token);
         Claims claims = authorizationService.validateRefreshToken(refresh_token);
         User user = jwtUserDetailsService.findByUserName(claims.getSubject());
         System.out.println("This is claim" + claims.getSubject());

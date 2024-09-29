@@ -13,6 +13,7 @@ import sit.int221.entities.primary.Board;
 import sit.int221.exceptions.AuthException;
 import sit.int221.exceptions.ItemNotFoundException;
 import sit.int221.repositories.primary.BoardRepository;
+import sit.int221.repositories.secondary.UserRepository;
 
 @Component
 public class AuthorizationService {
@@ -24,6 +25,8 @@ public class AuthorizationService {
 //    Tasks3Service tasks3Service;
     @Autowired
     BoardRepository boardRepository;
+    @Autowired
+    UserRepository userRepository;
 
     public Claims validateToken(String token) {
         if (token != null && token.startsWith("Bearer ")) {
@@ -53,16 +56,20 @@ public class AuthorizationService {
             System.out.println(token);
             try {
                 claims = jwtTokenUtil.getAllClaimsFromToken(jwtToken);
+                System.out.println("This is Refresh Token Subject" + claims.getSubject());
+                if(userRepository.existsByUsername(claims.getSubject()) == false){
+                    throw new AuthException("Invalid Username");
+                }
             } catch (IllegalArgumentException e) {
-                System.out.println("Unable to get JWT Token");
-                throw new AuthException("Invalid JWT token");
+                System.out.println("Unable to get Refresh Token");
+                throw new AuthException("Invalid Refresh token");
             } catch (ExpiredJwtException e) {
-                System.out.println("JWT Token has expired");
-                throw new AuthException("JWT Token has expired");
+                System.out.println("Refresh Token has expired");
+                throw new AuthException("Refresh Token has expired");
             } catch (MalformedJwtException e) {
-                throw new AuthException("Malformed JWT token");
+                throw new AuthException("Malformed Refresh token");
             } catch (SignatureException e) {
-                throw new AuthException("JWT signature not valid");
+                throw new AuthException("Refresh Token signature not valid");
             }
         } else {
             throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "JWT Token does not begin with Bearer String");
