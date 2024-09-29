@@ -35,7 +35,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeRequests(authorize -> authorize
-                        .requestMatchers("/login", "/error").permitAll()
+                        .requestMatchers("/login", "/token", "/error").permitAll()
                         .requestMatchers(HttpMethod.GET).permitAll() // Allow all GET requests for everyone
                         .anyRequest().hasAuthority("ROLE_OWNER")) // All other requests require ROLE_OWNER
                 .httpBasic(withDefaults());
