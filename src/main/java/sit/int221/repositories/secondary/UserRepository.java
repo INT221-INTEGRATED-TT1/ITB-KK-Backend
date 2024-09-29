@@ -6,5 +6,6 @@ import sit.int221.entities.secondary.User;
 
 public interface UserRepository extends JpaRepository<User, String> {
     User findByUsername(String userName);
-//    User findByOid(String oid);
+    Boolean existsByUsername(String userName);
+
 }

@@ -23,6 +23,8 @@ public class JwtTokenUtil implements Serializable {
     private long JWT_TOKEN_VALIDITY;
     @Value("${jwt.iss}")
     private String JWS_ISS;
+    @Value("#{${jwt.refresh-token-expiration}*60*60*1000}")
+    private long JWT_REFRESH_TOKEN_VALIDITY;
 
 
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
@@ -58,12 +60,34 @@ public class JwtTokenUtil implements Serializable {
         claims.put("role", user.getRole());
         return doGenerateToken(claims, userDetails.getUsername());
     }
+    public String generateAccessTokenByRefreshToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("name", user.getName());
+        claims.put("oid", user.getOid());
+        claims.put("email", user.getEmail());
+        claims.put("role", user.getRole());
+        return doGenerateToken(claims, user.getUsername());
+    }
+    public String generateRefreshToken(UserDetails userDetails, User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("username", user.getUsername());
+        claims.put("oid", user.getOid());
+        return doGenerateRefreshToken(claims, userDetails.getUsername());
+    }
 
     private String doGenerateToken(Map<String, Object> claims, String subject) {
         return Jwts.builder().setHeaderParam("typ", "JWT").setClaims(claims).setSubject(subject)
                 .setIssuer(JWS_ISS)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
+                .signWith(signatureAlgorithm, SECRET_KEY)
+                .compact();
+    }
+    private String doGenerateRefreshToken(Map<String, Object> claims, String subject) {
+        return Jwts.builder().setHeaderParam("typ", "JWT").setClaims(claims).setSubject(subject)
+                .setIssuer(JWS_ISS)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_REFRESH_TOKEN_VALIDITY))
                 .signWith(signatureAlgorithm, SECRET_KEY)
                 .compact();
     }
