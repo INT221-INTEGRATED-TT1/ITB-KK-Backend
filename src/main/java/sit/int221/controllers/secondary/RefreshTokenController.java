@@ -16,7 +16,7 @@ import sit.int221.services.AuthorizationService;
 import sit.int221.services.JwtUserDetailsService;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:5173", "https://intproj23.sit.kmutt.ac.th", "http://localhost:80", "https://ip23tt1.sit.kmutt.ac.th", "http://ip23tt1.sit.kmutt.ac.th:1449", "http://intproj23.sit.kmutt.ac.th:8080"})
+@CrossOrigin(origins = {"http://localhost:5173", "https://intproj23.sit.kmutt.ac.th", "http://localhost:80", "https://ip23tt1.sit.kmutt.ac.th"})
 @RequestMapping("/token")
 public class RefreshTokenController {
     @Autowired
