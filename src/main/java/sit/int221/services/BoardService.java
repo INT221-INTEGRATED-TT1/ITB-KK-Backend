@@ -11,16 +11,18 @@ import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.EditVisibilityDTO;
 import sit.int221.dtos.request.NewBoardDTO;
 import sit.int221.dtos.response.BoardResDTO;
+import sit.int221.dtos.response.CollaboratorDTORes;
 import sit.int221.dtos.response.OwnerBoard;
 import sit.int221.entities.primary.Board;
+import sit.int221.entities.primary.Collaborator;
 import sit.int221.entities.secondary.User;
 import sit.int221.exceptions.ItemNotFoundException;
-import sit.int221.exceptions.TaskNotFoundException;
 import sit.int221.repositories.primary.BoardRepository;
+import sit.int221.repositories.primary.CollaboratorRepository;
 import sit.int221.repositories.secondary.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -30,12 +32,24 @@ public class BoardService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private CollaboratorRepository collaboratorRepository;
+    @Autowired
     AuthorizationService authorizationService;
     @Autowired
     Statuses3Service statuses3Service;
     @Autowired
     ModelMapper modelMapper;
 
+
+    // code get all here
+    public List<CollaboratorDTORes> getAllCollaborators(Claims claims, String boardId) {
+        Board board = authorizationService.getBoardId(boardId);
+        validateAccess(claims, board);
+        List<Collaborator> collaborators = collaboratorRepository.findAll();
+        return collaborators.stream()
+                .map(this::getCollabResDTO)
+                .collect(Collectors.toList());
+    }
 
     public List<Board> getAllBoards(Claims claims) {
         String oid = (String) claims.get("oid");
@@ -59,10 +73,8 @@ public class BoardService {
         return getBoardResDTO(user, board);
     }
 
-
     public BoardResDTO insertBoard(Claims claims, NewBoardDTO boardDTO) {
         String oid = (String) claims.get("oid");
-//        System.out.println(oid);
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
         String nanoId = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 10);
         while (boardRepository.findById(nanoId).isPresent()) {
@@ -104,7 +116,30 @@ public class BoardService {
         }
     }
 
-    public BoardResDTO getBoardResDTO(User user, Board board) {
+    private void validateAccess(Claims claims, Board board) {
+        String oid = (String) claims.get("oid");
+        boolean isOwner = oid.equals(board.getOwnerId());
+        List<Collaborator> collaborators = collaboratorRepository.findByBoardIdAndOid(board.getId(), oid);
+        boolean isCollaborator = !collaborators.isEmpty();
+        if (!board.getVisibility().equalsIgnoreCase("PUBLIC") && !isOwner && !isCollaborator) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access board: board visibility is PRIVATE");
+        }
+        if ((isOwner || isCollaborator || !board.getVisibility().equalsIgnoreCase("PUBLIC")) && !isCollaborator) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found");
+        }
+    }
+
+    private CollaboratorDTORes getCollabResDTO(Collaborator collaborator) {
+        CollaboratorDTORes collabDTO = new CollaboratorDTORes();
+        collabDTO.setOid(collaborator.getOid());
+        collabDTO.setName(collaborator.getName());
+        collabDTO.setEmail(collaborator.getEmail());
+        collabDTO.setAccessRight(collaborator.getAccessRight());
+        collabDTO.setAddedOn(collaborator.getAddedOn());
+        return collabDTO;
+    }
+
+    private BoardResDTO getBoardResDTO(User user, Board board) {
         OwnerBoard ownerBoard = new OwnerBoard();
         ownerBoard.setOid(user.getOid());
         ownerBoard.setName(user.getName());
