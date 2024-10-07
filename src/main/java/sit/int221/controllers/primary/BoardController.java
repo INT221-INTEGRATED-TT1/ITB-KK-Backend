@@ -77,9 +77,9 @@ public class BoardController {
     @PatchMapping("/{boardId}")
     public EditVisibilityDTO updateVisibility(@RequestHeader("Authorization") String token,
                                               @PathVariable String boardId,
-                                              @RequestBody EditVisibilityDTO editVisibilityy) {
+                                              @RequestBody EditVisibilityDTO editVisibility) {
         Claims claims = authorizationService.validateToken(token);
-        Board updatedVisibility = boardService.updateVisibility(claims, boardId, editVisibilityy);
+        Board updatedVisibility = boardService.updateVisibility(claims, boardId, editVisibility);
         return modelMapper.map(updatedVisibility, EditVisibilityDTO.class);
     }
 

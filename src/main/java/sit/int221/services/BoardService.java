@@ -120,10 +120,15 @@ public class BoardService {
     public Board updateVisibility(Claims claims, String boardId, EditVisibilityDTO newVisibility) {
         Board board = authorizationService.getBoardId(boardId);
         String oid = (String) claims.get("oid");
+//        System.out.println(newVisibility.getVisibility());
         if (oid.equals(board.getOwnerId())) {
             authorizationService.checkIdThatBelongsToUser(claims, boardId);
-            if (!newVisibility.getVisibility().equalsIgnoreCase("PUBLIC") && !newVisibility.getVisibility().equalsIgnoreCase("PRIVATE")) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Visibility must be either 'PUBLIC' or 'PRIVATE'");
+            if (newVisibility.getVisibility() != null) {
+                if (!newVisibility.getVisibility().equalsIgnoreCase("PUBLIC") && !newVisibility.getVisibility().equalsIgnoreCase("PRIVATE")) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Visibility must be either 'PUBLIC' or 'PRIVATE'");
+                }
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Visibility cannot be null");
             }
             Board updateBoardVisibility = boardRepository.findById(boardId).orElseThrow(() -> new ItemNotFoundException("Board id " + boardId + " not found"));
             updateBoardVisibility.setVisibility(newVisibility.getVisibility().toUpperCase());

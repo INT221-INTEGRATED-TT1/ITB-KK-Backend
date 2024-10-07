@@ -102,7 +102,6 @@ public class AuthorizationService {
 
     public void checkIdThatBelongsToUser(Claims claims, String boardId) {
         Board board = getBoardId(boardId);
-
         String oid = (String) claims.get("oid");
         if (!board.getOwnerId().equals(oid)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Owner id " + oid + " doest not belong to " + board.getOwnerId());
