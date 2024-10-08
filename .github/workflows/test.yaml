@@ -44,7 +44,7 @@ jobs:
           newman run ./test/postman-collection/PBI20-Board-Visibility-TT1.post.json \
             --reporters htmlextra \
             --reporter-htmlextra-export PBI-20-report.html \
-            --environment ./test/postman-collection/itb-kk-env.postman_environment.json
+            --environment ./test/postman-collection/env/itb-kk-env.postman_environment.json
       - name: Archive Newman Report
         if: always()
         uses: actions/upload-artifact@v3
