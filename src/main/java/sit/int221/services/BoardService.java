@@ -75,17 +75,7 @@ public class BoardService {
         return getCollabResDTO(collaborator, collaborator.getLocalUser());
     }
 
-    // fix response to DTO Update [GET]:/boards to return personal boards and collab boards!!!!!!!!!!
-//    public List<Board> getAllBoards(Claims claims) {
-//        String oid = (String) claims.get("oid");
-//        List<Board> personalBoards = boardRepository.findAllByOwnerId(oid);
-//        System.out.println("personal " + personalBoards);
-//        List<Board> collaboratorBoards = boardRepository.findBoardsByUserOid(oid);
-//        System.out.println("collaborator " + collaboratorBoards);
-//
-//        return boardRepository.findAllByOwnerId(oid);
-//    }
-
+    // fix response to DTO Update [GET]:/boards to return personal boards and collab boards!!!!!!!!!!  #Checked
     public BoardAllDTORes getAllBoards(Claims claims) {
         String oid = (String) claims.get("oid");
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
