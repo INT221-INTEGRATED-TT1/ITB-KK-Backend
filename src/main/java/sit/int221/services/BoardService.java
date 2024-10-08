@@ -15,6 +15,7 @@ import sit.int221.dtos.response.CollaboratorDTORes;
 import sit.int221.dtos.response.OwnerBoard;
 import sit.int221.entities.primary.Board;
 import sit.int221.entities.primary.Collaborator;
+import sit.int221.entities.primary.LocalUser;
 import sit.int221.entities.secondary.User;
 import sit.int221.exceptions.ItemNotFoundException;
 import sit.int221.repositories.primary.BoardRepository;
@@ -47,10 +48,57 @@ public class BoardService {
         validateAccess(claims, board);
         List<Collaborator> collaborators = collaboratorRepository.findAll();
         return collaborators.stream()
-                .map(this::getCollabResDTO)
+                .map(collaborator -> getCollabResDTO(collaborator, collaborator.getLocalUser()))
                 .collect(Collectors.toList());
     }
 
+    public List<CollaboratorDTORes> getAllCollaborators(String boardId) {
+        List<Collaborator> collaborators = collaboratorRepository.findAll();
+        return collaborators.stream()
+                .map(collaborator -> getCollabResDTO(collaborator, collaborator.getLocalUser()))
+                .collect(Collectors.toList());
+    }
+
+    public CollaboratorDTORes getCollabById(Claims claims, String boardId, String oid) {
+        Board board = authorizationService.getBoardId(boardId);
+        validateAccess(claims, board);
+        Collaborator collaborator = collaboratorRepository.findByLocalUserOid(oid);
+        return getCollabResDTO(collaborator, collaborator.getLocalUser());
+    }
+
+    public CollaboratorDTORes getCollabById(String boardId, String oid) {
+        Board board = authorizationService.getBoardId(boardId);
+        Collaborator collaborator = collaboratorRepository.findByLocalUserOid(oid);
+        return getCollabResDTO(collaborator, collaborator.getLocalUser());
+    }
+
+    private CollaboratorDTORes getCollabResDTO(Collaborator collaborator, LocalUser localUser) {
+        CollaboratorDTORes collabDTO = new CollaboratorDTORes();
+        // set fields from localUser
+        collabDTO.setOid(localUser.getOid());
+        collabDTO.setName(localUser.getName());
+        collabDTO.setEmail(localUser.getEmail());
+        // set fields from collaborator
+        collabDTO.setAccessRight(collaborator.getAccessRight());
+        collabDTO.setAddedOn(collaborator.getAddedOn());
+        return collabDTO;
+    }
+
+    private void validateAccess(Claims claims, Board board) {
+        String oid = (String) claims.get("oid");
+        boolean isOwner = oid.equals(board.getOwnerId());
+        // try to understand this condition
+        boolean isCollaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid).isPresent();
+        System.out.println("dfs" + isCollaborator);
+        if (!isOwner && !isCollaborator) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access board: board visibility is PRIVATE");
+        }
+        if (!isCollaborator) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found");
+        }
+    }
+
+    // fix response to DTO
     public List<Board> getAllBoards(Claims claims) {
         String oid = (String) claims.get("oid");
         return boardRepository.findAllByOwnerId(oid);
@@ -116,28 +164,6 @@ public class BoardService {
         }
     }
 
-    private void validateAccess(Claims claims, Board board) {
-        String oid = (String) claims.get("oid");
-        boolean isOwner = oid.equals(board.getOwnerId());
-        List<Collaborator> collaborators = collaboratorRepository.findByBoardIdAndOid(board.getId(), oid);
-        boolean isCollaborator = !collaborators.isEmpty();
-        if (!board.getVisibility().equalsIgnoreCase("PUBLIC") && !isOwner && !isCollaborator) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access board: board visibility is PRIVATE");
-        }
-        if ((isOwner || isCollaborator || !board.getVisibility().equalsIgnoreCase("PUBLIC")) && !isCollaborator) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found");
-        }
-    }
-
-    private CollaboratorDTORes getCollabResDTO(Collaborator collaborator) {
-        CollaboratorDTORes collabDTO = new CollaboratorDTORes();
-        collabDTO.setOid(collaborator.getOid());
-        collabDTO.setName(collaborator.getName());
-        collabDTO.setEmail(collaborator.getEmail());
-        collabDTO.setAccessRight(collaborator.getAccessRight());
-        collabDTO.setAddedOn(collaborator.getAddedOn());
-        return collabDTO;
-    }
 
     private BoardResDTO getBoardResDTO(User user, Board board) {
         OwnerBoard ownerBoard = new OwnerBoard();

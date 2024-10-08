@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.sql.Timestamp;
 
@@ -19,23 +21,14 @@ public class Collaborator {
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
-    @Size(max = 45)
     @NotNull
-    @Column(name = "oid", nullable = false, length = 45)
-    private String oid;
-
-    @Size(max = 45)
-    @NotNull
-    @Column(name = "name", nullable = false, length = 45)
-    private String name;
-
-    @Size(max = 45)
-    @NotNull
-    @Column(name = "email", nullable = false, length = 45)
-    private String email;
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private LocalUser localUser;
 
     @Size(max = 45)
     @NotNull

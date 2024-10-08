@@ -6,7 +6,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.web.csrf.InvalidCsrfTokenException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
@@ -15,7 +14,6 @@ import sit.int221.dtos.request.NewBoardDTO;
 import sit.int221.dtos.response.BoardResDTO;
 import sit.int221.dtos.response.CollaboratorDTORes;
 import sit.int221.entities.primary.Board;
-import sit.int221.entities.primary.Collaborator;
 import sit.int221.services.BoardService;
 import sit.int221.services.AuthorizationService;
 
@@ -63,14 +61,28 @@ public class BoardController {
 
     @GetMapping("/{boardId}/collabs")
     public List<CollaboratorDTORes> getCollaborators(@RequestHeader(value = "Authorization", required = false)
-                                                               String token, @PathVariable String boardId) {
+                                                     String token, @PathVariable String boardId) {
         Board board = authorizationService.getBoardId(boardId);
-//        if(board.getVisibility().equalsIgnoreCase("PUBLIC")){
-//
-//        }
+        if (board.getVisibility().equalsIgnoreCase("PUBLIC")) {
+            return boardService.getAllCollaborators(boardId);
+        }
+        authorizationService.validateClaims(token);
         Claims claims = authorizationService.validateToken(token);
-        System.out.println(claims.get("oid"));
+//        System.out.println(claims.get("oid"));
         return boardService.getAllCollaborators(claims, boardId);
+    }
+
+    @GetMapping("{boardId}/collabs/{collabId}")
+    public ResponseEntity<CollaboratorDTORes> findCollabById(@RequestHeader(value = "Authorization", required = false)
+                                                             String token, @PathVariable String boardId,
+                                                             @PathVariable String collabId) {
+        Board board = authorizationService.getBoardId(boardId);
+        if (board.getVisibility().equalsIgnoreCase("PUBLIC")) {
+            return ResponseEntity.ok(boardService.getCollabById(boardId, collabId));
+        }
+        authorizationService.validateClaims(token);
+        Claims claims = authorizationService.validateToken(token);
+        return ResponseEntity.ok(boardService.getCollabById(claims, boardId, collabId));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
