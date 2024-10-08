@@ -64,7 +64,7 @@ public class BoardController {
                                                      String token, @PathVariable String boardId) {
         Board board = authorizationService.getBoardId(boardId);
         if (board.getVisibility().equalsIgnoreCase("PUBLIC")) {
-            return boardService.getAllCollaborators(boardId);
+            return boardService.getAllCollaborators();
         }
         authorizationService.validateClaims(token);
         Claims claims = authorizationService.validateToken(token);
@@ -78,7 +78,7 @@ public class BoardController {
                                                              @PathVariable String collabId) {
         Board board = authorizationService.getBoardId(boardId);
         if (board.getVisibility().equalsIgnoreCase("PUBLIC")) {
-            return ResponseEntity.ok(boardService.getCollabById(boardId, collabId));
+            return ResponseEntity.ok(boardService.getCollabById(collabId));
         }
         authorizationService.validateClaims(token);
         Claims claims = authorizationService.validateToken(token);
