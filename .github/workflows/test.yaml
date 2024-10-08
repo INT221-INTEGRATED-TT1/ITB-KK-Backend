@@ -47,7 +47,7 @@ jobs:
             --environment ./test/postman-collection/itb-kk-env.postman_environment.json
       - name: Archive Newman Report
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: PBI-20-report
           path: PBI-20-report.html
