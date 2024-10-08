@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.EditVisibilityDTO;
 import sit.int221.dtos.request.NewBoardDTO;
+import sit.int221.dtos.response.BoardAllDTORes;
 import sit.int221.dtos.response.BoardResDTO;
 import sit.int221.dtos.response.CollaboratorDTORes;
 import sit.int221.dtos.response.OwnerBoard;
@@ -75,9 +76,50 @@ public class BoardService {
     }
 
     // fix response to DTO Update [GET]:/boards to return personal boards and collab boards!!!!!!!!!!
-    public List<Board> getAllBoards(Claims claims) {
+//    public List<Board> getAllBoards(Claims claims) {
+//        String oid = (String) claims.get("oid");
+//        List<Board> personalBoards = boardRepository.findAllByOwnerId(oid);
+//        System.out.println("personal " + personalBoards);
+//        List<Board> collaboratorBoards = boardRepository.findBoardsByUserOid(oid);
+//        System.out.println("collaborator " + collaboratorBoards);
+//
+//        return boardRepository.findAllByOwnerId(oid);
+//    }
+
+    public BoardAllDTORes getAllBoards(Claims claims) {
         String oid = (String) claims.get("oid");
-        return boardRepository.findAllByOwnerId(oid);
+        User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
+
+        //get personal boards
+        List<Board> personalBoards = boardRepository.findAllByOwnerId(oid);
+
+        // get collab boards
+        List<Board> collaboratorBoards = boardRepository.findBoardsByUserOid(oid);
+
+        // Map personal boards to BoardResDTO
+        List<BoardResDTO> personalBoardDTOs = personalBoards.stream()
+                .map(board -> new BoardResDTO(
+                        board.getId(),
+                        board.getName(),
+                        board.getVisibility(),
+                        new OwnerBoard(user.getOid(), user.getName())
+                ))
+                .toList();
+
+        List<BoardResDTO> collaboratorBoardDTOs = collaboratorBoards.stream()
+                .map(board -> new BoardResDTO(
+                        board.getId(),
+                        board.getName(),
+                        board.getVisibility(),
+                        new OwnerBoard(userRepository.findById(board.getOwnerId())
+                                .orElseThrow(() -> new ItemNotFoundException("Owner Not Found")).getOid(),
+                                userRepository.findById(board.getOwnerId())
+                                        .orElseThrow(() -> new ItemNotFoundException("Owner Not Found")).getName()
+                        )
+                ))
+                .toList();
+
+        return new BoardAllDTORes(personalBoardDTOs, collaboratorBoardDTOs);
     }
 
 
