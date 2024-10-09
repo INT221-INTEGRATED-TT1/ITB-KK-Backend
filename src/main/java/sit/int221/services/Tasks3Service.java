@@ -12,6 +12,7 @@ import sit.int221.exceptions.ItemNotFoundException;
 import sit.int221.exceptions.StatusNotExistException;
 import sit.int221.exceptions.TaskNotFoundException;
 import sit.int221.repositories.primary.BoardRepository;
+import sit.int221.repositories.primary.CollaboratorRepository;
 import sit.int221.repositories.primary.Tasks3Repository;
 
 import java.util.Arrays;
@@ -26,15 +27,19 @@ public class Tasks3Service {
     @Autowired
     BoardRepository boardRepository;
     @Autowired
+    CollaboratorRepository collaboratorRepository;
+    @Autowired
     AuthorizationService authorizationService;
 
 
+    // need to fix allow access by board's collaborator as well #Checked
     public List<Tasks3> getFilterTasksAndSorted(Claims claims, String sortBy, String[] filterStatuses, String direction, String boardId) {
         Sort sort = direction.equalsIgnoreCase("ASC") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Board board = authorizationService.getBoardId(boardId);
 
         String oid = (String) claims.get("oid");
-        if (oid.equals(board.getOwnerId())) {
+        boolean isCollaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid).isPresent();
+        if (oid.equals(board.getOwnerId()) || isCollaborator) {
             List<Tasks3> allTasksSorted = tasks3Repository.findAllByBoard(board, sort);
             if (filterStatuses.length > 0) {
                 List<String> filterStatusList = Arrays.asList(filterStatuses);
@@ -42,7 +47,7 @@ public class Tasks3Service {
             }
             return allTasksSorted;
         } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access tasks: board visibility is PRIVATE");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access tasks: board visibility is PRIVATE or You are not collaborator");
         }
     }
 
@@ -57,15 +62,16 @@ public class Tasks3Service {
         return allTasksSorted;
     }
 
-
     public Tasks3 findTask3ById(Claims claims, String boardId, Integer taskId) {
         Board board = authorizationService.getBoardId(boardId);
         String oid = (String) claims.get("oid");
-        if (oid.equals(board.getOwnerId())) {
+        boolean isCollaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid).isPresent();
+
+        if (oid.equals(board.getOwnerId()) || isCollaborator) {
             Tasks3 tasks3Id = tasks3Repository.findById(taskId).orElseThrow(() -> new ItemNotFoundException("Task id " + taskId + " not found"));
             return checkTasksThatBelongsToBoard(tasks3Id, board.getId());
         } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access task: board visibility is PRIVATE");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access task: board visibility is PRIVATE or You are not collaborator");
         }
     }
 

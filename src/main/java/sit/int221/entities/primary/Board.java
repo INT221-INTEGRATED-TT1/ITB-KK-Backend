@@ -48,10 +48,11 @@ public class Board {
     private Timestamp updatedOn;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "board", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "board")
     private Set<Tasks3> tasks3s = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "board", fetch = FetchType.EAGER)
+    @JsonIgnore
+    @OneToMany(mappedBy = "board")
     private Set<Collaborator> collaborators = new LinkedHashSet<>();
 
 //    @JsonIgnore

@@ -51,16 +51,12 @@ public class BoardService {
         Board board = authorizationService.getBoardId(boardId);
         validateAccess(claims, board);
         List<Collaborator> collaborators = collaboratorRepository.findAll();
-        return collaborators.stream()
-                .map(collaborator -> getCollabResDTO(collaborator, collaborator.getLocalUser()))
-                .collect(Collectors.toList());
+        return collaborators.stream().map(collaborator -> getCollabResDTO(collaborator, collaborator.getLocalUser())).collect(Collectors.toList());
     }
 
     public List<CollaboratorDTORes> getAllCollaborators() {
         List<Collaborator> collaborators = collaboratorRepository.findAll();
-        return collaborators.stream()
-                .map(collaborator -> getCollabResDTO(collaborator, collaborator.getLocalUser()))
-                .collect(Collectors.toList());
+        return collaborators.stream().map(collaborator -> getCollabResDTO(collaborator, collaborator.getLocalUser())).collect(Collectors.toList());
     }
 
     public CollaboratorDTORes getCollabById(Claims claims, String boardId, String oid) {
@@ -87,42 +83,25 @@ public class BoardService {
         List<Board> collaboratorBoards = boardRepository.findBoardsByUserOid(oid);
 
         // Map personal boards to BoardResDTO
-        List<BoardResDTO> personalBoardDTOs = personalBoards.stream()
-                .map(board -> new BoardResDTO(
-                        board.getId(),
-                        board.getName(),
-                        board.getVisibility(),
-                        new OwnerBoard(user.getOid(), user.getName())
-                ))
-                .toList();
+        List<BoardResDTO> personalBoardDTOs = personalBoards.stream().map(board -> new BoardResDTO(board.getId(), board.getName(), board.getVisibility(), new OwnerBoard(user.getOid(), user.getName()))).toList();
 
-        List<BoardResDTO> collaboratorBoardDTOs = collaboratorBoards.stream()
-                .map(board -> new BoardResDTO(
-                        board.getId(),
-                        board.getName(),
-                        board.getVisibility(),
-                        new OwnerBoard(userRepository.findById(board.getOwnerId())
-                                .orElseThrow(() -> new ItemNotFoundException("Owner Not Found")).getOid(),
-                                userRepository.findById(board.getOwnerId())
-                                        .orElseThrow(() -> new ItemNotFoundException("Owner Not Found")).getName()
-                        )
-                ))
-                .toList();
+        List<BoardResDTO> collaboratorBoardDTOs = collaboratorBoards.stream().map(board -> new BoardResDTO(board.getId(), board.getName(), board.getVisibility(), new OwnerBoard(userRepository.findById(board.getOwnerId()).orElseThrow(() -> new ItemNotFoundException("Owner Not Found")).getOid(), userRepository.findById(board.getOwnerId()).orElseThrow(() -> new ItemNotFoundException("Owner Not Found")).getName()))).toList();
 
         return new BoardAllDTORes(personalBoardDTOs, collaboratorBoardDTOs);
     }
 
-
+    // need to fix allow access by board's collaborator as well #Checked
     public BoardResDTO getBoardById(Claims claims, String id) {
         String oid = (String) claims.get("oid");
         Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + " not found"));
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
         boolean isCollaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid).isPresent();
 
-        if (oid.equals(board.getOwnerId())) {
+        // check if is owner of the board or is Collaborator of the board
+        if (oid.equals(board.getOwnerId()) || isCollaborator) {
             return getBoardResDTO(user, board);
         } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access board: board visibility is PRIVATE");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access board: board visibility is PRIVATE or You are not collaborator");
         }
     }
 
