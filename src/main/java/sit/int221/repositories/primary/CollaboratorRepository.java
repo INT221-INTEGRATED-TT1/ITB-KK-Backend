@@ -12,7 +12,7 @@ public interface CollaboratorRepository extends JpaRepository<Collaborator, Inte
     Optional<Collaborator> findByBoardIdAndLocalUserOid(String boardId, String oid);
 
     Collaborator findByLocalUserOid(String oid);
-    List<Collaborator> findAllByBoard(Board board);
 
-//    List<Collaborator> findByBoardId(String boardId);
+    Boolean existsByBoardAndLocalUserEmail(Board board, String email);
+
 }
