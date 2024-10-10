@@ -8,5 +8,6 @@ import java.util.List;
 public interface BoardRepository extends JpaRepository<Board, String> {
     List<Board> findAllByOwnerId(String ownerId);
 //    Boolean findByOwnerId(String oid);
+    boolean existsById(String boardId);
 
 }

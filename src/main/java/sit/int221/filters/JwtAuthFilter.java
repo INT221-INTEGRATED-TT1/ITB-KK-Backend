@@ -1,5 +1,6 @@
 package sit.int221.filters;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,10 +19,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
+import sit.int221.exceptions.AuthException;
 import sit.int221.repositories.primary.BoardRepository;
+import sit.int221.services.AuthorizationService;
+import sit.int221.services.BoardService;
 import sit.int221.services.JwtUserDetailsService;
 
 import java.io.IOException;
@@ -36,6 +42,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private JwtUserDetailsService jwtUserDetailsService;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private AuthorizationService authorizationService;
+    @Autowired
+    private BoardService boardService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -56,10 +66,65 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         requestURI.matches("/v3/boards/[A-Za-z0-9]+/statuses(/\\d+)?") ||
                         requestURI.matches("/v3/boards/[A-Za-z0-9]+/tasks(/\\d+)?"));
 
+
+        // handle Http Method all method but not GET Method
+        boolean isPublicEndPointOperation = (method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT") || method.equalsIgnoreCase("PATCH") || method.equalsIgnoreCase("DELETE") ) &&
+                (requestURI.matches("/v3/boards/[A-Za-z0-9]+") ||
+                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/statuses(/\\d+)?") ||
+                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/tasks(/\\d+)?"));
+
 //         If the endpoint is public GET, allow access without token
         if (isPublicGetEndpoint) {
+
             chain.doFilter(request, response);
             return;
+        }
+
+        if(isPublicEndPointOperation){
+            // Validate Access Token
+            if(!StringUtils.hasText(request.getHeader("Authorization"))){
+                response.setStatus(HttpStatus.UNAUTHORIZED.value()); // Set the status to 401 Unauthorized
+                response.getWriter().write("Authorization header is missing or empty"); // Optional: write a message to the response
+                return; // Stop further processing, do not call chain.doFilter()
+            }
+            try {
+                authorizationService.validateToken(request.getHeader("Authorization"));
+            }
+            catch (AuthException e){
+                response.setStatus(HttpStatus.UNAUTHORIZED.value()); // Set the status to 401 Unauthorized
+                response.getWriter().write(e.getMessage());
+
+            }
+            // Check is board exist
+
+
+            String[] uriParts = requestURI.split("/");
+            System.out.println("Board ID in filter: " + uriParts[3]);
+            if ("boards".equals(uriParts[2])) {
+                // Extract the boardId
+                String boardId = uriParts[3];
+                if (boardService.boardExist(boardId) == false){
+                    response.setStatus(HttpStatus.NOT_FOUND.value()); // Set the status to 404 Not Found
+                    response.getWriter().write("Board does not exist");
+                    return;
+                }
+                // Check is Board Owner
+
+                try {
+                    authorizationService.checkIdThatBelongsToUser(authorizationService.validateToken(request.getHeader("Authorization")),boardId);
+                }
+                // if not owner of Board
+                catch (ResponseStatusException e){
+                    response.setStatus(HttpStatus.FORBIDDEN.value());
+                    response.getWriter().write("You are not owner of this board");
+                    return;
+                }
+                chain.doFilter(request, response);
+
+
+            }
+
+
         }
 
         if (requestTokenHeader != null) {
