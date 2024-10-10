@@ -28,6 +28,8 @@ public class Statuses3Service {
     @Autowired
     BoardRepository boardRepository;
     @Autowired
+    CollaboratorRepository collaboratorRepository;
+    @Autowired
     AuthorizationService authorizationService;
     @Autowired
     ModelMapper modelMapper;
@@ -35,7 +37,9 @@ public class Statuses3Service {
     public List<Status3HomeCountDTO> getAllStatusesWithCountTasksInUse(Claims claims, String boardId) {
         Board board = authorizationService.getBoardId(boardId);
         String oid = (String) claims.get("oid");
-        if (oid.equals(board.getOwnerId())) {
+        boolean isCollaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid).isPresent();
+
+        if (oid.equals(board.getOwnerId()) || isCollaborator) {
             List<Statuses3> statuses3List = statuses3Repository.findAllByBoardId(board);
             List<Status3HomeCountDTO> statusHomeCountDTOS = new ArrayList<>();
             for (int i = 0; i < statuses3List.stream().count(); i++) {
@@ -49,7 +53,7 @@ public class Statuses3Service {
             }
             return statusHomeCountDTOS;
         } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access statuses: board visibility is PRIVATE");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access statuses: board visibility is PRIVATE or You are not collaborator");
         }
     }
 
@@ -72,11 +76,13 @@ public class Statuses3Service {
     public Statuses3 findStatusById(Claims claims, String boardId, Integer statusId) {
         Board board = authorizationService.getBoardId(boardId);
         String oid = (String) claims.get("oid");
-        if (oid.equals(board.getOwnerId())) {
+        boolean isCollaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid).isPresent();
+
+        if (oid.equals(board.getOwnerId()) || isCollaborator) {
             Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Status id " + statusId + " not found"));
             return checkStatusesThatBelongsToBoard(statuses3Id, board.getId());
         } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access status: board visibility is PRIVATE");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access status: board visibility is PRIVATE or You are not collaborator");
         }
     }
 
