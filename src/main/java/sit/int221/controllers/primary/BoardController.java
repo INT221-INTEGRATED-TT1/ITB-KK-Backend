@@ -11,11 +11,14 @@ import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
 import sit.int221.dtos.request.EditVisibilityDTO;
 import sit.int221.dtos.request.NewBoardDTO;
+import sit.int221.dtos.request.NewCollaboratorDTO;
 import sit.int221.dtos.response.BoardResDTO;
 import sit.int221.dtos.response.CollaboratorDTORes;
+import sit.int221.dtos.response.NewCollabDTORes;
 import sit.int221.entities.primary.Board;
 import sit.int221.services.BoardService;
 import sit.int221.services.AuthorizationService;
+import sit.int221.services.CollaboratorService;
 
 import java.util.List;
 
@@ -28,6 +31,8 @@ import java.util.List;
 public class BoardController {
     @Autowired
     BoardService boardService;
+    @Autowired
+    CollaboratorService collaboratorService;
     @Autowired
     AuthorizationService authorizationService;
     @Autowired
@@ -72,7 +77,7 @@ public class BoardController {
         return boardService.getAllCollaborators(claims, boardId);
     }
 
-    @GetMapping("{boardId}/collabs/{collabId}")
+    @GetMapping("/{boardId}/collabs/{collabId}")
     public ResponseEntity<CollaboratorDTORes> findCollabById(@RequestHeader(value = "Authorization", required = false)
                                                              String token, @PathVariable String boardId,
                                                              @PathVariable String collabId) {
@@ -83,6 +88,16 @@ public class BoardController {
         authorizationService.validateClaims(token);
         Claims claims = authorizationService.validateToken(token);
         return ResponseEntity.ok(boardService.getCollabById(claims, boardId, collabId));
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/{boardId}/collabs")
+    public ResponseEntity<NewCollabDTORes> createCollaborator(@RequestHeader("Authorization") String token,
+                                                              @PathVariable String boardId,
+                                                              @RequestBody NewCollaboratorDTO newCollab) {
+        Claims claims = authorizationService.validateToken(token);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(collaboratorService.createNewCollaborator(claims, boardId, newCollab));
     }
 
     @ResponseStatus(HttpStatus.CREATED)

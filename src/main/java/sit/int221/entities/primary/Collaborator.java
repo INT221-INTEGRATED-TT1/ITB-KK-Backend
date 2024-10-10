@@ -16,6 +16,7 @@ import java.sql.Timestamp;
 @Table(name = "collaborator")
 public class Collaborator {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "collabId", nullable = false)
     private Integer id;
 
@@ -35,7 +36,6 @@ public class Collaborator {
     @Column(name = "accessRight", nullable = false, length = 45)
     private String accessRight;
 
-    @NotNull
     @Column(name = "addedOn", nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssX")
     @CreationTimestamp
