@@ -4,10 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OwnerBoard {
-    private String oid;
-    private String name;
+public class BoardAllDTORes {
+    private List<BoardResDTO> personalBoards;
+    private List<BoardResDTO> collaboratorBoards;
+
+
 }

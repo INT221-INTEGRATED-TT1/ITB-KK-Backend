@@ -6,6 +6,7 @@ import sit.int221.entities.primary.Statuses3;
 
 import java.util.List;
 
+
 public interface Statuses3Repository extends JpaRepository<Statuses3, Integer> {
 //    Statuses3 findByName(String name);
     Boolean existsByNameAndBoardId(String name, Board boardId);
