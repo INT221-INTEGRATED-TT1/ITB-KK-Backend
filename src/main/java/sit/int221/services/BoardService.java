@@ -213,4 +213,9 @@ public class BoardService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allow to access this board");
         }
     }
+
+//    check board have in database yet ?
+    public boolean boardExist(String boardId){
+        return boardRepository.existsById(boardId);
+    }
 }
