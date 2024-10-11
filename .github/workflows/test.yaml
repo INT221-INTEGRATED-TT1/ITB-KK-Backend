@@ -1,0 +1,57 @@
+name: Testing Backend WorkFlow
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install OpenVPN
+        run: |
+          sudo apt update
+          sudo apt install -y openvpn openvpn-systemd-resolved
+      - name: Connect to VPN
+        uses: "kota65535/github-openvpn-connect-action@v3.1.0"
+        with:
+          config_file: ./test/openVpn/sitst-client.ovpn
+          username: ${{ secrets.OVPN_USERNAME }}
+          password: ${{ secrets.OVPN_PASSWORD }}
+      - name: Run docker-compose
+        uses: hoverkraft-tech/compose-action@v2.0.1
+        with:
+            compose-file: "./docker-compose-test.yaml"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+            node-version: '20'
+            
+      - name: Install NewMan and  HTML Reporter for Newman
+        run: |
+            npm install -g newman
+            npm install -g newman-reporter-htmlextra
+      - name: Run Newman Tests For PBI-20-Board-VisiBility
+        run: |
+          newman run ./test/postman-collection/PBI20-Board-Visibility-TT1.post.json --reporters htmlextra --reporter-htmlextra-export PBI-20-report.html --environment ./test/postman-collection/env/itb-kk-env.postman_environment.json
+             
+           
+            
+      - name: Archive Newman Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: PBI-20-report
+          path: PBI-20-report.html
+      - name: Stop and remove containers
+        if: always()
+        run: |
+          docker-compose -f docker-compose-test.yaml down      
