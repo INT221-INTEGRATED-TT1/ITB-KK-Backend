@@ -45,10 +45,6 @@ public class BoardService {
     @Autowired
     ModelMapper modelMapper;
 
-
-
-
-    // fix response to DTO Update [GET]:/boards to return personal boards and collab boards!!!!!!!!!!  #Checked
     public BoardAllDTORes getAllBoards(Claims claims) {
         String oid = (String) claims.get("oid");
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
@@ -67,7 +63,6 @@ public class BoardService {
         return new BoardAllDTORes(personalBoardDTOs, collaboratorBoardDTOs);
     }
 
-    // need to fix allow access by board's collaborator as well #Checked
     public BoardResDTO getBoardById(Claims claims, String id) {
         String oid = (String) claims.get("oid");
         Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + " not found"));
@@ -152,7 +147,6 @@ public class BoardService {
         }
     }
 
-
     private BoardResDTO getBoardResDTO(User user, Board board) {
         OwnerBoard ownerBoard = new OwnerBoard();
         ownerBoard.setOid(user.getOid());
@@ -165,7 +159,6 @@ public class BoardService {
         boardResDTO.setOwner(ownerBoard);
         return boardResDTO;
     }
-
 
 //    check board have in database yet ?
     public boolean boardExist(String boardId){
