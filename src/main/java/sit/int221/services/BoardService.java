@@ -152,6 +152,7 @@ public class BoardService {
         }
     }
 
+
     private BoardResDTO getBoardResDTO(User user, Board board) {
         OwnerBoard ownerBoard = new OwnerBoard();
         ownerBoard.setOid(user.getOid());
@@ -163,6 +164,12 @@ public class BoardService {
         boardResDTO.setVisibility(board.getVisibility());
         boardResDTO.setOwner(ownerBoard);
         return boardResDTO;
+    }
+
+
+//    check board have in database yet ?
+    public boolean boardExist(String boardId){
+        return boardRepository.existsById(boardId);
     }
 
 }

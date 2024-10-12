@@ -1,0 +1,2297 @@
+{
+	"info": {
+		"_postman_id": "5f587c74-7845-4b25-a5ab-e2c787e2e763",
+		"name": "R2 Sprint 03 - PBI20 Board Visibility",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19571900"
+	},
+	"item": [
+		{
+			"name": "PBI20 BOARD VISIBILITY",
+			"item": [
+				{
+					"name": "PBI20-TC1 private-owner",
+					"item": [
+						{
+							"name": "PBI20-TC1-Step 1 create tmp user and store access_token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Successful login with new tmp user\", function () {",
+											"    pm.response.to.have.status(200);",
+											"",
+											"    var responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.be.has.property('access_token');",
+											"    pm.collectionVariables.set(\"ACCESS_TOKEN\", responseJson.access_token);",
+											"",
+											"});",
+											"",
+											"/*",
+											"var responseJson = pm.response.json();",
+											"// Validate that the response is json object",
+											"pm.test(\"Response with access_token\", function () {",
+											"    pm.expect(responseJson).to.be.has.property('access_token');",
+											"    pm.collectionVariables.set(\"ACCESS_TOKEN\", responseJson.access_token);",
+											"});",
+											"*/"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const req = {",
+											"        url:  \"https://intproj23.sit.kmutt.ac.th/ft/shared/users\", ",
+											"        method: 'POST',",
+											"        header: {",
+											"            'content-type': 'application/json',",
+											"            'Authorization': \"Bearer eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL2ludHByb2oyMy5zaXQua211dHQuYWMudGgvZnQvIiwic3ViIjoiYWRtaW4iLCJleHAiOjE3MzQ3NDEwOTQsImlhdCI6MTcyNjEwMTA5NCwic2NvcGUiOiJhZG1pbiJ9.eBbccjOqaW7wYXURb_rDppsFimSXONchp6QKgZ1ZdqrsruLiAPlaCD22wfQh9Vv_AufzEEcMu_CK3owUqWxWlEMhlz4kiTgEsZsVadUiTByYCtf9vSYNvRU3F3roT6PJS-PQpxr3aehXZNBXL9Az3_UF2ofdxOtg13o2LRo_7aeZvnafClxBZu1nJS7Tpm-fRnKwVJTANUiO6S9urbeFPoiZrZBxlGs0lAgYFp1_OGE5rhAuq6oewPFR8TkwbM5bmv79roBnBWnXaoYTu5eM6FsfivwTyJvKof4iqDQJXOLQDXPpfIord4u5IIyVxsZCnCIeYYqwqM4kde4IAiQRlw\",",
+											"            'Accept': \"*/*\"",
+											"        }",
+											"    };",
+											"pm.sendRequest(req, function (err, response) {",
+											"    newUser = response.json();",
+											"    pm.request.body.raw = {",
+											"        'userName': newUser.username,",
+											"        'password': newUser.password",
+											"    }",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"followOriginalHttpMethod": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "PBI20-TC1-Step 2 create new board and store board-id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Validate that the response code should be 200",
+											"pm.test(\"Successful creation of new personal board\", function () {",
+											"    pm.response.to.have.status(201);",
+											"",
+											"    var responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.be.an('object');",
+											"    pm.collectionVariables.set(\"BOARD_ID\", \"/\"+responseJson.id);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.request.body.raw = {",
+											"        'name': 'PBI20-BOARD-VISIBILITY'",
+											"    }"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"followOriginalHttpMethod": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{BOARD_PATH}}",
+									"host": [
+										"{{baseUrl}}{{BOARD_PATH}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "PBI20-TC1-Step 3 test endpoint authz",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = pm.collectionVariables.get(\"BOARD_ID\");",
+											"token = pm.collectionVariables.get(\"ACCESS_TOKEN\");",
+											"",
+											"pm.test(\"visibility is 'PRIVATE'\", function () {",
+											"    pm.expect(pm.response.json().visibility.toLowerCase()).to.equal('private');",
+											"});",
+											"",
+											"// step 3.1",
+											"pm.test(\"step 3.1 GET:/v3/boards/{id} - 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"// step 3.2",
+											"let req = { url:  baseURL+boardPATH+boardID+\"/tasks\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.2 GET:/v3/boards/{id}/tasks - 200\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"    });",
+											"});",
+											"",
+											"// step 3.3",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.3 GET:/v3/boards/{id}/tasks/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 3.4",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.4 GET:/v3/boards/{id}/statuses - 200\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"    });",
+											"});",
+											"",
+											"// step 3.5",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.5 GET:/v3/boards/{id}/statuses/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 3.6",
+											"req = { url:  baseURL+boardPATH+boardID, ",
+											"        method: 'PATCH', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.6 PATCH:/v3/boards/{id} - 400\", function () {",
+											"        pm.expect(response).to.have.status(400);",
+											"    });",
+											"});",
+											"",
+											"// step 3.7",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks\", ",
+											"        method: 'POST', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.7 POST:/v3/boards/{id}/tasks - 400\", function () {",
+											"        pm.expect(response).to.have.status(400);",
+											"    });",
+											"});",
+											"",
+											"// step 3.8",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'PUT', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.8 PUT:/v3/boards/{id}/tasks/99999 - 400 or 404\", function () {",
+											"        pm.expect(response.code).to.be.oneOf([400,404]);",
+											"    });",
+											"});",
+											"",
+											"// step 3.9",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'DELETE', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.9 DELETE:/v3/boards/{id}/tasks/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 3.10",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'POST', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.10 POST:/v3/boards/{id}/statuses - 400\", function () {",
+											"        pm.expect(response).to.have.status(400);",
+											"    });",
+											"});",
+											"",
+											"// step 3.11",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'PUT', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.11 PUT:/v3/boards/{id}/statuses/99999 - 400 or 404\", function () {",
+											"        pm.expect(response.code).to.be.oneOf([400,404]);",
+											"    });",
+											"});",
+											"",
+											"// step 3.12",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'DELETE', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.12 DELETE:/v3/boards/{id}/statuses/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"followOriginalHttpMethod": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}",
+									"host": [
+										"{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "- private board / owner",
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{ACCESS_TOKEN}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "PBI20-TC2 failed PATCH",
+					"item": [
+						{
+							"name": "PBI20-TC2-Step 1 PATCH with empty",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = pm.collectionVariables.get(\"BOARD_ID\");",
+											"token = pm.collectionVariables.get(\"ACCESS_TOKEN\");",
+											"",
+											"pm.test(\"PATCH with empty - 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"// check visibility value",
+											"let req = { url: baseURL+boardPATH+boardID, ",
+											"         method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"visibility is still 'PRIVATE'\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"        pm.expect(response.json().visibility.toLowerCase()).to.equal('private');",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"followOriginalHttpMethod": true
+							},
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"visibility\": \"\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}",
+									"host": [
+										"{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "PBI20-TC2-Step 2 PATCH with 'p'",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = pm.collectionVariables.get(\"BOARD_ID\");",
+											"token = pm.collectionVariables.get(\"ACCESS_TOKEN\");",
+											"",
+											"pm.test(\"PATCH with 'p' - 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"// check visibility value",
+											"let req = { url: baseURL+boardPATH+boardID, ",
+											"         method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"Visibility is still 'PRIVATE'\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"        pm.expect(response.json().visibility.toLowerCase()).to.equal('private');",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"followOriginalHttpMethod": true
+							},
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"visibility\": \"p\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}",
+									"host": [
+										"{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "- PATCH:/v3/boards/{id} failed with 400",
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{ACCESS_TOKEN}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "PBI20-TC3 private-no authn",
+					"item": [
+						{
+							"name": "PBI20-TC3-Step 1 test endpoint authz",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = pm.collectionVariables.get(\"BOARD_ID\");",
+											"",
+											"// step 1.1",
+											"pm.test(\"step 1.1 GET:/v3/boards/{id} - 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"// step 1.2",
+											"let req = { url: baseURL+boardPATH+boardID+\"/tasks\", ",
+											"         method: 'GET' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.2 GET:/v3/boards/{id}/tasks - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.3",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'GET' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.3 GET:/v3/boards/{id}/tasks/99999 - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.4",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'GET' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.4 GET:/v3/boards/{id}/statuses - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.5",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'GET' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.5 GET:/v3/boards/{id}/statuses/99999 - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.6",
+											"req = { url:  baseURL+boardPATH+boardID, ",
+											"        method: 'PATCH' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.6 PATCH:/v3/boards/{id} - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.7",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks\", ",
+											"        method: 'POST' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.7 POST:/v3/boards/{id}/tasks - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.8",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'PUT' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.8 PUT:/v3/boards/{id}/tasks/99999 - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.9",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'DELETE' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.9 DELETE:/v3/boards/{id}/tasks/99999 - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.10",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'POST' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.10 POST:/v3/boards/{id}/statuses - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.11",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'PUT' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.11 PUT:/v3/boards/{id}/statuses/99999 - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.12",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'DELETE' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.12 DELETE:/v3/boards/{id}/statuses/99999 - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// check visibility value",
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = pm.collectionVariables.get(\"BOARD_ID\");",
+											"token = pm.collectionVariables.get(\"ACCESS_TOKEN\");",
+											"let req = { url:  baseURL+boardPATH+boardID, ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"visibility is 'PRIVATE'\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"        pm.expect(response.json().visibility.toLowerCase()).to.equal('private');",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"followOriginalHttpMethod": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}",
+									"host": [
+										"{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "- private board / not authenticated",
+					"auth": {
+						"type": "noauth"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "PBI20-TC4 private-not owner",
+					"item": [
+						{
+							"name": "PBI20-TC4-Step 0 login as itbkk.somsuan",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Successful login as itbkk.somsuan\", function () {",
+											"    var responseJson = pm.response.json();",
+											"",
+											"    pm.response.to.have.status(200);",
+											"    pm.expect(responseJson).to.be.has.property('access_token');",
+											"    pm.collectionVariables.set(\"OTHER_ACCESS_TOKEN\", responseJson.access_token);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"followOriginalHttpMethod": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userName\": \"itbkk.somsuan\",\n    \"password\": \"ip23/SOM\" \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "PBI20-TC4-Step 1 test endpoint authz",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = pm.collectionVariables.get(\"BOARD_ID\");",
+											"token = pm.collectionVariables.get(\"OTHER_ACCESS_TOKEN\");",
+											"",
+											"// step 1.1",
+											"pm.test(\"step 1.1 GET:/v3/boards/{id} - 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"// step 1.2",
+											"let req = { url:  baseURL+boardPATH+boardID+\"/tasks\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.2 GET:/v3/boards/{id}/tasks - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.3",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.3 GET:/v3/boards/{id}/tasks/99999 - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.4",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.4 GET:/v3/boards/{id}/statuses - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.5",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.5 GET:/v3/boards/{id}/statuses/99999 - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.6",
+											"req = { url:  baseURL+boardPATH+boardID, ",
+											"        method: 'PATCH', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.6 PATCH:/v3/boards/{id} - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.7",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks\", ",
+											"        method: 'POST', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.7 POST:/v3/boards/{id}/tasks - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.8",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'PUT', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.8 PUT:/v3/boards/{id}/tasks/99999 - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.9",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'DELETE', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.9 DELETE:/v3/boards/{id}/tasks/99999 - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.10",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'POST', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.10 POST:/v3/boards/{id}/statuses - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.11",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'PUT', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.11 PUT:/v3/boards/{id}/statuses/99999 - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.12",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'DELETE', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.12 DELETE:/v3/boards/{id}/statuses/99999 - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// check visibility value",
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = pm.collectionVariables.get(\"BOARD_ID\");",
+											"token = pm.collectionVariables.get(\"ACCESS_TOKEN\");",
+											"let req = { url:  baseURL+boardPATH+boardID, ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"Visibility is 'PRIVATE'\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"        pm.expect(response.json().visibility.toLowerCase()).to.equal('private');",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{OTHER_ACCESS_TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}",
+									"host": [
+										"{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "- private board / not owner",
+					"auth": {
+						"type": "noauth"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "PBI20-TC5 public-owner",
+					"item": [
+						{
+							"name": "PBI20-TC5-Step 2.0 PATCH with \"PRIVATE\"",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = pm.collectionVariables.get(\"BOARD_ID\");",
+											"token = pm.collectionVariables.get(\"ACCESS_TOKEN\");",
+											"",
+											"pm.test(\"PATCH with 'PRIVATE' - 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"// check visibility value",
+											"req = { url:  baseURL+boardPATH+boardID, ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"visibility is 'PRIVATE'\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"        pm.expect(response.json().visibility.toLowerCase()).to.equal('private');",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"followOriginalHttpMethod": true
+							},
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"visibility\": \"PRIVATE\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}",
+									"host": [
+										"{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "PBI20-TC5-Step 2.1 PATCH with \"PUBLIC\"",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = pm.collectionVariables.get(\"BOARD_ID\");",
+											"token = pm.collectionVariables.get(\"ACCESS_TOKEN\");",
+											"",
+											"pm.test(\"PATCH with 'PUBLIC' - 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"// check visibility value",
+											"req = { url:  baseURL+boardPATH+boardID, ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"visibility is 'PUBLIC'\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"        pm.expect(response.json().visibility.toLowerCase()).to.equal('public');",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"followOriginalHttpMethod": true
+							},
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"visibility\": \"PUBLIC\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}",
+									"host": [
+										"{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "PBI20-TC5-Step 3 test endpoint authz",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = pm.collectionVariables.get(\"BOARD_ID\");",
+											"token = pm.collectionVariables.get(\"ACCESS_TOKEN\");",
+											"",
+											"// step 3.1",
+											"pm.test(\"step 3.1 visibility is 'PUBLIC'\", function () {",
+											"    pm.response.to.have.status(200);",
+											"    pm.expect(pm.response.json().visibility.toLowerCase()).to.equal('public');",
+											"});",
+											"",
+											"// step 3.2",
+											"let req = { url:  baseURL+boardPATH+boardID+\"/tasks\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.2 GET:/v3/boards/{id}/tasks - 200\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"    });",
+											"});",
+											"",
+											"// step 3.3",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.3 GET:/v3/boards/{id}/tasks/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 3.4",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.4 GET:/v3/boards/{id}/statuses - 200\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"    });",
+											"});",
+											"",
+											"// step 3.5",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.5 GET:/v3/boards/{id}/statuses/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 3.6",
+											"req = { url:  baseURL+boardPATH+boardID, ",
+											"        method: 'PATCH', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.6 PATCH:/v3/boards/{id} - 400\", function () {",
+											"        pm.expect(response).to.have.status(400);",
+											"    });",
+											"});",
+											"",
+											"// step 3.7",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks\", ",
+											"        method: 'POST', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.7 POST:/v3/boards/{id}/tasks - 400\", function () {",
+											"        pm.expect(response).to.have.status(400);",
+											"    });",
+											"});",
+											"",
+											"// step 3.8",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'PUT', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.8 PUT:/v3/boards/{id}/tasks/99999 - 400 or 404\", function () {",
+											"        pm.expect(response.code).to.be.oneOf([400,404]);",
+											"    });",
+											"});",
+											"",
+											"// step 3.9",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'DELETE', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.9 DELETE:/v3/boards/{id}/tasks/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 3.10",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'POST', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.10 POST:/v3/boards/{id}/statuses - 400\", function () {",
+											"        pm.expect(response).to.have.status(400);",
+											"    });",
+											"});",
+											"",
+											"// step 3.11",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'PUT', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.11 PUT:/v3/boards/{id}/statuses/99999 - 400 or 404\", function () {",
+											"        pm.expect(response.code).to.be.oneOf([400,404]);",
+											"    });",
+											"});",
+											"",
+											"// step 3.12",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'DELETE', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 3.12 DELETE:/v3/boards/{id}/statuses/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"followOriginalHttpMethod": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}",
+									"host": [
+										"{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "- PATCH:/v3/boards/{id} successful\n    \n- public board / owner",
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{ACCESS_TOKEN}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "PBI20-TC6 public-no authn",
+					"item": [
+						{
+							"name": "PBI20-TC6-Step 1 test endpoint authz",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = pm.collectionVariables.get(\"BOARD_ID\");",
+											"",
+											"// step 1.1",
+											"pm.test(\"step 1.1 GET:/v3/boards/{id} - 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"// step 1.2",
+											"let req = { url:  baseURL+boardPATH+boardID+\"/tasks\", ",
+											"        method: 'GET' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.2 GET:/v3/boards/{id}/tasks - 200\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"    });",
+											"});",
+											"",
+											"// step 1.3",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'GET' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.3 GET:/v3/boards/{id}/tasks/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.4",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'GET' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.4 GET:/v3/boards/{id}/statuses - 200\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"    });",
+											"});",
+											"",
+											"// step 1.5",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'GET' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.5 GET:/v3/boards/{id}/statuses/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.6",
+											"req = { url:  baseURL+boardPATH+boardID, ",
+											"        method: 'PATCH' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.6 PATCH:/v3/boards/{id} - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.7",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks\", ",
+											"        method: 'POST' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.7 POST:/v3/boards/{id}/tasks - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.8",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'PUT' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.8 PUT:/v3/boards/{id}/tasks/99999 - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.9",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'DELETE' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.9 DELETE:/v3/boards/{id}/tasks/99999 - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.10",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'POST' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.10 POST:/v3/boards/{id}/statuses - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.11",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'PUT' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.11 PUT:/v3/boards/{id}/statuses/99999 - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.12",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'DELETE' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.12 DELETE:/v3/boards/{id}/statuses/99999 - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// check visibility value",
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = pm.collectionVariables.get(\"BOARD_ID\");",
+											"token = pm.collectionVariables.get(\"ACCESS_TOKEN\");",
+											"let req = { url:  baseURL+boardPATH+boardID, ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"Visibility is 'PUBLIC'\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"        pm.expect(response.json().visibility.toLowerCase()).to.equal('public');",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"followOriginalHttpMethod": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}",
+									"host": [
+										"{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "- public board / not authenticated",
+					"auth": {
+						"type": "noauth"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "PBI20-TC7 public-not owner",
+					"item": [
+						{
+							"name": "PBI20-TC7-Step 0 login as itbkk.somsuan",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Successful login as itbkk.somsuan\", function () {",
+											"    var responseJson = pm.response.json();",
+											"",
+											"    pm.response.to.have.status(200);",
+											"    pm.expect(responseJson).to.be.has.property('access_token');",
+											"    pm.collectionVariables.set(\"OTHER_ACCESS_TOKEN\", responseJson.access_token);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"followOriginalHttpMethod": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userName\": \"itbkk.somsuan\",\n    \"password\": \"ip23/SOM\" \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "PBI20-TC7-Step 1 test endpoint authz",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = pm.collectionVariables.get(\"BOARD_ID\");",
+											"token = pm.collectionVariables.get(\"OTHER_ACCESS_TOKEN\");",
+											"",
+											"// step 1.1",
+											"pm.test(\"step 1.1 GET:/v3/boards/{id} - 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"// step 1.2",
+											"let req = { url:  baseURL+boardPATH+boardID+\"/tasks\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.2 GET:/v3/boards/{id}/tasks - 200\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"    });",
+											"});",
+											"",
+											"// step 1.3",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.3 GET:/v3/boards/{id}/tasks/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.4",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.4 GET:/v3/boards/{id}/statuses - 200\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"    });",
+											"});",
+											"",
+											"// step 1.5",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.5 GET:/v3/boards/{id}/statuses/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.6",
+											"req = { url:  baseURL+boardPATH+boardID, ",
+											"        method: 'PATCH', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.6 PATCH:/v3/boards/{id} - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.7",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks\", ",
+											"        method: 'POST', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.7 POST:/v3/boards/{id}/tasks - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.8",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'PUT', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.8 PUT:/v3/boards/{id}/tasks/99999 - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.9",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'DELETE', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.9 DELETE:/v3/boards/{id}/tasks/99999 - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.10",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'POST', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.10 POST:/v3/boards/{id}/statuses - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.11",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'PUT', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.11 PUT:/v3/boards/{id}/statuses/99999 - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											"",
+											"// step 1.12",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'DELETE', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.12 DELETE:/v3/boards/{id}/statuses/99999 - 403\", function () {",
+											"        pm.expect(response).to.have.status(403);",
+											"    });",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// check visibility value",
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = pm.collectionVariables.get(\"BOARD_ID\");",
+											"token = pm.collectionVariables.get(\"ACCESS_TOKEN\");",
+											"",
+											"let req = { url:  baseURL+boardPATH+boardID, ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"visibility is 'PUBLIC'\", function () {",
+											"        pm.expect(response).to.have.status(200);",
+											"        pm.expect(response.json().visibility.toLowerCase()).to.equal('public');",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{OTHER_ACCESS_TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}",
+									"host": [
+										"{{baseUrl}}{{BOARD_PATH}}{{BOARD_ID}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "- public board / not owner",
+					"auth": {
+						"type": "noauth"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "PBI20-TC8 no board-no authn",
+					"item": [
+						{
+							"name": "PBI20-TC8-Step 1 test endpoint authz",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = \"/99999\";",
+											"",
+											"// step 1.1",
+											"pm.test(\"step 1.1 GET:/v3/boards/{id} - 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"// step 1.2",
+											"let req = { url:  baseURL+boardPATH+boardID+\"/tasks\", ",
+											"        method: 'GET' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.2 GET:/v3/boards/{id}/tasks - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.3",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'GET' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.3 GET:/v3/boards/{id}/tasks/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.4",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'GET' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.4 GET:/v3/boards/{id}/statuses - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.5",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'GET' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.5 GET:/v3/boards/{id}/statuses/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.6",
+											"req = { url:  baseURL+boardPATH+boardID, ",
+											"        method: 'PATCH' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.6 PATCH:/v3/boards/{id} - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.7",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks\", ",
+											"        method: 'POST' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.7 POST:/v3/boards/{id}/tasks - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.8",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'PUT' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.8 PUT:/v3/boards/{id}/tasks/99999 - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.9",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'DELETE' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.9 DELETE:/v3/boards/{id}/tasks/99999 - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.10",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'POST' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.10 POST:/v3/boards/{id}/statuses - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.11",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'PUT' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.11 PUT:/v3/boards/{id}/statuses/99999 - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											"",
+											"// step 1.12",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'DELETE' };",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.12 DELETE:/v3/boards/{id}/statuses/99999 - 401\", function () {",
+											"        pm.expect(response).to.have.status(401);",
+											"    });",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"followOriginalHttpMethod": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{BOARD_PATH}}/99999",
+									"host": [
+										"{{baseUrl}}{{BOARD_PATH}}"
+									],
+									"path": [
+										"99999"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "- no board / not authenticated",
+					"auth": {
+						"type": "noauth"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "PBI20-TC9 no board-authn",
+					"item": [
+						{
+							"name": "PBI20-TC9-Step 0 login as itbkk.somsuan",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Successful login as itbkk.somsuan\", function () {",
+											"    var responseJson = pm.response.json();",
+											"",
+											"    pm.response.to.have.status(200);",
+											"    pm.expect(responseJson).to.be.has.property('access_token');",
+											"    pm.collectionVariables.set(\"OTHER_ACCESS_TOKEN\", responseJson.access_token);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"followOriginalHttpMethod": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userName\": \"itbkk.somsuan\",\n    \"password\": \"ip23/SOM\" \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "PBI20-TC9-Step 1 test endpoint authz",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"baseURL = pm.environment.get(\"baseUrl\");",
+											"boardPATH = pm.collectionVariables.get(\"BOARD_PATH\");",
+											"boardID = \"/99999\";",
+											"token = pm.collectionVariables.get(\"OTHER_ACCESS_TOKEN\");",
+											"",
+											"// step 1.1",
+											"pm.test(\"step 1.1 GET:/v3/boards/{id} - 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"// step 1.2",
+											"let req = { url:  baseURL+boardPATH+boardID+\"/tasks\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.2 GET:/v3/boards/{id}/tasks - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.3",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.3 GET:/v3/boards/{id}/tasks/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.4",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.4 GET:/v3/boards/{id}/statuses - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.5",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'GET', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.5 GET:/v3/boards/{id}/statuses/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.6",
+											"req = { url:  baseURL+boardPATH+boardID, ",
+											"        method: 'PATCH', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.6 PATCH:/v3/boards/{id} - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.7",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks\", ",
+											"        method: 'POST', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.7 POST:/v3/boards/{id}/tasks - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.8",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'PUT', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.8 PUT:/v3/boards/{id}/tasks/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.9",
+											"req = { url:  baseURL+boardPATH+boardID+\"/tasks/99999\", ",
+											"        method: 'DELETE', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.9 DELETE:/v3/boards/{id}/tasks/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.10",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses\", ",
+											"        method: 'POST', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.10 POST:/v3/boards/{id}/statuses - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.11",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'PUT', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.11 PUT:/v3/boards/{id}/statuses/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											"",
+											"// step 1.12",
+											"req = { url:  baseURL+boardPATH+boardID+\"/statuses/99999\", ",
+											"        method: 'DELETE', header: {'Authorization': \"Bearer \"+token}};",
+											"",
+											"pm.sendRequest(req, function (err, response) {",
+											"    pm.test(\"step 1.12 DELETE:/v3/boards/{id}/statuses/99999 - 404\", function () {",
+											"        pm.expect(response).to.have.status(404);",
+											"    });",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{OTHER_ACCESS_TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{BOARD_PATH}}/99999",
+									"host": [
+										"{{baseUrl}}{{BOARD_PATH}}"
+									],
+									"path": [
+										"99999"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "- no board / authenticated",
+					"auth": {
+						"type": "noauth"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "BOARD_PATH",
+			"value": "/v3/boards",
+			"type": "string"
+		},
+		{
+			"key": "ACCESS_TOKEN",
+			"value": ""
+		},
+		{
+			"key": "BOARD_ID",
+			"value": ""
+		},
+		{
+			"key": "OTHER_ACCESS_TOKEN",
+			"value": ""
+		}
+	]
+}
