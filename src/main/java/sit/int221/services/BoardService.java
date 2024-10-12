@@ -46,30 +46,7 @@ public class BoardService {
     ModelMapper modelMapper;
 
 
-    // code get all here
-    public List<CollaboratorDTORes> getAllCollaborators(Claims claims, String boardId) {
-        Board board = authorizationService.getBoardId(boardId);
-        validateAccess(claims, board);
-        List<Collaborator> collaborators = collaboratorRepository.findAll();
-        return collaborators.stream().map(collaborator -> getCollabResDTO(collaborator, collaborator.getLocalUser())).collect(Collectors.toList());
-    }
 
-    public List<CollaboratorDTORes> getAllCollaborators() {
-        List<Collaborator> collaborators = collaboratorRepository.findAll();
-        return collaborators.stream().map(collaborator -> getCollabResDTO(collaborator, collaborator.getLocalUser())).collect(Collectors.toList());
-    }
-
-    public CollaboratorDTORes getCollabById(Claims claims, String boardId, String oid) {
-        Board board = authorizationService.getBoardId(boardId);
-        validateAccess(claims, board);
-        Collaborator collaborator = collaboratorRepository.findByLocalUserOid(oid);
-        return getCollabResDTO(collaborator, collaborator.getLocalUser());
-    }
-
-    public CollaboratorDTORes getCollabById(String oid) {
-        Collaborator collaborator = collaboratorRepository.findByLocalUserOid(oid);
-        return getCollabResDTO(collaborator, collaborator.getLocalUser());
-    }
 
     // fix response to DTO Update [GET]:/boards to return personal boards and collab boards!!!!!!!!!!  #Checked
     public BoardAllDTORes getAllBoards(Claims claims) {
@@ -154,45 +131,6 @@ public class BoardService {
         }
     }
 
-    private CollaboratorDTORes getCollabResDTO(Collaborator collaborator, LocalUser localUser) {
-        CollaboratorDTORes collabDTO = new CollaboratorDTORes();
-        // set fields from localUser
-        collabDTO.setOid(localUser.getOid());
-        collabDTO.setName(localUser.getName());
-        collabDTO.setEmail(localUser.getEmail());
-        // set fields from collaborator
-        collabDTO.setAccessRight(collaborator.getAccessRight());
-        collabDTO.setAddedOn(collaborator.getAddedOn());
-        return collabDTO;
-    }
-
-    private void validateAccess(Claims claims, Board board) {
-        String oid = (String) claims.get("oid");
-        boolean isOwner = oid.equals(board.getOwnerId());
-        // try to understand this condition
-        boolean isCollaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid).isPresent();
-        System.out.println("dfs" + isCollaborator);
-        if (!isOwner && !isCollaborator) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access board: board visibility is PRIVATE");
-        }
-        if (!isCollaborator) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found");
-        }
-    }
-
-    private BoardResDTO getBoardResDTO(User user, Board board) {
-        OwnerBoard ownerBoard = new OwnerBoard();
-        ownerBoard.setOid(user.getOid());
-        ownerBoard.setName(user.getName());
-
-        BoardResDTO boardResDTO = new BoardResDTO();
-        boardResDTO.setId(board.getId());
-        boardResDTO.setName(board.getName());
-        boardResDTO.setVisibility(board.getVisibility());
-        boardResDTO.setOwner(ownerBoard);
-        return boardResDTO;
-    }
-
     public Board updateVisibility(Claims claims, String boardId, EditVisibilityDTO newVisibility) {
         Board board = authorizationService.getBoardId(boardId);
         String oid = (String) claims.get("oid");
@@ -213,4 +151,18 @@ public class BoardService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allow to access this board");
         }
     }
+
+    private BoardResDTO getBoardResDTO(User user, Board board) {
+        OwnerBoard ownerBoard = new OwnerBoard();
+        ownerBoard.setOid(user.getOid());
+        ownerBoard.setName(user.getName());
+
+        BoardResDTO boardResDTO = new BoardResDTO();
+        boardResDTO.setId(board.getId());
+        boardResDTO.setName(board.getName());
+        boardResDTO.setVisibility(board.getVisibility());
+        boardResDTO.setOwner(ownerBoard);
+        return boardResDTO;
+    }
+
 }

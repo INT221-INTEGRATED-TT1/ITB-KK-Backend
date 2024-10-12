@@ -5,6 +5,5 @@ import sit.int221.entities.primary.LocalUser;
 
 public interface LocalUserRepository extends JpaRepository<LocalUser, String> {
     boolean existsByUsername(String username);
-
     LocalUser findByEmail(String email);
 }
