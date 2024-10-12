@@ -12,9 +12,9 @@ public interface BoardRepository extends JpaRepository<Board, String> {
 
 //    Boolean findByOwnerId(String oid);
     boolean existsById(String boardId);
-  
+
     //    Boolean findByOwnerId(String oid);
-// Find boards where the user is a collaborator
+    // Find boards where the user is a collaborator
     @Query("SELECT b FROM Board b JOIN b.collaborators c WHERE c.localUser.oid = :oid")
     List<Board> findBoardsByUserOid(@Param("oid") String oid);
 }
