@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewStatus3DTO;
 import sit.int221.dtos.response.Status3HomeCountDTO;
 import sit.int221.entities.primary.Board;
+import sit.int221.entities.primary.Collaborator;
 import sit.int221.entities.primary.Statuses3;
 import sit.int221.exceptions.ItemNotFoundException;
 import sit.int221.exceptions.StatusNotFoundException;
@@ -18,6 +19,7 @@ import sit.int221.repositories.primary.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class Statuses3Service {
@@ -104,10 +106,11 @@ public class Statuses3Service {
     }
 
     public Statuses3 insertStatus(Claims claims, String boardId, NewStatus3DTO newStatusDTO) {
-//        authorizationService.checkIdThatBelongsToUser(claims, boardId);
         Board board = authorizationService.getBoardId(boardId);
         String oid = (String) claims.get("oid");
-        if (oid.equals(board.getOwnerId())) {
+        Optional<Collaborator> collaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(boardId, oid);
+
+        if (oid.equals(board.getOwnerId()) || collaborator.isPresent() && collaborator.get().getAccessRight().equals("WRITE")) {
             newStatusDTO.setName(newStatusDTO.getName().trim());
             if (statuses3Repository.existsByNameAndBoardId(newStatusDTO.getName(), authorizationService.getBoardId(boardId))) {
                 throw new StatusUniqueException("Status name must be unique within the board");
@@ -121,7 +124,7 @@ public class Statuses3Service {
             statuses3.setBoardId(authorizationService.getBoardId(boardId));
             return statuses3Repository.saveAndFlush(statuses3);
         } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allow to access this board");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not authorized to create a task on this board");
         }
     }
 
@@ -143,10 +146,11 @@ public class Statuses3Service {
     }
 
     public Statuses3 removeStatus(Claims claims, String boardId, Integer statusId) {
-//        authorizationService.checkIdThatBelongsToUser(claims, boardId);
         Board board = authorizationService.getBoardId(boardId);
         String oid = (String) claims.get("oid");
-        if (oid.equals(board.getOwnerId())) {
+        Optional<Collaborator> collaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(boardId, oid);
+
+        if (oid.equals(board.getOwnerId()) || collaborator.isPresent() && collaborator.get().getAccessRight().equals("WRITE")) {
             Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Status id " + statusId + " not found"));
             checkStatusesThatBelongsToBoard(statuses3Id, board.getId());
             Statuses3 findStatus = findStatusByOnlyId(statusId);
@@ -162,7 +166,7 @@ public class Statuses3Service {
             }
             return statuses3Id;
         } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allow to access this board");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not authorized to create a task on this board");
         }
     }
 
@@ -182,10 +186,11 @@ public class Statuses3Service {
 
     @Transactional(transactionManager = "primaryTransactionManager")
     public Statuses3 updateTasksStatusAndDelete(Claims claims, String boardId, Integer oldStatus, Integer newStatus) {
-//        authorizationService.checkIdThatBelongsToUser(claims, boardId);
         Board board = authorizationService.getBoardId(boardId);
         String oid = (String) claims.get("oid");
-        if (oid.equals(board.getOwnerId())) {
+        Optional<Collaborator> collaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(boardId, oid);
+
+        if (oid.equals(board.getOwnerId()) || collaborator.isPresent() && collaborator.get().getAccessRight().equals("WRITE")) {
             Statuses3 statuses3Id = statuses3Repository.findById(oldStatus).orElseThrow(() -> new StatusNotFoundException("Status id " + oldStatus + " not found"));
             checkStatusesThatBelongsToBoard(statuses3Id, board.getId());
             findStatusByOnlyId(oldStatus);
@@ -200,15 +205,16 @@ public class Statuses3Service {
             removeOldStatus(oldStatus);
             return statuses3Id;
         } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allow to access this board");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not authorized to create a task on this board");
         }
     }
 
     public Statuses3 updateStatus(Claims claims, String boardId, Integer statusId, NewStatus3DTO newStatus) {
-//        authorizationService.checkIdThatBelongsToUser(claims, boardId);
         Board board = authorizationService.getBoardId(boardId);
         String oid = (String) claims.get("oid");
-        if (oid.equals(board.getOwnerId())) {
+        Optional<Collaborator> collaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(boardId, oid);
+
+        if (oid.equals(board.getOwnerId()) || collaborator.isPresent() && collaborator.get().getAccessRight().equals("WRITE")) {
             Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Status id " + statusId + " not found"));
             checkStatusesThatBelongsToBoard(statuses3Id, board.getId());
             Statuses3 findStatus = findStatusByOnlyId(statusId);
@@ -238,7 +244,7 @@ public class Statuses3Service {
             statuses3Repository.save(findStatus);
             return findStatus;
         } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allow to access this board");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not authorized to create a task on this board");
         }
     }
 

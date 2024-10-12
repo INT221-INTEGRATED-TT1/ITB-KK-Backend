@@ -60,6 +60,7 @@ public class Tasks3Controller {
     @PostMapping("/{boardId}/tasks")
     @ResponseStatus(HttpStatus.CREATED)
     public TaskDetail3DTO createTaskWithBoardId(@RequestHeader("Authorization") String token, @PathVariable String boardId, @RequestBody NewTask3DTO task3DTO) {
+        
         Claims claims = authorizationService.validateToken(token);
         Tasks3 tasks3 = tasks3Service.createNewTaskByBoardId(claims, boardId, task3DTO);
         return modelMapper.map(tasks3, TaskDetail3DTO.class);
