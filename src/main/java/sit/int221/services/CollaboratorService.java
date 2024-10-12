@@ -157,6 +157,29 @@ public class CollaboratorService {
         }
     }
 
+    public CollaboratorDTORes removeCollaborator(Claims claims, String boardId, String oid) {
+//        token.is.valid AND board($id).NOT.exists
+        Board board = authorizationService.getBoardId(boardId);
+        String boardOid = (String) claims.get("oid");
+        Collaborator collaborator = collaboratorRepository.findByBoardIdAndLocalUserOidOrThrow(boardId, oid);
+        // owner and collaborator themselves can remove collaborator
+        if (boardOid.equals(board.getOwnerId()) || boardOid.equals(oid)) {
+            if (collaborator != null) {
+                Collaborator collabToDelete = collaboratorRepository.findByLocalUserOid(oid);
+                LocalUser localUser = collaborator.getLocalUser();
+                collaboratorRepository.delete(collabToDelete);
+                return getCollabResDTO(collaborator, localUser);
+            } else {
+                // Collaborator not found
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found on the board with ID: " + boardId);
+            }
+        } else {
+            // token.is.valid AND board($id).exists AND
+            // (token.oid.is.NOT.board.owner OR token.oid.is.NOT.board.collaborator
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not Board Owner or Not Board Collaborator");
+        }
+    }
+
     private CollaboratorDTORes getCollabResDTO(Collaborator collaborator, LocalUser localUser) {
         CollaboratorDTORes collabDTO = new CollaboratorDTORes();
         // set fields from localUser

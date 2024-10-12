@@ -68,11 +68,9 @@ public class BoardController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
-    public ResponseEntity<BoardResDTO> createBoard(@RequestHeader("Authorization") String token,
-                                                   @RequestBody NewBoardDTO boardDTO) {
+    public ResponseEntity<BoardResDTO> createBoard(@RequestHeader("Authorization") String token, @RequestBody NewBoardDTO boardDTO) {
         Claims claims = authorizationService.validateToken(token);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(boardService.insertBoard(claims, boardDTO));
+        return ResponseEntity.status(HttpStatus.CREATED).body(boardService.insertBoard(claims, boardDTO));
     }
 
     @DeleteMapping("/{boardId}")
@@ -83,17 +81,14 @@ public class BoardController {
     }
 
     @PatchMapping("/{boardId}")
-    public EditVisibilityDTO updateVisibility(@RequestHeader("Authorization") String token,
-                                              @PathVariable String boardId,
-                                              @RequestBody EditVisibilityDTO editVisibility) {
+    public EditVisibilityDTO updateVisibility(@RequestHeader("Authorization") String token, @PathVariable String boardId, @RequestBody EditVisibilityDTO editVisibility) {
         Claims claims = authorizationService.validateToken(token);
         Board updatedVisibility = boardService.updateVisibility(claims, boardId, editVisibility);
         return modelMapper.map(updatedVisibility, EditVisibilityDTO.class);
     }
 
     @GetMapping("/{boardId}/collabs")
-    public List<CollaboratorDTORes> getCollaborators(@RequestHeader(value = "Authorization", required = false)
-                                                     String token, @PathVariable String boardId) {
+    public List<CollaboratorDTORes> getCollaborators(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable String boardId) {
         Board board = authorizationService.getBoardId(boardId);
         if (board.getVisibility().equalsIgnoreCase("PUBLIC")) {
             return collaboratorService.getAllCollaborators();
@@ -105,9 +100,7 @@ public class BoardController {
     }
 
     @GetMapping("/{boardId}/collabs/{collabId}")
-    public ResponseEntity<CollaboratorDTORes> findCollabById(@RequestHeader(value = "Authorization", required = false)
-                                                             String token, @PathVariable String boardId,
-                                                             @PathVariable String collabId) {
+    public ResponseEntity<CollaboratorDTORes> findCollabById(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable String boardId, @PathVariable String collabId) {
         Board board = authorizationService.getBoardId(boardId);
         if (board.getVisibility().equalsIgnoreCase("PUBLIC")) {
             return ResponseEntity.ok(collaboratorService.getCollabById(boardId, collabId));
@@ -119,21 +112,23 @@ public class BoardController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{boardId}/collabs")
-    public ResponseEntity<NewCollabDTORes> createCollaborator(@RequestHeader("Authorization") String token,
-                                                              @PathVariable String boardId,
-                                                              @RequestBody NewCollaboratorDTO newCollab) {
+    public ResponseEntity<NewCollabDTORes> createCollaborator(@RequestHeader("Authorization") String token, @PathVariable String boardId, @RequestBody NewCollaboratorDTO newCollab) {
         Claims claims = authorizationService.validateToken(token);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(collaboratorService.createNewCollaborator(claims, boardId, newCollab));
+        return ResponseEntity.status(HttpStatus.CREATED).body(collaboratorService.createNewCollaborator(claims, boardId, newCollab));
     }
 
     @PatchMapping("/{boardId}/collabs/{oid}")
-    public EditAccessRightDTO updateAccessRight(@RequestHeader("Authorization") String token,
-                                                @PathVariable String boardId,
-                                                @PathVariable String oid,
-                                                @RequestBody EditAccessRightDTO editAccessRight) {
+    public ResponseEntity<EditAccessRightDTO> updateAccessRight(@RequestHeader("Authorization") String token, @PathVariable String boardId, @PathVariable String oid, @RequestBody EditAccessRightDTO editAccessRight) {
         Claims claims = authorizationService.validateToken(token);
-        return collaboratorService.updateAccessRight(claims, boardId, oid, editAccessRight);
+        return ResponseEntity.ok(collaboratorService.updateAccessRight(claims, boardId, oid, editAccessRight));
+    }
+
+    @DeleteMapping("/{boardId}/collabs/{oid}")
+    public ResponseEntity<CollaboratorDTORes> removeCollaborator(@RequestHeader("Authorization") String token,
+                                                           @PathVariable String boardId,
+                                                           @PathVariable String oid) {
+        Claims claims = authorizationService.validateToken(token);
+        return ResponseEntity.ok(collaboratorService.removeCollaborator(claims, boardId, oid));
     }
 
 
