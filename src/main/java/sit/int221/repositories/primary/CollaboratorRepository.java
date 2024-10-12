@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CollaboratorRepository extends JpaRepository<Collaborator, Integer> {
-    //    List<Collaborator> findByBoardIdAndLocalUserOid(String boardId, String oid);
     Optional<Collaborator> findByBoardIdAndLocalUserOid(String boardId, String oid);
     Collaborator findByLocalUserOid(String oid);
     Boolean existsByBoardAndLocalUserEmail(Board board, String email);
