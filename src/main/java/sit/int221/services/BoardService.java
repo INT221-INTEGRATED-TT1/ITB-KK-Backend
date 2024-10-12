@@ -160,9 +160,4 @@ public class BoardService {
         return boardResDTO;
     }
 
-//    check board have in database yet ?
-    public boolean boardExist(String boardId){
-        return boardRepository.existsById(boardId);
-    }
-
 }
