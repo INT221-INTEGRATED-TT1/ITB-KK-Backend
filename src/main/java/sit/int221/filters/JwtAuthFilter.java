@@ -72,21 +72,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 (requestURI.matches("/v3/boards/[A-Za-z0-9]+") ||
                         requestURI.matches("/v3/boards/[A-Za-z0-9]+/statuses(/\\d+)?") ||
                         requestURI.matches("/v3/boards/[A-Za-z0-9]+/tasks(/\\d+)?") || requestURI.matches("/v3/boards/[A-Za-z0-9]+/collabs(/([A-Za-z0-9]+))?")) ;
-        System.out.println("Debug" + "Block 1");
-        System.out.println(isPublicEndPointOperation);
-        System.out.println(isPublicGetEndpoint);
 
-//      //   If the endpoint is public GET, allow access without token
+
+      //   If the endpoint is public GET, allow access without token
         if (isPublicGetEndpoint) {
             chain.doFilter(request, response);
             return;
         }
+        // Handle PUT POST PATCH DELETE
 
         if(isPublicEndPointOperation){
-            System.out.println("Debug " + "Block 2");
+
             // Validate Access Token
             if(StringUtils.hasText(request.getHeader("Authorization")) == false){
-                logger.warn("This is Block 1");
+
                 System.out.println(request.getHeader("Authorization"));
                 response.setStatus(HttpStatus.UNAUTHORIZED.value()); // Set the status to 401 Unauthorized
                 response.getWriter().write("Authorization header is missing or empty"); // Optional: write a message to the response
@@ -120,7 +119,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     authorizationService.checkIdThatBelongsToUser(authorizationService.validateToken(request.getHeader("Authorization")),boardId);
                     System.out.println("Checked owner access board");
                 }
-                // If token expire
+
 
 
                 // if not owner of Board
@@ -137,11 +136,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
 
 //
-                    // User Have write Access
+                    // User Have write Access if it not board owner?
                     boolean isUserHaveWriteAccess = authorizationService.isUserHaveWriteAccess(authorizationService.validateToken(request.getHeader("Authorization")),boardId);
 
                       if(isUserHaveWriteAccess){
                           if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                              // Set Role to Collaborator Request have Write Access
                               UserDetails userDetails = this.jwtUserDetailsService.setCollaboratorWriteAccess(username);
                               if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
                                   System.out.println("Validate Token");
@@ -183,18 +183,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 }
 
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    // Set Role With Owner Role
                     UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
                     if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
                         System.out.println("Validate Token");
-                        UsernamePasswordAuthenticationToken authToken = new
-                                UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authToken);
-                    }
-                }
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
-                    if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
                         UsernamePasswordAuthenticationToken authToken = new
                                 UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
