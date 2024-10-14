@@ -42,10 +42,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private JwtUserDetailsService jwtUserDetailsService;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-    @Autowired
-    private AuthorizationService authorizationService;
-    @Autowired
-    private BoardService boardService;
+//    @Autowired
+//    private AuthorizationService authorizationService;
+//    @Autowired
+//    private BoardService boardService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,

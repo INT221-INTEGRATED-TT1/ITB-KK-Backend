@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OwnerBoard {
+public class OwnerBoardDTORes {
     private String oid;
     private String name;
 }

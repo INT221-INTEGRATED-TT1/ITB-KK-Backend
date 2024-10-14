@@ -1,7 +1,5 @@
 package sit.int221.dtos.response;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BoardResDTO {
+public class CollabsBoardResDTO {
     private String id;
     private String name;
-    private String visibility;
-    private OwnerBoard owner;
+    private OwnerBoardCollabDTORes owner;
+    private String accessRight;
 }

@@ -10,23 +10,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.EditVisibilityDTO;
 import sit.int221.dtos.request.NewBoardDTO;
-import sit.int221.dtos.response.BoardAllDTORes;
-import sit.int221.dtos.response.BoardResDTO;
-import sit.int221.dtos.response.CollaboratorDTORes;
-import sit.int221.dtos.response.OwnerBoard;
+import sit.int221.dtos.response.*;
 import sit.int221.entities.primary.Board;
 import sit.int221.entities.primary.Collaborator;
-import sit.int221.entities.primary.LocalUser;
 import sit.int221.entities.secondary.User;
 import sit.int221.exceptions.ItemNotFoundException;
 import sit.int221.repositories.primary.BoardRepository;
 import sit.int221.repositories.primary.CollaboratorRepository;
-import sit.int221.repositories.primary.LocalUserRepository;
 import sit.int221.repositories.secondary.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -47,6 +40,7 @@ public class BoardService {
     public BoardAllDTORes getAllBoards(Claims claims) {
         String oid = (String) claims.get("oid");
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
+        Collaborator collaborator = collaboratorRepository.findByLocalUserOid(oid);
 
         //get personal boards
         List<Board> personalBoards = boardRepository.findAllByOwnerId(oid);
@@ -55,14 +49,24 @@ public class BoardService {
         List<Board> collaboratorBoards = boardRepository.findBoardsByUserOid(oid);
 
         // Map personal boards to BoardResDTO
-        List<BoardResDTO> personalBoardDTOs = personalBoards.stream().map(board -> new BoardResDTO(board.getId(), board.getName(), board.getVisibility(), new OwnerBoard(user.getOid(), user.getName()))).toList();
+        List<PersonalBoardResDTO> personalBoardDTOs = personalBoards.stream()
+                .map(board -> new PersonalBoardResDTO(board.getId(), board.getName(),
+                        board.getVisibility(),
+                        new OwnerBoardDTORes(user.getOid(), user.getName()))).toList();
 
-        List<BoardResDTO> collaboratorBoardDTOs = collaboratorBoards.stream().map(board -> new BoardResDTO(board.getId(), board.getName(), board.getVisibility(), new OwnerBoard(userRepository.findById(board.getOwnerId()).orElseThrow(() -> new ItemNotFoundException("Owner Not Found")).getOid(), userRepository.findById(board.getOwnerId()).orElseThrow(() -> new ItemNotFoundException("Owner Not Found")).getName()))).toList();
+        List<CollabsBoardResDTO> collaboratorBoardDTOs = collaboratorBoards.stream()
+                .map(board -> new CollabsBoardResDTO(
+                        board.getId(),
+                        board.getName(),
+                        new OwnerBoardCollabDTORes(userRepository.findById(board.getOwnerId()).orElseThrow(() ->
+                                new ItemNotFoundException("Owner Not Found")).getName()),
+                        collaborator.getAccessRight()
+                )).toList();
 
         return new BoardAllDTORes(personalBoardDTOs, collaboratorBoardDTOs);
     }
 
-    public BoardResDTO getBoardById(Claims claims, String id) {
+    public PersonalBoardResDTO getBoardById(Claims claims, String id) {
         String oid = (String) claims.get("oid");
         Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + " not found"));
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
@@ -76,13 +80,13 @@ public class BoardService {
         }
     }
 
-    public BoardResDTO getBoardById(String id) {
+    public PersonalBoardResDTO getBoardById(String id) {
         Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + " not found"));
         User user = userRepository.findById(board.getOwnerId()).orElseThrow(() -> new ItemNotFoundException("User id " + board.getOwnerId() + " DOES NOT EXIST!!!"));
         return getBoardResDTO(user, board);
     }
 
-    public BoardResDTO insertBoard(Claims claims, NewBoardDTO boardDTO) {
+    public PersonalBoardResDTO insertBoard(Claims claims, NewBoardDTO boardDTO) {
         String oid = (String) claims.get("oid");
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
         String nanoId = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 10);
@@ -112,7 +116,7 @@ public class BoardService {
 
     }
 
-    public BoardResDTO removeBoardById(Claims claims, String boardId) {
+    public PersonalBoardResDTO removeBoardById(Claims claims, String boardId) {
         Board board = authorizationService.getBoardId(boardId);
         String oid = (String) claims.get("oid");
         if (oid.equals(board.getOwnerId())) {
@@ -145,23 +149,24 @@ public class BoardService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allow to access this board");
         }
     }
+
     //    check board have in database yet ?
-    public boolean boardExist(String boardId){
+    public boolean boardExist(String boardId) {
         return boardRepository.existsById(boardId);
     }
 
 
-    private BoardResDTO getBoardResDTO(User user, Board board) {
-        OwnerBoard ownerBoard = new OwnerBoard();
-        ownerBoard.setOid(user.getOid());
-        ownerBoard.setName(user.getName());
+    private PersonalBoardResDTO getBoardResDTO(User user, Board board) {
+        OwnerBoardDTORes ownerBoardDTORes = new OwnerBoardDTORes();
+        ownerBoardDTORes.setOid(user.getOid());
+        ownerBoardDTORes.setName(user.getName());
 
-        BoardResDTO boardResDTO = new BoardResDTO();
-        boardResDTO.setId(board.getId());
-        boardResDTO.setName(board.getName());
-        boardResDTO.setVisibility(board.getVisibility());
-        boardResDTO.setOwner(ownerBoard);
-        return boardResDTO;
+        PersonalBoardResDTO personalBoardResDTO = new PersonalBoardResDTO();
+        personalBoardResDTO.setId(board.getId());
+        personalBoardResDTO.setName(board.getName());
+        personalBoardResDTO.setVisibility(board.getVisibility());
+        personalBoardResDTO.setOwner(ownerBoardDTORes);
+        return personalBoardResDTO;
     }
 
 }
