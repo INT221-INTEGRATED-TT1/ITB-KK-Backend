@@ -37,7 +37,7 @@ public class WebSecurityConfig {
                 .authorizeRequests(authorize -> authorize
                         .requestMatchers("/login", "/token", "/error").permitAll()
                         .requestMatchers(HttpMethod.GET).permitAll() // Allow all GET requests for everyone
-                        .anyRequest().hasAuthority("ROLE_OWNER")) // All other requests require ROLE_OWNER
+                        .anyRequest().hasAnyAuthority("ROLE_OWNER","ROLE_COLLABORATOR_WRITE")) // All other requests require ROLE_OWNER OR ROLE_COLLABORATOR_WRITE
                 .httpBasic(withDefaults());
         httpSecurity.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();

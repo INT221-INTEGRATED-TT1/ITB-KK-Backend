@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
+import sit.int221.dtos.response.CollaboratorDTORes;
 import sit.int221.entities.primary.Board;
 import sit.int221.exceptions.AuthException;
 import sit.int221.exceptions.ItemNotFoundException;
@@ -24,6 +25,10 @@ public class AuthorizationService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+
+    CollaboratorService collaboratorService;
 
     String jwtToken;
     Claims claims;
@@ -110,5 +115,29 @@ public class AuthorizationService {
 
     public Board getBoardId(String boardId) {
         return boardRepository.findById(boardId).orElseThrow(() -> new ItemNotFoundException("Board id " + boardId + " not found"));
+    }
+
+    public boolean isUserHaveWriteAccess(Claims claims , String boardId){
+        String oid = (String) claims.get("oid");
+        Board board = getBoardId(boardId);
+
+
+        if(board.getOwnerId().equals(oid)){
+            System.out.println("Owner have write access");
+            return true;
+        }
+        else {
+            CollaboratorDTORes collaborator = collaboratorService.getCollabById(boardId, oid);
+            if (collaborator.getAccessRight().equals("WRITE")){
+                System.out.println("Collaborator have write access");
+
+                return true;
+            }
+            return false;
+
+
+        }
+
+
     }
 }

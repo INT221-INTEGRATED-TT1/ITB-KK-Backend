@@ -61,28 +61,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         String method = request.getMethod();
-        boolean isPublicGetEndpoint = method.equalsIgnoreCase("GET") &&
+        boolean isPublicGetEndpoint = (method.equalsIgnoreCase("GET")) &&
                 (requestURI.matches("/v3/boards/[A-Za-z0-9]+") ||
                         requestURI.matches("/v3/boards/[A-Za-z0-9]+/statuses(/\\d+)?") ||
-                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/tasks(/\\d+)?"));
+                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/tasks(/\\d+)?") || requestURI.matches("/v3/boards/[A-Za-z0-9]+/collabs(/([A-Za-z0-9]+))?")) ;
 
 
         // handle Http Method all method but not GET Method
-//        boolean isPublicEndPointOperation = (method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT") || method.equalsIgnoreCase("PATCH") || method.equalsIgnoreCase("DELETE") ) &&
-//                (requestURI.matches("/v3/boards/[A-Za-z0-9]+") ||
-//                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/statuses(/\\d+)?") ||
-//                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/tasks(/\\d+)?"));
-//
-////         If the endpoint is public GET, allow access without token
-//        if (isPublicGetEndpoint) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
+        boolean isPublicEndPointOperation = (method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT") || method.equalsIgnoreCase("PATCH") || method.equalsIgnoreCase("DELETE") ) &&
+                (requestURI.matches("/v3/boards/[A-Za-z0-9]+") ||
+                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/statuses(/\\d+)?") ||
+                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/tasks(/\\d+)?") || requestURI.matches("/v3/boards/[A-Za-z0-9]+/collabs(/([A-Za-z0-9]+))?")) ;
+
+
+      //   If the endpoint is public GET, allow access without token
+        if (isPublicGetEndpoint) {
+            chain.doFilter(request, response);
+            return;
+        }
+        // Handle PUT POST PATCH DELETE
+
 //        if(isPublicEndPointOperation){
+//
 //            // Validate Access Token
 //            if(StringUtils.hasText(request.getHeader("Authorization")) == false){
-//                logger.warn("This is Block 1");
+//
 //                System.out.println(request.getHeader("Authorization"));
 //                response.setStatus(HttpStatus.UNAUTHORIZED.value()); // Set the status to 401 Unauthorized
 //                response.getWriter().write("Authorization header is missing or empty"); // Optional: write a message to the response
@@ -116,14 +119,49 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 //                    authorizationService.checkIdThatBelongsToUser(authorizationService.validateToken(request.getHeader("Authorization")),boardId);
 //                    System.out.println("Checked owner access board");
 //                }
-//                // If token expire
+//
 //
 //
 //                // if not owner of Board
 //                catch (ResponseStatusException e){
-//                    response.setStatus(HttpStatus.FORBIDDEN.value());
-//                    response.getWriter().write("You are not owner of this board");
-//                    return;
+//                     try {
+//                         authorizationService.isUserHaveWriteAccess(authorizationService.validateToken(request.getHeader("Authorization")),boardId);
+//                         chain.doFilter(request, response);
+//                     }
+//                     catch (ResponseStatusException error){
+//                         response.setStatus(HttpStatus.FORBIDDEN.value());
+//                         response.getWriter().write(error.getMessage());
+//                         return;
+//                     }
+//
+//
+////
+//                    // User Have write Access if it not board owner?
+//                    boolean isUserHaveWriteAccess = authorizationService.isUserHaveWriteAccess(authorizationService.validateToken(request.getHeader("Authorization")),boardId);
+//                    System.out.println("Debug user have write access: "+isUserHaveWriteAccess);
+//                      if(isUserHaveWriteAccess){
+//                          if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+//                              // Set Role to Collaborator Request have Write Access
+//                              UserDetails userDetails = this.jwtUserDetailsService.setCollaboratorWriteAccess(username);
+//                              if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+//                                  System.out.println("Validate Token");
+//                                  UsernamePasswordAuthenticationToken authToken = new
+//                                          UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+//                                  authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//                                  SecurityContextHolder.getContext().setAuthentication(authToken);
+//                              }
+//                          }
+//                          chain.doFilter(request, response);
+//                          return;
+//
+//                      }
+//                      else {
+//                          response.setStatus(HttpStatus.FORBIDDEN.value());
+//                          response.getWriter().write("You do not have write access");
+//                          return; // Prevent further processing
+//                      }
+//
+//
 //                }
 //                System.out.println("Doing Filter chain");
 //                if (requestTokenHeader != null) {
@@ -146,18 +184,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 //                }
 //
 //                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+//                    // Set Role With Owner Role
 //                    UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
 //                    if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
 //                        System.out.println("Validate Token");
-//                        UsernamePasswordAuthenticationToken authToken = new
-//                                UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-//                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//                        SecurityContextHolder.getContext().setAuthentication(authToken);
-//                    }
-//                }
-//                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-//                    UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
-//                    if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
 //                        UsernamePasswordAuthenticationToken authToken = new
 //                                UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 //                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

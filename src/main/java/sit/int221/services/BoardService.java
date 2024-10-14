@@ -25,6 +25,7 @@ import sit.int221.repositories.primary.LocalUserRepository;
 import sit.int221.repositories.secondary.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -144,6 +145,11 @@ public class BoardService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allow to access this board");
         }
     }
+    //    check board have in database yet ?
+    public boolean boardExist(String boardId){
+        return boardRepository.existsById(boardId);
+    }
+
 
     private BoardResDTO getBoardResDTO(User user, Board board) {
         OwnerBoard ownerBoard = new OwnerBoard();
