@@ -74,7 +74,6 @@ public class CollaboratorService {
         Board board = authorizationService.getBoardId(boardId);
 
         // check  email exists in share_itbkk
-//        Boolean existsEmailShared = userRepository.existsByEmail(newCollab.getEmail());
         User existsEmailShared = userRepository.findByEmail(newCollab.getEmail());
         // check if oid is the owner of the board
         if (oid.equals(board.getOwnerId())) {
@@ -120,8 +119,6 @@ public class CollaboratorService {
                 newLocalUser.setEmail(existsEmailShared.getEmail());
                 localUser = localUserRepository.save(newLocalUser);
             }
-
-            System.out.println("localUser " + localUser);
 
             Collaborator newCollaborator = new Collaborator();
             System.out.println("newCollab 1 " + newCollaborator);
