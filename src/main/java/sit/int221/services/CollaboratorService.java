@@ -13,6 +13,7 @@ import sit.int221.dtos.response.NewCollabDTORes;
 import sit.int221.entities.primary.Board;
 import sit.int221.entities.primary.Collaborator;
 import sit.int221.entities.primary.LocalUser;
+import sit.int221.entities.secondary.User;
 import sit.int221.repositories.primary.BoardRepository;
 import sit.int221.repositories.primary.CollaboratorRepository;
 import sit.int221.repositories.primary.LocalUserRepository;
@@ -73,7 +74,8 @@ public class CollaboratorService {
         Board board = authorizationService.getBoardId(boardId);
 
         // check  email exists in share_itbkk
-        Boolean existsEmailShared = userRepository.existsByEmail(newCollab.getEmail());
+//        Boolean existsEmailShared = userRepository.existsByEmail(newCollab.getEmail());
+        User existsEmailShared = userRepository.findByEmail(newCollab.getEmail());
         // check if oid is the owner of the board
         if (oid.equals(board.getOwnerId())) {
             // Validate email and accessRight fields
@@ -87,7 +89,7 @@ public class CollaboratorService {
             }
 
             // e-mail.NOT.exists.in.itbkk_shared
-            if (existsEmailShared == false) {
+            if (existsEmailShared ==  null) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Email does not exist in itbkk_shared");
             }
 
@@ -110,6 +112,15 @@ public class CollaboratorService {
 
             // Fetch the LocalUser by email
             LocalUser localUser = localUserRepository.findByEmail(newCollab.getEmail());
+            if(localUser == null){
+                LocalUser newLocalUser = new LocalUser();
+                newLocalUser.setOid(existsEmailShared.getOid());
+                newLocalUser.setName(existsEmailShared.getName());
+                newLocalUser.setUsername(existsEmailShared.getUsername());
+                newLocalUser.setEmail(existsEmailShared.getEmail());
+                localUser  = localUserRepository.save(newLocalUser);
+            }
+
             System.out.println("localUser " + localUser) ;
 
             Collaborator newCollaborator = new Collaborator();
