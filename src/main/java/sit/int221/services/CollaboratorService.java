@@ -89,7 +89,7 @@ public class CollaboratorService {
             }
 
             // e-mail.NOT.exists.in.itbkk_shared
-            if (existsEmailShared ==  null) {
+            if (existsEmailShared == null) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Email does not exist in itbkk_shared");
             }
 
@@ -112,16 +112,16 @@ public class CollaboratorService {
 
             // Fetch the LocalUser by email
             LocalUser localUser = localUserRepository.findByEmail(newCollab.getEmail());
-            if(localUser == null){
+            if (localUser == null) {
                 LocalUser newLocalUser = new LocalUser();
                 newLocalUser.setOid(existsEmailShared.getOid());
                 newLocalUser.setName(existsEmailShared.getName());
                 newLocalUser.setUsername(existsEmailShared.getUsername());
                 newLocalUser.setEmail(existsEmailShared.getEmail());
-                localUser  = localUserRepository.save(newLocalUser);
+                localUser = localUserRepository.save(newLocalUser);
             }
 
-            System.out.println("localUser " + localUser) ;
+            System.out.println("localUser " + localUser);
 
             Collaborator newCollaborator = new Collaborator();
             System.out.println("newCollab 1 " + newCollaborator);
@@ -150,6 +150,9 @@ public class CollaboratorService {
         if (boardOid.equals(board.getOwnerId())) {
             // Get collaborator or throw exception if not found
             Collaborator collaborator = collaboratorRepository.findByBoardIdAndLocalUserOidOrThrow(boardId, oid);
+            if (editAccessRightDTO.getAccessRight() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Access right cannot be null");
+            }
             if (collaborator != null) {
                 // access_right not {READ, WRITE}:
                 if (!editAccessRightDTO.getAccessRight().equalsIgnoreCase("READ") && !editAccessRightDTO.getAccessRight().equalsIgnoreCase("WRITE")) {
