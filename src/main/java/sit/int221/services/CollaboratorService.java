@@ -72,7 +72,7 @@ public class CollaboratorService {
         // Retrieve the board by boardId, throws exception if board does not exist
         Board board = authorizationService.getBoardId(boardId);
 
-        // check if email is in share_itbkk
+        // check  email exists in share_itbkk
         Boolean existsEmailShared = userRepository.existsByEmail(newCollab.getEmail());
         // check if oid is the owner of the board
         if (oid.equals(board.getOwnerId())) {
