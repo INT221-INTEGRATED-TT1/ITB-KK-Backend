@@ -91,11 +91,10 @@ public class BoardController {
     public List<CollaboratorDTORes> getCollaborators(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable String boardId) {
         Board board = authorizationService.getBoardId(boardId);
         if (board.getVisibility().equalsIgnoreCase("PUBLIC")) {
-            return collaboratorService.getAllCollaborators();
+            return collaboratorService.getAllCollaborators(boardId);
         }
         authorizationService.validateClaims(token);
         Claims claims = authorizationService.validateToken(token);
-//        System.out.println(claims.get("oid"));
         return collaboratorService.getAllCollaborators(claims, boardId);
     }
 

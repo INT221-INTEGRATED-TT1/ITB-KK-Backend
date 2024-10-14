@@ -14,7 +14,10 @@ public interface CollaboratorRepository extends JpaRepository<Collaborator, Inte
     Collaborator findByLocalUserOid(String oid);
     Boolean existsByBoardAndLocalUserEmail(Board board, String email);
 
+    List<Collaborator> findAllByBoardId(String boardId);
+
     @Query("SELECT c FROM Collaborator c WHERE c.board.id = :boardId AND c.localUser.oid = :oid")
     Collaborator findByBoardIdAndLocalUserOidOrThrow(@Param("boardId") String boardId, @Param("oid") String oid);
+
 
 }
