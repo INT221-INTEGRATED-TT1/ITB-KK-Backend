@@ -35,8 +35,6 @@ public class BoardService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private LocalUserRepository localUserRepository;
-    @Autowired
     private CollaboratorRepository collaboratorRepository;
     @Autowired
     AuthorizationService authorizationService;
@@ -69,7 +67,7 @@ public class BoardService {
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
         boolean isCollaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid).isPresent();
 
-        // check if is owner of the board or is Collaborator of the board
+        // check if is owner of the board or is Collaborator of the board can access board
         if (oid.equals(board.getOwnerId()) || isCollaborator) {
             return getBoardResDTO(user, board);
         } else {

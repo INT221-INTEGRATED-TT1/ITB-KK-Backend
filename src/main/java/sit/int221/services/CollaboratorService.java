@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewCollaboratorDTO;
 import sit.int221.dtos.response.CollaboratorDTORes;
@@ -23,8 +24,6 @@ import java.util.stream.Collectors;
 @Service
 public class CollaboratorService {
     @Autowired
-    private BoardRepository boardRepository;
-    @Autowired
     private UserRepository userRepository;
     @Autowired
     private CollaboratorRepository collaboratorRepository;
@@ -36,12 +35,12 @@ public class CollaboratorService {
     public List<CollaboratorDTORes> getAllCollaborators(Claims claims, String boardId) {
         Board board = authorizationService.getBoardId(boardId);
         validateAccess(claims, board);
-        List<Collaborator> collaborators = collaboratorRepository.findAll();
+        List<Collaborator> collaborators = collaboratorRepository.findAllByBoardId(boardId);
         return collaborators.stream().map(collaborator -> getCollabResDTO(collaborator, collaborator.getLocalUser())).collect(Collectors.toList());
     }
 
-    public List<CollaboratorDTORes> getAllCollaborators() {
-        List<Collaborator> collaborators = collaboratorRepository.findAll();
+    public List<CollaboratorDTORes> getAllCollaborators(String boardId) {
+        List<Collaborator> collaborators = collaboratorRepository.findAllByBoardId(boardId);
         return collaborators.stream().map(collaborator -> getCollabResDTO(collaborator, collaborator.getLocalUser())).collect(Collectors.toList());
     }
 
@@ -66,6 +65,7 @@ public class CollaboratorService {
         return getCollabResDTO(collaborator, collaborator.getLocalUser());
     }
 
+    @Transactional(transactionManager = "primaryTransactionManager")
     public NewCollabDTORes createNewCollaborator(Claims claims, String boardId, NewCollaboratorDTO newCollab) {
         String oid = (String) claims.get("oid");
         String email = (String) claims.get("email");
@@ -110,11 +110,15 @@ public class CollaboratorService {
 
             // Fetch the LocalUser by email
             LocalUser localUser = localUserRepository.findByEmail(newCollab.getEmail());
+            System.out.println("localUser " + localUser) ;
 
             Collaborator newCollaborator = new Collaborator();
+            System.out.println("newCollab 1 " + newCollaborator);
             newCollaborator.setBoard(board);
             newCollaborator.setLocalUser(localUser);
             newCollaborator.setAccessRight(newCollab.getAccessRight().toUpperCase());
+            System.out.println("newCollab 2 " + newCollaborator);
+
             collaboratorRepository.save(newCollaborator);
 
             // create responseDTO
@@ -165,9 +169,8 @@ public class CollaboratorService {
         // owner and collaborator themselves can remove collaborator
         if (boardOid.equals(board.getOwnerId()) || boardOid.equals(oid)) {
             if (collaborator != null) {
-                Collaborator collabToDelete = collaboratorRepository.findByLocalUserOid(oid);
                 LocalUser localUser = collaborator.getLocalUser();
-                collaboratorRepository.delete(collabToDelete);
+                collaboratorRepository.delete(collaborator);
                 return getCollabResDTO(collaborator, localUser);
             } else {
                 // Collaborator not found
