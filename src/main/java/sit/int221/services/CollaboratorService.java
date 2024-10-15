@@ -76,16 +76,25 @@ public class CollaboratorService {
 
         // check  email exists in share_itbkk
         User existsEmailShared = userRepository.findByEmail(newCollab.getEmail());
+
+        // check  email exists in localUser database
+        Boolean existsEmailCollab = collaboratorRepository.existsByBoardAndLocalUserEmail(board, newCollab.getEmail());
+
         // check if oid is the owner of the board
         if (oid.equals(board.getOwnerId())) {
-            // Validate email and accessRight fields
-            if (newCollab.getEmail() == null || newCollab.getAccessRight() == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email or Access right cannot be null");
+
+            // Validate accessRight fields
+            if(newCollab.getAccessRight() == null || newCollab.getAccessRight().isBlank()){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Access right cannot be null or empty");
             }
 
-            // Set 'READ' as the default value for accessRight if it's empty
-            if (newCollab.getAccessRight().isBlank()) {
-                newCollab.setAccessRight("READ");
+            // Validate email
+            if (newCollab.getEmail() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email cannot be null");
+            }
+
+            if (!newCollab.getAccessRight().equalsIgnoreCase("READ") && !newCollab.getAccessRight().equalsIgnoreCase("WRITE")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Access right must be either 'READ' or 'WRITE'");
             }
 
             // e-mail.NOT.exists.in.itbkk_shared
@@ -98,17 +107,11 @@ public class CollaboratorService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot add yourself as a collaborator");
             }
 
-            Boolean existsEmailCollab = collaboratorRepository.existsByBoardAndLocalUserEmail(board, newCollab.getEmail());
-
             // Check if the user is already a collaborator on the board
             if (existsEmailCollab) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "User is already a collaborator on this board");
             }
 
-            // access_right not {READ, WRITE}:
-            if (!newCollab.getAccessRight().equalsIgnoreCase("READ") && !newCollab.getAccessRight().equalsIgnoreCase("WRITE")) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Access right must be either 'READ' or 'WRITE'");
-            }
 
             // Fetch the LocalUser by email
             LocalUser localUser = localUserRepository.findByEmail(newCollab.getEmail());
@@ -191,11 +194,7 @@ public class CollaboratorService {
                 LocalUser localUser = collaborator.getLocalUser();
                 collaboratorRepository.delete(collaborator);
                 return getCollabResDTO(collaborator, localUser);
-            }
-//            else if (!oid.equals(boardId)) {
-//                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-//            }
-            else {
+            } else {
                 // Collaborator not found
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found on the board with ID: " + boardId);
             }
