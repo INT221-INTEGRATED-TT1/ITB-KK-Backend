@@ -1,5 +1,4 @@
-package sit.int221.configs.secondarydbconfig;
-
+package sit.int221.configs.taskbase_config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
@@ -16,24 +15,22 @@ import javax.sql.DataSource;
 @EnableTransactionManagement
 @Configuration
 @EnableJpaRepositories(
-        basePackages = "sit.int221.repositories.secondary",
-        entityManagerFactoryRef = "secondaryEntityManagerFactoryBean",
-        transactionManagerRef = "secondaryTransactionManager"
+        basePackages = "sit.int221.repositories.task_base",
+        entityManagerFactoryRef = "taskBaseEntityManagerFactoryBean",
+        transactionManagerRef = "taskBaseTransactionManager"
 )
-public class SecondaryJPAConfiguration {
-
+public class TaskBaseJPAConfiguration {
     @Bean
-    LocalContainerEntityManagerFactoryBean secondaryEntityManagerFactoryBean(EntityManagerFactoryBuilder entityManagerFactoryBuilder,
-                                                                             @Qualifier("secondaryDataSource") DataSource dataSource) {
-
+    LocalContainerEntityManagerFactoryBean taskBaseEntityManagerFactoryBean(EntityManagerFactoryBuilder entityManagerFactoryBuilder,
+                                                                            @Qualifier("taskBaseDataSource") DataSource dataSource) {
         return entityManagerFactoryBuilder
                 .dataSource(dataSource)
-                .packages("sit.int221.entities.secondary")
+                .packages("sit.int221.entities.task_base")
                 .build();
     }
 
     @Bean
-    PlatformTransactionManager secondaryTransactionManager(@Qualifier("secondaryEntityManagerFactoryBean") LocalContainerEntityManagerFactoryBean emfb) {
+    PlatformTransactionManager taskBaseTransactionManager(@Qualifier("taskBaseEntityManagerFactoryBean") LocalContainerEntityManagerFactoryBean emfb) {
         return new JpaTransactionManager(emfb.getObject());
     }
 }

@@ -1,4 +1,4 @@
-package sit.int221.configs.primarydbconfig;
+package sit.int221.configs.taskbase_config;
 
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -10,17 +10,17 @@ import javax.sql.DataSource;
 
 
 @Configuration
-public class PrimaryDatasourceConfiguration {
+public class TaskBaseDatasourceConfiguration {
 
-    @ConfigurationProperties("spring.datasource.primary")
+    @ConfigurationProperties("spring.datasource.task-base")
     @Bean
-    public DataSourceProperties primaryDataSourceProperties() {
+    public DataSourceProperties taskBaseDataSourceProperties() {
         return new DataSourceProperties();
     }
 
     @Primary
     @Bean
-    public DataSource primaryDataSource(){
-        return primaryDataSourceProperties().initializeDataSourceBuilder().build();
+    public DataSource taskBaseDataSource(){
+        return taskBaseDataSourceProperties().initializeDataSourceBuilder().build();
     }
 }

@@ -1,4 +1,4 @@
-package sit.int221.configs.secondarydbconfig;
+package sit.int221.configs.itbkk_config;
 
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 @Configuration
 public class SecondaryDatasourceConfiguration {
 
-    @ConfigurationProperties("spring.datasource.secondary")
+    @ConfigurationProperties("spring.datasource.itbkk-shared")
     @Bean
     public DataSourceProperties secondaryDataSourceProperties() {
         return new DataSourceProperties();
