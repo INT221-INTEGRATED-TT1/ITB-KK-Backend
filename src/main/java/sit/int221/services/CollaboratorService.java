@@ -20,6 +20,7 @@ import sit.int221.repositories.primary.LocalUserRepository;
 import sit.int221.repositories.secondary.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -176,6 +177,13 @@ public class CollaboratorService {
 //        token.is.valid AND board($id).NOT.exists
         Board board = authorizationService.getBoardId(boardId);
         String boardOid = (String) claims.get("oid");
+        Boolean currentUserCollaboratorOpt = collaboratorRepository.findByBoardIdAndLocalUserOid(boardId, boardOid).isPresent();
+
+        if (!currentUserCollaboratorOpt && !boardOid.equals(board.getOwnerId())) {
+            // The user is neither the board owner nor a collaborator
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are neither the board owner nor a collaborator and cannot perform this action.");
+        }
+
         Collaborator collaborator = collaboratorRepository.findByBoardIdAndLocalUserOidOrThrow(boardId, oid);
         // owner and collaborator themselves can remove collaborator
         if (boardOid.equals(board.getOwnerId()) || boardOid.equals(oid)) {
@@ -183,14 +191,18 @@ public class CollaboratorService {
                 LocalUser localUser = collaborator.getLocalUser();
                 collaboratorRepository.delete(collaborator);
                 return getCollabResDTO(collaborator, localUser);
-            } else {
+            }
+//            else if (!oid.equals(boardId)) {
+//                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+//            }
+            else {
                 // Collaborator not found
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found on the board with ID: " + boardId);
             }
         } else {
             // token.is.valid AND board($id).exists AND
             // (token.oid.is.NOT.board.owner OR token.oid.is.NOT.board.collaborator
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not Board Owner or Not Board Collaborator");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are neither the board owner nor a collaborator");
         }
     }
 
