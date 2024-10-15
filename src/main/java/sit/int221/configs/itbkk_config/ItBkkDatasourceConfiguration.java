@@ -8,17 +8,16 @@ import org.springframework.context.annotation.Configuration;
 import javax.sql.DataSource;
 
 @Configuration
-public class SecondaryDatasourceConfiguration {
+public class ItBkkDatasourceConfiguration {
 
     @ConfigurationProperties("spring.datasource.itbkk-shared")
     @Bean
-    public DataSourceProperties secondaryDataSourceProperties() {
+    public DataSourceProperties itBkkDataSourceProperties() {
         return new DataSourceProperties();
     }
 
-
     @Bean
-    public DataSource secondaryDataSource(){
-        return secondaryDataSourceProperties().initializeDataSourceBuilder().build();
+    public DataSource itBkkDataSource(){
+        return itBkkDataSourceProperties().initializeDataSourceBuilder().build();
     }
 }

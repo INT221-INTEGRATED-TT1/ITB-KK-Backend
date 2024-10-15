@@ -1,9 +1,9 @@
-package sit.int221.repositories.primary;
+package sit.int221.repositories.task_base;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import sit.int221.entities.primary.Board;
+import sit.int221.entities.task_base.Board;
 
 import java.util.List;
 

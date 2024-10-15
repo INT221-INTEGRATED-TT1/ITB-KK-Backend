@@ -16,24 +16,24 @@ import javax.sql.DataSource;
 @EnableTransactionManagement
 @Configuration
 @EnableJpaRepositories(
-        basePackages = "sit.int221.repositories.secondary",
-        entityManagerFactoryRef = "secondaryEntityManagerFactoryBean",
-        transactionManagerRef = "secondaryTransactionManager"
+        basePackages = "sit.int221.repositories.itbkk_shared",
+        entityManagerFactoryRef = "itBkkEntityManagerFactoryBean",
+        transactionManagerRef = "itBkkTransactionManager"
 )
-public class SecondaryJPAConfiguration {
+public class ItBkkJPAConfiguration {
 
     @Bean
-    LocalContainerEntityManagerFactoryBean secondaryEntityManagerFactoryBean(EntityManagerFactoryBuilder entityManagerFactoryBuilder,
-                                                                             @Qualifier("secondaryDataSource") DataSource dataSource) {
+    LocalContainerEntityManagerFactoryBean itBkkEntityManagerFactoryBean(EntityManagerFactoryBuilder entityManagerFactoryBuilder,
+                                                                             @Qualifier("itBkkDataSource") DataSource dataSource) {
 
         return entityManagerFactoryBuilder
                 .dataSource(dataSource)
-                .packages("sit.int221.entities.secondary")
+                .packages("sit.int221.entities.itbkk_shared")
                 .build();
     }
 
     @Bean
-    PlatformTransactionManager secondaryTransactionManager(@Qualifier("secondaryEntityManagerFactoryBean") LocalContainerEntityManagerFactoryBean emfb) {
+    PlatformTransactionManager itBkkTransactionManager(@Qualifier("itBkkEntityManagerFactoryBean") LocalContainerEntityManagerFactoryBean emfb) {
         return new JpaTransactionManager(emfb.getObject());
     }
 }

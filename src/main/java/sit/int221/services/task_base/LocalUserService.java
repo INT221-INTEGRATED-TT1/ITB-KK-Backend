@@ -1,11 +1,11 @@
-package sit.int221.services;
+package sit.int221.services.task_base;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sit.int221.entities.primary.LocalUser;
-import sit.int221.entities.secondary.User;
-import sit.int221.repositories.primary.LocalUserRepository;
-import sit.int221.repositories.secondary.UserRepository;
+import sit.int221.entities.task_base.LocalUser;
+import sit.int221.entities.itbkk_shared.User;
+import sit.int221.repositories.task_base.LocalUserRepository;
+import sit.int221.repositories.itbkk_shared.UserRepository;
 
 @Service
 public class LocalUserService {

@@ -1,4 +1,4 @@
-package sit.int221.services;
+package sit.int221.services.task_base;
 
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,13 +7,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewTask3DTO;
-import sit.int221.entities.primary.*;
+import sit.int221.entities.task_base.*;
 import sit.int221.exceptions.ItemNotFoundException;
 import sit.int221.exceptions.StatusNotExistException;
 import sit.int221.exceptions.TaskNotFoundException;
-import sit.int221.repositories.primary.BoardRepository;
-import sit.int221.repositories.primary.CollaboratorRepository;
-import sit.int221.repositories.primary.Tasks3Repository;
+import sit.int221.repositories.task_base.BoardRepository;
+import sit.int221.repositories.task_base.CollaboratorRepository;
+import sit.int221.repositories.task_base.Tasks3Repository;
+import sit.int221.services.itbkk_shared.AuthorizationService;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,19 +1,15 @@
-package sit.int221.controllers.secondary;
+package sit.int221.controllers.itbkk_shared;
 
 import io.jsonwebtoken.Claims;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.components.JwtTokenUtil;
 import sit.int221.dtos.response.RefreshTokenDTORes;
-import sit.int221.entities.secondary.User;
-import sit.int221.services.AuthorizationService;
-import sit.int221.services.JwtUserDetailsService;
+import sit.int221.entities.itbkk_shared.User;
+import sit.int221.services.itbkk_shared.AuthorizationService;
+import sit.int221.services.itbkk_shared.JwtUserDetailsService;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:5173", "https://intproj23.sit.kmutt.ac.th", "http://localhost:80", "https://ip23tt1.sit.kmutt.ac.th"})

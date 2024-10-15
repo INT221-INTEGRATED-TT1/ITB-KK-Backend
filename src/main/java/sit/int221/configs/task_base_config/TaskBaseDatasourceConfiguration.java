@@ -1,4 +1,4 @@
-package sit.int221.configs.taskbase_config;
+package sit.int221.configs.task_base_config;
 
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;

@@ -1,4 +1,4 @@
-package sit.int221.services;
+package sit.int221.services.task_base;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import io.jsonwebtoken.Claims;
@@ -11,13 +11,14 @@ import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.EditVisibilityDTO;
 import sit.int221.dtos.request.NewBoardDTO;
 import sit.int221.dtos.response.*;
-import sit.int221.entities.primary.Board;
-import sit.int221.entities.primary.Collaborator;
-import sit.int221.entities.secondary.User;
+import sit.int221.entities.task_base.Board;
+import sit.int221.entities.task_base.Collaborator;
+import sit.int221.entities.itbkk_shared.User;
 import sit.int221.exceptions.ItemNotFoundException;
-import sit.int221.repositories.primary.BoardRepository;
-import sit.int221.repositories.primary.CollaboratorRepository;
-import sit.int221.repositories.secondary.UserRepository;
+import sit.int221.repositories.task_base.BoardRepository;
+import sit.int221.repositories.task_base.CollaboratorRepository;
+import sit.int221.repositories.itbkk_shared.UserRepository;
+import sit.int221.services.itbkk_shared.AuthorizationService;
 
 import java.util.List;
 

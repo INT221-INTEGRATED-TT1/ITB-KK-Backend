@@ -1,4 +1,4 @@
-package sit.int221.services;
+package sit.int221.services.itbkk_shared;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -9,12 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
-import sit.int221.dtos.response.CollaboratorDTORes;
-import sit.int221.entities.primary.Board;
+import sit.int221.entities.task_base.Board;
 import sit.int221.exceptions.AuthException;
 import sit.int221.exceptions.ItemNotFoundException;
-import sit.int221.repositories.primary.BoardRepository;
-import sit.int221.repositories.secondary.UserRepository;
+import sit.int221.repositories.task_base.BoardRepository;
+import sit.int221.repositories.itbkk_shared.UserRepository;
 
 @Component
 public class AuthorizationService {

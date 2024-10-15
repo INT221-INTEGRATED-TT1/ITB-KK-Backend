@@ -1,9 +1,6 @@
-package sit.int221.controllers.secondary;
+package sit.int221.controllers.itbkk_shared;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.security.SignatureException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,11 +15,10 @@ import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
 import sit.int221.dtos.request.JwtRequestUser;
 import sit.int221.dtos.response.AccessTokenDTORes;
-import sit.int221.entities.secondary.User;
-import sit.int221.exceptions.AuthException;
-import sit.int221.services.AuthorizationService;
-import sit.int221.services.JwtUserDetailsService;
-import sit.int221.services.LocalUserService;
+import sit.int221.entities.itbkk_shared.User;
+import sit.int221.services.itbkk_shared.AuthorizationService;
+import sit.int221.services.itbkk_shared.JwtUserDetailsService;
+import sit.int221.services.task_base.LocalUserService;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:5173", "https://intproj23.sit.kmutt.ac.th", "http://localhost:80", "https://ip23tt1.sit.kmutt.ac.th"})

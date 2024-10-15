@@ -1,4 +1,4 @@
-package sit.int221.services;
+package sit.int221.services.task_base;
 
 import io.jsonwebtoken.Claims;
 import org.modelmapper.ModelMapper;
@@ -9,13 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewStatus3DTO;
 import sit.int221.dtos.response.Status3HomeCountDTO;
-import sit.int221.entities.primary.Board;
-import sit.int221.entities.primary.Collaborator;
-import sit.int221.entities.primary.Statuses3;
+import sit.int221.entities.task_base.Board;
+import sit.int221.entities.task_base.Collaborator;
+import sit.int221.entities.task_base.Statuses3;
 import sit.int221.exceptions.ItemNotFoundException;
 import sit.int221.exceptions.StatusNotFoundException;
 import sit.int221.exceptions.StatusUniqueException;
-import sit.int221.repositories.primary.*;
+import sit.int221.repositories.task_base.*;
+import sit.int221.services.itbkk_shared.AuthorizationService;
 
 import java.util.ArrayList;
 import java.util.List;

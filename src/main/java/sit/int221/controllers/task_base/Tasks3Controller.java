@@ -1,4 +1,4 @@
-package sit.int221.controllers.primary;
+package sit.int221.controllers.task_base;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
@@ -7,15 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewTask3DTO;
 import sit.int221.dtos.response.TaskDetail3DTO;
-import sit.int221.entities.primary.Board;
-import sit.int221.entities.primary.Tasks3;
-import sit.int221.services.AuthorizationService;
-import sit.int221.services.BoardService;
+import sit.int221.entities.task_base.Board;
+import sit.int221.entities.task_base.Tasks3;
+import sit.int221.services.itbkk_shared.AuthorizationService;
+import sit.int221.services.task_base.BoardService;
 import sit.int221.services.ListMapper;
-import sit.int221.services.Tasks3Service;
+import sit.int221.services.task_base.Tasks3Service;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:5173", "https://intproj23.sit.kmutt.ac.th", "http://localhost:80", "https://ip23tt1.sit.kmutt.ac.th"})

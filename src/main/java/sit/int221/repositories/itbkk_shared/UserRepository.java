@@ -1,4 +1,4 @@
-package sit.int221.repositories.secondary;
+package sit.int221.repositories.itbkk_shared;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;

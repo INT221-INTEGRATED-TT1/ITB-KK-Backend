@@ -1,4 +1,4 @@
-package sit.int221.controllers.primary;
+package sit.int221.controllers.task_base;
 
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
@@ -6,18 +6,16 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewStatus3DTO;
 import sit.int221.dtos.response.Status3DetailDTO;
 import sit.int221.dtos.response.Status3HomeCountDTO;
-import sit.int221.entities.primary.Board;
-import sit.int221.entities.primary.Statuses3;
-import sit.int221.services.AuthorizationService;
+import sit.int221.entities.task_base.Board;
+import sit.int221.entities.task_base.Statuses3;
+import sit.int221.services.itbkk_shared.AuthorizationService;
 import sit.int221.services.ListMapper;
-import sit.int221.services.Statuses3Service;
+import sit.int221.services.task_base.Statuses3Service;
 
 import java.util.List;
-import java.util.Map;
 
 @CrossOrigin(origins = {"http://localhost:5173", "https://intproj23.sit.kmutt.ac.th", "http://localhost:80", "https://ip23tt1.sit.kmutt.ac.th"})
 @RestController

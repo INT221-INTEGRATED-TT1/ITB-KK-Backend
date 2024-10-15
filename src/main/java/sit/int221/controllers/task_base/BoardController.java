@@ -1,4 +1,4 @@
-package sit.int221.controllers.primary;
+package sit.int221.controllers.task_base;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
@@ -16,10 +16,10 @@ import sit.int221.dtos.response.PersonalBoardResDTO;
 import sit.int221.dtos.response.CollaboratorDTORes;
 import sit.int221.dtos.response.EditAccessRightDTO;
 import sit.int221.dtos.response.NewCollabDTORes;
-import sit.int221.entities.primary.Board;
-import sit.int221.services.BoardService;
-import sit.int221.services.AuthorizationService;
-import sit.int221.services.CollaboratorService;
+import sit.int221.entities.task_base.Board;
+import sit.int221.services.task_base.BoardService;
+import sit.int221.services.itbkk_shared.AuthorizationService;
+import sit.int221.services.task_base.CollaboratorService;
 
 import java.util.List;
 

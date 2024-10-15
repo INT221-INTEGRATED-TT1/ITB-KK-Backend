@@ -1,4 +1,4 @@
-package sit.int221.entities.primary;
+package sit.int221.entities.task_base;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;

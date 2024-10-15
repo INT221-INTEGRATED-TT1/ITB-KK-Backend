@@ -1,4 +1,4 @@
-package sit.int221.services;
+package sit.int221.services.task_base;
 
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,17 +10,16 @@ import sit.int221.dtos.request.NewCollaboratorDTO;
 import sit.int221.dtos.response.CollaboratorDTORes;
 import sit.int221.dtos.response.EditAccessRightDTO;
 import sit.int221.dtos.response.NewCollabDTORes;
-import sit.int221.entities.primary.Board;
-import sit.int221.entities.primary.Collaborator;
-import sit.int221.entities.primary.LocalUser;
-import sit.int221.entities.secondary.User;
-import sit.int221.repositories.primary.BoardRepository;
-import sit.int221.repositories.primary.CollaboratorRepository;
-import sit.int221.repositories.primary.LocalUserRepository;
-import sit.int221.repositories.secondary.UserRepository;
+import sit.int221.entities.task_base.Board;
+import sit.int221.entities.task_base.Collaborator;
+import sit.int221.entities.task_base.LocalUser;
+import sit.int221.entities.itbkk_shared.User;
+import sit.int221.repositories.task_base.CollaboratorRepository;
+import sit.int221.repositories.task_base.LocalUserRepository;
+import sit.int221.repositories.itbkk_shared.UserRepository;
+import sit.int221.services.itbkk_shared.AuthorizationService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
