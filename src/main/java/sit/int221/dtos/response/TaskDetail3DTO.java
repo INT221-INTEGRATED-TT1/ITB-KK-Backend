@@ -1,7 +1,7 @@
 package sit.int221.dtos.response;
 
 import lombok.Data;
-import sit.int221.entities.primary.Statuses3;
+import sit.int221.entities.task_base.Statuses3;
 
 @Data
 public class TaskDetail3DTO {
