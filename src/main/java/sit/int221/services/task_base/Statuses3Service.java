@@ -185,7 +185,7 @@ public class Statuses3Service {
         }
     }
 
-    @Transactional(transactionManager = "primaryTransactionManager")
+    @Transactional(transactionManager = "itBkkTransactionManager")
     public Statuses3 updateTasksStatusAndDelete(Claims claims, String boardId, Integer oldStatus, Integer newStatus) {
         Board board = authorizationService.getBoardId(boardId);
         String oid = (String) claims.get("oid");

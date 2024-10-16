@@ -48,27 +48,27 @@ public class JwtUserDetailsService implements UserDetailsService {
         return new AuthUser(userName, user.getPassword(), authorities);
     }
 
-    public UserDetails setCollaboratorWriteAccess(String userName) {
-        User user = userRepository.findByUsername(userName);
-//        String oid = user.getOid();
-//        System.out.println(user);
-
-//        Board board = authorizationService.getBoardId(boardId);
-
-
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
-        }
-
-//        Boolean board = boardRepository.findByOwnerId(oid);
-//        if(!board){
-//            throw  new ResponseStatusException(HttpStatus.FORBIDDEN, "fdf");
+//    public UserDetails setCollaboratorWriteAccess(String userName) {
+//        User user = userRepository.findByUsername(userName);
+////        String oid = user.getOid();
+////        System.out.println(user);
+//
+////        Board board = authorizationService.getBoardId(boardId);
+//
+//
+//        if (user == null) {
+//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
 //        }
-
-        List<GrantedAuthority> authorities = new LinkedList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_COLLABORATOR_WRITE"));
-        return new AuthUser(userName, user.getPassword(), authorities);
-    }
+//
+////        Boolean board = boardRepository.findByOwnerId(oid);
+////        if(!board){
+////            throw  new ResponseStatusException(HttpStatus.FORBIDDEN, "fdf");
+////        }
+//
+//        List<GrantedAuthority> authorities = new LinkedList<>();
+//        authorities.add(new SimpleGrantedAuthority("ROLE_COLLABORATOR_WRITE"));
+//        return new AuthUser(userName, user.getPassword(), authorities);
+//    }
 
 
 

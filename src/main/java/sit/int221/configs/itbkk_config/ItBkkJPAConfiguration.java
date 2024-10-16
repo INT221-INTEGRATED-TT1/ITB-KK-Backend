@@ -24,7 +24,7 @@ public class ItBkkJPAConfiguration {
 
     @Bean
     LocalContainerEntityManagerFactoryBean itBkkEntityManagerFactoryBean(EntityManagerFactoryBuilder entityManagerFactoryBuilder,
-                                                                             @Qualifier("itBkkDataSource") DataSource dataSource) {
+                                                                         @Qualifier("itBkkDataSource") DataSource dataSource) {
 
         return entityManagerFactoryBuilder
                 .dataSource(dataSource)

@@ -52,13 +52,13 @@ public class CollaboratorService {
         if (!isCollaborator) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found");
         }
-        Collaborator collaborator = collaboratorRepository.findByLocalUserOid(oid);
+        Collaborator collaborator = collaboratorRepository.findByBoardIdAndLocalUserOidOrThrow(boardId, oid);
         return getCollabResDTO(collaborator, collaborator.getLocalUser());
     }
 
     public CollaboratorDTORes getCollabById(String boardId, String oid) {
         Board board = authorizationService.getBoardId(boardId);
-        Collaborator collaborator = collaboratorRepository.findByLocalUserOid(oid);
+        Collaborator collaborator = collaboratorRepository.findByBoardIdAndLocalUserOidOrThrow(boardId, oid);
         boolean isCollaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid).isPresent();
         if (!isCollaborator) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found");
@@ -66,7 +66,7 @@ public class CollaboratorService {
         return getCollabResDTO(collaborator, collaborator.getLocalUser());
     }
 
-    @Transactional(transactionManager = "primaryTransactionManager")
+    @Transactional(transactionManager = "taskBaseTransactionManager")
     public NewCollabDTORes createNewCollaborator(Claims claims, String boardId, NewCollaboratorDTO newCollab) {
         String oid = (String) claims.get("oid");
         String email = (String) claims.get("email");

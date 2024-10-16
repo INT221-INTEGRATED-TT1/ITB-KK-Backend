@@ -44,12 +44,10 @@ public class BoardController {
 
     @GetMapping("")
     public ResponseEntity<Object> getAllBoards(@RequestHeader(value = "Authorization", required = false) String token) {
-        try {
+
             Claims claims = authorizationService.validateToken(token);
             return ResponseEntity.ok(boardService.getAllBoards(claims));
-        } catch (Exception ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+
     }
 
     @GetMapping("/{boardId}")

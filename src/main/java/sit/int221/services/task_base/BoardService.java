@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.EditVisibilityDTO;
 import sit.int221.dtos.request.NewBoardDTO;
@@ -21,6 +22,7 @@ import sit.int221.repositories.itbkk_shared.UserRepository;
 import sit.int221.services.itbkk_shared.AuthorizationService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -38,16 +40,23 @@ public class BoardService {
     @Autowired
     ModelMapper modelMapper;
 
-    public BoardAllDTORes getAllBoards(Claims claims) {
+    public List<BoardAllDTORes> getAllBoards(Claims claims) {
         String oid = (String) claims.get("oid");
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
-        Collaborator collaborator = collaboratorRepository.findByLocalUserOid(oid);
 
+        System.out.println(oid);
+
+        System.out.println(user);
         //get personal boards
         List<Board> personalBoards = boardRepository.findAllByOwnerId(oid);
 
         // get collab boards
         List<Board> collaboratorBoards = boardRepository.findBoardsByUserOid(oid);
+
+        List<Collaborator> collaborators =  collaboratorRepository.findByLocalUserOid(oid);
+
+
+//        System.out.println("collab" + collaborator);
 
         // Map personal boards to BoardResDTO
         List<PersonalBoardResDTO> personalBoardDTOs = personalBoards.stream()
@@ -61,10 +70,19 @@ public class BoardService {
                         board.getName(),
                         new OwnerBoardCollabDTORes(userRepository.findById(board.getOwnerId()).orElseThrow(() ->
                                 new ItemNotFoundException("Owner Not Found")).getName()),
-                        collaborator.getAccessRight()
+                        collaborators.stream().filter(c -> c.getBoard().getId().equals(board.getId()))
+                                .map(Collaborator::getAccessRight)
+                                .collect(Collectors.toList()).toString()
                 )).toList();
+        System.out.println(personalBoardDTOs);
 
-        return new BoardAllDTORes(personalBoardDTOs, collaboratorBoardDTOs);
+        System.out.println(collaboratorBoardDTOs);
+
+        // Collect one BoardAllDTORes per user’s boards
+        BoardAllDTORes boardAllDTORes = new BoardAllDTORes(personalBoardDTOs, collaboratorBoardDTOs);
+
+        // Return list with BoardAllDTORes
+        return List.of(boardAllDTORes);
     }
 
     public PersonalBoardResDTO getBoardById(Claims claims, String id) {
@@ -87,6 +105,7 @@ public class BoardService {
         return getBoardResDTO(user, board);
     }
 
+//    @Transactional(transactionManager = "itBkkTransactionManager")
     public PersonalBoardResDTO insertBoard(Claims claims, NewBoardDTO boardDTO) {
         String oid = (String) claims.get("oid");
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));

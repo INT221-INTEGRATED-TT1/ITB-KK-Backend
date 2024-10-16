@@ -50,14 +50,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         boolean isPublicGetEndpoint = (method.equalsIgnoreCase("GET")) &&
                 (requestURI.matches("/v3/boards/[A-Za-z0-9]+") ||
                         requestURI.matches("/v3/boards/[A-Za-z0-9]+/statuses(/\\d+)?") ||
-                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/tasks(/\\d+)?") || requestURI.matches("/v3/boards/[A-Za-z0-9]+/collabs(/([A-Za-z0-9]+))?")) ;
+                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/tasks(/\\d+)?") ||
+                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/collabs(/([A-Za-z0-9]+))?")) ;
 
 
         // handle Http Method all method but not GET Method
-        boolean isPublicEndPointOperation = (method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT") || method.equalsIgnoreCase("PATCH") || method.equalsIgnoreCase("DELETE") ) &&
-                (requestURI.matches("/v3/boards/[A-Za-z0-9]+") ||
-                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/statuses(/\\d+)?") ||
-                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/tasks(/\\d+)?") || requestURI.matches("/v3/boards/[A-Za-z0-9]+/collabs(/([A-Za-z0-9]+))?")) ;
+//        boolean isPublicEndPointOperation = (method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT") || method.equalsIgnoreCase("PATCH") || method.equalsIgnoreCase("DELETE") ) &&
+//                (requestURI.matches("/v3/boards/[A-Za-z0-9]+") ||
+//                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/statuses(/\\d+)?") ||
+//                        requestURI.matches("/v3/boards/[A-Za-z0-9]+/tasks(/\\d+)?") || requestURI.matches("/v3/boards/[A-Za-z0-9]+/collabs(/([A-Za-z0-9]+))?")) ;
 
 
       //   If the endpoint is public GET, allow access without token
