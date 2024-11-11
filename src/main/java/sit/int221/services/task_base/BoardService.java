@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.EditVisibilityDTO;
 import sit.int221.dtos.request.NewBoardDTO;
 import sit.int221.dtos.response.*;
+import sit.int221.entities.enums.InvitationStatus;
 import sit.int221.entities.task_base.Board;
 import sit.int221.entities.task_base.Collaborator;
 import sit.int221.entities.itbkk_shared.User;
@@ -22,6 +23,7 @@ import sit.int221.repositories.itbkk_shared.UserRepository;
 import sit.int221.services.itbkk_shared.AuthorizationService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -89,10 +91,15 @@ public class BoardService {
         String oid = (String) claims.get("oid");
         Board board = boardRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Board id " + id + " not found"));
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
-        boolean isCollaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid).isPresent();
+        Optional<Collaborator> collaboratorOpt = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid);
+
+        boolean isCollaboratorAccepted = collaboratorOpt
+                .map(collaborator -> InvitationStatus.ACCEPTED.equals(collaborator.getInvitationStatus()))
+                .orElse(false);
+
 
         // check if is owner of the board or is Collaborator of the board can access board
-        if (oid.equals(board.getOwnerId()) || isCollaborator) {
+        if (oid.equals(board.getOwnerId()) || isCollaboratorAccepted) {
             return getBoardResDTO(user, board);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access board: board visibility is PRIVATE or You are not collaborator");

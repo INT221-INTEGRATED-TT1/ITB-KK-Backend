@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import sit.int221.components.JwtTokenUtil;
 import sit.int221.dtos.request.EditVisibilityDTO;
 import sit.int221.dtos.request.NewBoardDTO;
@@ -45,8 +44,8 @@ public class BoardController {
     @GetMapping("")
     public ResponseEntity<Object> getAllBoards(@RequestHeader(value = "Authorization", required = false) String token) {
 
-            Claims claims = authorizationService.validateToken(token);
-            return ResponseEntity.ok(boardService.getAllBoards(claims));
+        Claims claims = authorizationService.validateToken(token);
+        return ResponseEntity.ok(boardService.getAllBoards(claims));
 
     }
 
@@ -121,11 +120,26 @@ public class BoardController {
 
     @DeleteMapping("/{boardId}/collabs/{oid}")
     public ResponseEntity<CollaboratorDTORes> removeCollaborator(@RequestHeader("Authorization") String token,
-                                                           @PathVariable String boardId,
-                                                           @PathVariable String oid) {
+                                                                 @PathVariable String boardId,
+                                                                 @PathVariable String oid) {
         Claims claims = authorizationService.validateToken(token);
         return ResponseEntity.ok(collaboratorService.removeCollaborator(claims, boardId, oid));
     }
 
+    @PutMapping("/{boardId}/collabs/invitations/accept")
+    public ResponseEntity<NewCollabDTORes> acceptInvitation(@RequestHeader("Authorization") String token,
+                                                            @PathVariable String boardId
+                                                         ) {
+        Claims claims = authorizationService.validateToken(token);
+        NewCollabDTORes updateCollaborator = collaboratorService.acceptInvitation(claims, boardId);
+        return ResponseEntity.status(HttpStatus.OK).body(updateCollaborator);
+    }
 
+    @DeleteMapping("/{boardId}/collabs/invitations/decline")
+    public ResponseEntity<NewCollabDTORes> declineInvitation(@RequestHeader("Authorization") String token,
+                                                             @PathVariable String boardId){
+        Claims claims = authorizationService.validateToken(token);
+        NewCollabDTORes deleteCollaborator = collaboratorService.declineInvitation(claims, boardId);
+        return ResponseEntity.status(HttpStatus.OK).body(deleteCollaborator);
+    }
 }

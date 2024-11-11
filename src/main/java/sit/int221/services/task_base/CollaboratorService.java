@@ -10,6 +10,7 @@ import sit.int221.dtos.request.NewCollaboratorDTO;
 import sit.int221.dtos.response.CollaboratorDTORes;
 import sit.int221.dtos.response.EditAccessRightDTO;
 import sit.int221.dtos.response.NewCollabDTORes;
+import sit.int221.entities.enums.InvitationStatus;
 import sit.int221.entities.task_base.Board;
 import sit.int221.entities.task_base.Collaborator;
 import sit.int221.entities.task_base.LocalUser;
@@ -17,9 +18,11 @@ import sit.int221.entities.itbkk_shared.User;
 import sit.int221.repositories.task_base.CollaboratorRepository;
 import sit.int221.repositories.task_base.LocalUserRepository;
 import sit.int221.repositories.itbkk_shared.UserRepository;
+import sit.int221.services.EmailService;
 import sit.int221.services.itbkk_shared.AuthorizationService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +33,8 @@ public class CollaboratorService {
     private CollaboratorRepository collaboratorRepository;
     @Autowired
     private LocalUserRepository localUserRepository;
+    @Autowired
+    private EmailService emailService;
     @Autowired
     AuthorizationService authorizationService;
 
@@ -70,6 +75,7 @@ public class CollaboratorService {
     public NewCollabDTORes createNewCollaborator(Claims claims, String boardId, NewCollaboratorDTO newCollab) {
         String oid = (String) claims.get("oid");
         String email = (String) claims.get("email");
+        String name = (String) claims.get("name");
         // Retrieve the board by boardId, throws exception if board does not exist
         Board board = authorizationService.getBoardId(boardId);
 
@@ -83,7 +89,7 @@ public class CollaboratorService {
         if (oid.equals(board.getOwnerId())) {
 
             // Validate accessRight fields
-            if(newCollab.getAccessRight() == null || newCollab.getAccessRight().isBlank()){
+            if (newCollab.getAccessRight() == null || newCollab.getAccessRight().isBlank()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Access right cannot be null or empty");
             }
 
@@ -107,10 +113,19 @@ public class CollaboratorService {
             }
 
             // Check if the user is already a collaborator on the board
-            if (existsEmailCollab) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "User is already a collaborator on this board");
-            }
+//            if (existsEmailCollab) {
+//                throw new ResponseStatusException(HttpStatus.CONFLICT, "User is already a collaborator on this board");
+//            }
 
+            // Check if the user is already a collaborator on the board
+            if (existsEmailCollab) {
+                Optional<Collaborator> existingCollaborator = collaboratorRepository.findByBoardIdAndLocalUserEmail(board.getId(), newCollab.getEmail());
+                existingCollaborator.ifPresent(collaborator -> {
+                    if (collaborator.getInvitationStatus() == InvitationStatus.PENDING || collaborator.getInvitationStatus() == InvitationStatus.ACCEPTED) {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "User is already a collaborator or pending collaborator on this board");
+                    }
+                });
+            }
 
             // Fetch the LocalUser by email
             LocalUser localUser = localUserRepository.findByEmail(newCollab.getEmail());
@@ -124,22 +139,78 @@ public class CollaboratorService {
             }
 
             Collaborator newCollaborator = new Collaborator();
-            System.out.println("newCollab 1 " + newCollaborator);
             newCollaborator.setBoard(board);
             newCollaborator.setLocalUser(localUser);
-            newCollaborator.setAccessRight(newCollab.getAccessRight().toUpperCase());
-            System.out.println("newCollab 2 " + newCollaborator);
+            newCollaborator.setInvitationStatus(InvitationStatus.PENDING);
+            //  must accept before get accessRight
+            newCollaborator.setAccessRight(newCollab.getAccessRight());
+//            newCollaborator.setAccessRight("");
+
 
             collaboratorRepository.save(newCollaborator);
 
+            emailService.sendEmail("itasdfasdxcvqwerqwe@gmail.com",
+//                    newCollab.getEmail(),
+                    name,
+                    newCollab.getAccessRight(),
+                    board.getName(),
+                    board.getId());
+
             // create responseDTO
-            return collaboratorResponse(boardId, localUser, newCollaborator.getAccessRight());
+            return collaboratorResponse(boardId, localUser, newCollaborator.getAccessRight(), newCollaborator.getInvitationStatus());
 
         } else {
             // token.is.valid AND board($id).exists AND token.oid.is.NOT.board.owner return 403
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not Board Owner");
         }
     }
+
+    public NewCollabDTORes acceptInvitation(Claims claims, String boardId) {
+        String oid = (String) claims.get("oid");
+        // Retrieve the board by boardId, throws exception if board does not exist
+        Board board = authorizationService.getBoardId(boardId);
+
+        // find collaborator on board with oid
+        Collaborator collaborator = collaboratorRepository.findByBoardIdAndLocalUserOidOrThrow(board.getId(), oid);
+
+        // Check if the collaborator is in PENDING status
+        if (collaborator == null || collaborator.getInvitationStatus() != InvitationStatus.PENDING) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No pending invitation for this collaborator");
+        }
+
+        if (collaborator.getInvitationStatus() == InvitationStatus.PENDING) {
+            // Set invitation status to ACCEPTED
+            collaborator.setInvitationStatus(InvitationStatus.ACCEPTED);
+            collaboratorRepository.save(collaborator);
+        }
+
+        LocalUser localUser = localUserRepository.findByEmail(collaborator.getLocalUser().getEmail());
+
+        return collaboratorResponse(boardId, localUser,
+                collaborator.getAccessRight(), collaborator.getInvitationStatus());
+    }
+
+    public NewCollabDTORes declineInvitation(Claims claims, String boardId) {
+        String oid = (String) claims.get("oid");
+        // Retrieve the board by boardId, throws exception if board does not exist
+        Board board = authorizationService.getBoardId(boardId);
+
+        // find collaborator on board with oid
+        Collaborator collaborator = collaboratorRepository.findByBoardIdAndLocalUserOidOrThrow(board.getId(), oid);
+
+        // Check if the collaborator is in PENDING status
+        if (collaborator == null || collaborator.getInvitationStatus() != InvitationStatus.PENDING) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No pending invitation for this collaborator");
+        }
+
+        collaboratorRepository.delete(collaborator);
+
+        LocalUser localUser = localUserRepository.findByEmail(collaborator.getLocalUser().getEmail());
+
+        return collaboratorResponse(boardId, localUser,
+                collaborator.getAccessRight(), collaborator.getInvitationStatus());
+    }
+
 
     public EditAccessRightDTO updateAccessRight(Claims claims, String boardId, String oid, EditAccessRightDTO editAccessRightDTO) {
         // token.is.valid AND board($id).NOT.exists
@@ -227,12 +298,13 @@ public class CollaboratorService {
         }
     }
 
-    private NewCollabDTORes collaboratorResponse(String boardId, LocalUser localUser, String accessRight) {
+    private NewCollabDTORes collaboratorResponse(String boardId, LocalUser localUser, String accessRight, InvitationStatus invitationStatus) {
         NewCollabDTORes dtoResponse = new NewCollabDTORes();
         dtoResponse.setBoardId(boardId);
         dtoResponse.setCollaboratorName(localUser.getName());
         dtoResponse.setCollaboratorEmail(localUser.getEmail());
         dtoResponse.setAccessRight(accessRight);
+        dtoResponse.setInvitationStatus(invitationStatus);
         return dtoResponse;
     }
 }

@@ -41,7 +41,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String jwtToken = null;
 
         String requestURI = request.getRequestURI();
-        if (requestURI.equals("/login") || requestURI.equals("/token")) {
+        if (requestURI.equals("/login") || requestURI.equals("/token") || requestURI.equals("/sendEmail")) {
             chain.doFilter(request, response);
             return;
         }

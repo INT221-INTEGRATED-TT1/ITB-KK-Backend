@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewTask3DTO;
+import sit.int221.entities.enums.InvitationStatus;
 import sit.int221.entities.task_base.*;
 import sit.int221.exceptions.ItemNotFoundException;
 import sit.int221.exceptions.StatusNotExistException;
@@ -40,8 +41,13 @@ public class Tasks3Service {
         Board board = authorizationService.getBoardId(boardId);
 
         String oid = (String) claims.get("oid");
-        boolean isCollaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid).isPresent();
-        if (oid.equals(board.getOwnerId()) || isCollaborator) {
+        Optional<Collaborator> collaboratorOpt = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid);
+
+        boolean isCollaboratorAccepted = collaboratorOpt
+                .map(collaborator -> InvitationStatus.ACCEPTED.equals(collaborator.getInvitationStatus()))
+                .orElse(false);
+
+        if (oid.equals(board.getOwnerId()) || isCollaboratorAccepted) {
             List<Tasks3> allTasksSorted = tasks3Repository.findAllByBoard(board, sort);
             if (filterStatuses.length > 0) {
                 List<String> filterStatusList = Arrays.asList(filterStatuses);
@@ -67,9 +73,12 @@ public class Tasks3Service {
     public Tasks3 findTask3ById(Claims claims, String boardId, Integer taskId) {
         Board board = authorizationService.getBoardId(boardId);
         String oid = (String) claims.get("oid");
-        boolean isCollaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid).isPresent();
+        Optional<Collaborator> collaboratorOpt = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid);
+        boolean isCollaboratorAccepted = collaboratorOpt
+                .map(collaborator -> InvitationStatus.ACCEPTED.equals(collaborator.getInvitationStatus()))
+                .orElse(false);
 
-        if (oid.equals(board.getOwnerId()) || isCollaborator) {
+        if (oid.equals(board.getOwnerId()) || isCollaboratorAccepted) {
             Tasks3 tasks3Id = tasks3Repository.findById(taskId).orElseThrow(() -> new ItemNotFoundException("Task id " + taskId + " not found"));
             return checkTasksThatBelongsToBoard(tasks3Id, board.getId());
         } else {
