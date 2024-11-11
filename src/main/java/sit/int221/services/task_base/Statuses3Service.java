@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewStatus3DTO;
 import sit.int221.dtos.response.Status3HomeCountDTO;
+import sit.int221.entities.enums.InvitationStatus;
 import sit.int221.entities.task_base.Board;
 import sit.int221.entities.task_base.Collaborator;
 import sit.int221.entities.task_base.Statuses3;
@@ -18,6 +19,7 @@ import sit.int221.exceptions.StatusUniqueException;
 import sit.int221.repositories.task_base.*;
 import sit.int221.services.itbkk_shared.AuthorizationService;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,9 +42,13 @@ public class Statuses3Service {
     public List<Status3HomeCountDTO> getAllStatusesWithCountTasksInUse(Claims claims, String boardId) {
         Board board = authorizationService.getBoardId(boardId);
         String oid = (String) claims.get("oid");
-        boolean isCollaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid).isPresent();
+        Optional<Collaborator> collaboratorOpt = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid);
 
-        if (oid.equals(board.getOwnerId()) || isCollaborator) {
+        boolean isCollaboratorAccepted = collaboratorOpt
+                .map(collaborator -> InvitationStatus.ACCEPTED.equals(collaborator.getInvitationStatus()))
+                .orElse(false);
+
+        if (oid.equals(board.getOwnerId()) || isCollaboratorAccepted) {
             List<Statuses3> statuses3List = statuses3Repository.findAllByBoardId(board);
             List<Status3HomeCountDTO> statusHomeCountDTOS = new ArrayList<>();
             for (int i = 0; i < statuses3List.stream().count(); i++) {
@@ -79,9 +85,13 @@ public class Statuses3Service {
     public Statuses3 findStatusById(Claims claims, String boardId, Integer statusId) {
         Board board = authorizationService.getBoardId(boardId);
         String oid = (String) claims.get("oid");
-        boolean isCollaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid).isPresent();
+        Optional<Collaborator> collaboratorOpt = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid);
 
-        if (oid.equals(board.getOwnerId()) || isCollaborator) {
+        boolean isCollaboratorAccepted = collaboratorOpt
+                .map(collaborator -> InvitationStatus.ACCEPTED.equals(collaborator.getInvitationStatus()))
+                .orElse(false);
+
+        if (oid.equals(board.getOwnerId()) || isCollaboratorAccepted) {
             Statuses3 statuses3Id = statuses3Repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException("Status id " + statusId + " not found"));
             return checkStatusesThatBelongsToBoard(statuses3Id, board.getId());
         } else {

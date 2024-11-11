@@ -8,6 +8,7 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import sit.int221.entities.enums.InvitationStatus;
 
 import java.sql.Timestamp;
 
@@ -40,5 +41,10 @@ public class Collaborator {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssX")
     @CreationTimestamp
     private Timestamp addedOn;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "invitationStatus", nullable = false)
+    private InvitationStatus invitationStatus;
 
 }
