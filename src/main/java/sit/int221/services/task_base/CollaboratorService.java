@@ -113,11 +113,6 @@ public class CollaboratorService {
             }
 
             // Check if the user is already a collaborator on the board
-//            if (existsEmailCollab) {
-//                throw new ResponseStatusException(HttpStatus.CONFLICT, "User is already a collaborator on this board");
-//            }
-
-            // Check if the user is already a collaborator on the board
             if (existsEmailCollab) {
                 Optional<Collaborator> existingCollaborator = collaboratorRepository.findByBoardIdAndLocalUserEmail(board.getId(), newCollab.getEmail());
                 existingCollaborator.ifPresent(collaborator -> {
@@ -144,8 +139,6 @@ public class CollaboratorService {
             newCollaborator.setInvitationStatus(InvitationStatus.PENDING);
             //  must accept before get accessRight
             newCollaborator.setAccessRight(newCollab.getAccessRight());
-//            newCollaborator.setAccessRight("");
-
 
             collaboratorRepository.save(newCollaborator);
 
@@ -208,7 +201,7 @@ public class CollaboratorService {
         LocalUser localUser = localUserRepository.findByEmail(collaborator.getLocalUser().getEmail());
 
         return collaboratorResponse(boardId, localUser,
-                collaborator.getAccessRight(), collaborator.getInvitationStatus());
+                collaborator.getAccessRight(), InvitationStatus.DECLINED);
     }
 
 
