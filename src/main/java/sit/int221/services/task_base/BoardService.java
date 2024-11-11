@@ -42,23 +42,16 @@ public class BoardService {
     @Autowired
     ModelMapper modelMapper;
 
-    public List<BoardAllDTORes> getAllBoards(Claims claims) {
+    public BoardAllDTORes getAllBoards(Claims claims) {
         String oid = (String) claims.get("oid");
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
 
-        System.out.println(oid);
-
-        System.out.println(user);
         //get personal boards
         List<Board> personalBoards = boardRepository.findAllByOwnerId(oid);
 
         // get collab boards
         List<Board> collaboratorBoards = boardRepository.findBoardsByUserOid(oid);
-
-        List<Collaborator> collaborators =  collaboratorRepository.findByLocalUserOid(oid);
-
-
-//        System.out.println("collab" + collaborator);
+        List<Collaborator> collaborators = collaboratorRepository.findByLocalUserOid(oid);
 
         // Map personal boards to BoardResDTO
         List<PersonalBoardResDTO> personalBoardDTOs = personalBoards.stream()
@@ -74,17 +67,11 @@ public class BoardService {
                                 new ItemNotFoundException("Owner Not Found")).getName()),
                         collaborators.stream().filter(c -> c.getBoard().getId().equals(board.getId()))
                                 .map(Collaborator::getAccessRight)
-                                .collect(Collectors.toList()).toString()
+                                    .collect(Collectors.joining(", "))
+                        // Join access rights into a comma-separated string
                 )).toList();
-        System.out.println(personalBoardDTOs);
 
-        System.out.println(collaboratorBoardDTOs);
-
-        // Collect one BoardAllDTORes per user’s boards
-        BoardAllDTORes boardAllDTORes = new BoardAllDTORes(personalBoardDTOs, collaboratorBoardDTOs);
-
-        // Return list with BoardAllDTORes
-        return List.of(boardAllDTORes);
+        return new BoardAllDTORes(personalBoardDTOs ,collaboratorBoardDTOs);
     }
 
     public PersonalBoardResDTO getBoardById(Claims claims, String id) {
@@ -112,7 +99,7 @@ public class BoardService {
         return getBoardResDTO(user, board);
     }
 
-//    @Transactional(transactionManager = "itBkkTransactionManager")
+    //    @Transactional(transactionManager = "itBkkTransactionManager")
     public PersonalBoardResDTO insertBoard(Claims claims, NewBoardDTO boardDTO) {
         String oid = (String) claims.get("oid");
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
