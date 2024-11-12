@@ -46,12 +46,16 @@ public class BoardService {
         String oid = (String) claims.get("oid");
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
 
+
         //get personal boards
         List<Board> personalBoards = boardRepository.findAllByOwnerId(oid);
 
         // get collab boards
         List<Board> collaboratorBoards = boardRepository.findBoardsByUserOid(oid);
-        List<Collaborator> collaborators = collaboratorRepository.findByLocalUserOid(oid);
+
+        List<Collaborator> acceptedCollaborators = collaboratorRepository.findByLocalUserOid(oid).stream()
+                .filter(c -> c.getInvitationStatus() == InvitationStatus.ACCEPTED)
+                .toList();
 
         // Map personal boards to BoardResDTO
         List<PersonalBoardResDTO> personalBoardDTOs = personalBoards.stream()
@@ -60,18 +64,25 @@ public class BoardService {
                         new OwnerBoardDTORes(user.getOid(), user.getName()))).toList();
 
         List<CollabsBoardResDTO> collaboratorBoardDTOs = collaboratorBoards.stream()
+                .filter(board -> acceptedCollaborators.stream()
+                        .anyMatch(collab -> collab.getBoard().getId().equals(board.getId())))
                 .map(board -> new CollabsBoardResDTO(
                         board.getId(),
                         board.getName(),
-                        new OwnerBoardCollabDTORes(userRepository.findById(board.getOwnerId()).orElseThrow(() ->
-                                new ItemNotFoundException("Owner Not Found")).getName()),
-                        collaborators.stream().filter(c -> c.getBoard().getId().equals(board.getId()))
+                        new OwnerBoardCollabDTORes(
+                                userRepository.findById(board.getOwnerId())
+                                        .orElseThrow(() -> new ItemNotFoundException("Owner Not Found"))
+                                        .getName()
+                        ),
+                        acceptedCollaborators.stream()
+                                .filter(c -> c.getBoard().getId().equals(board.getId()))
                                 .map(Collaborator::getAccessRight)
-                                    .collect(Collectors.joining(", "))
-                        // Join access rights into a comma-separated string
-                )).toList();
+                                .collect(Collectors.joining(", "))
+//                        // Join access rights into a comma-separated string
+                ))
+                .toList();
 
-        return new BoardAllDTORes(personalBoardDTOs ,collaboratorBoardDTOs);
+        return new BoardAllDTORes(personalBoardDTOs, collaboratorBoardDTOs);
     }
 
     public PersonalBoardResDTO getBoardById(Claims claims, String id) {
