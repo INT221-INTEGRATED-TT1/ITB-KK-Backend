@@ -3,6 +3,7 @@ package sit.int221.dtos.response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import sit.int221.entities.enums.InvitationStatus;
 
 @Data
 @NoArgsConstructor
@@ -12,4 +13,5 @@ public class CollabsBoardResDTO {
     private String name;
     private OwnerBoardCollabDTORes owner;
     private String accessRight;
+    private InvitationStatus invitationStatus;
 }

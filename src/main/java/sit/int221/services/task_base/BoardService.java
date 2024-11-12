@@ -60,15 +60,21 @@ public class BoardService {
                 .map(board -> new PersonalBoardResDTO(board.getId(), board.getName(), board.getVisibility(),
                         new OwnerBoardDTORes(user.getOid(), user.getName()))).toList();
 
-        List<CollabsBoardResDTO> collaboratorBoardDTOs = collaboratorBoards.stream().map(board ->
-                new CollabsBoardResDTO(board.getId(), board.getName(),
-                        new OwnerBoardCollabDTORes(userRepository.findById(board.getOwnerId()).orElseThrow(() ->
-                                new ItemNotFoundException("Owner Not Found")).getName()), collaborators.stream()
-                                .filter(c -> c.getBoard().getId().equals(board.getId()))
-                                .map(Collaborator::getAccessRight)
-                                .collect(Collectors.joining(", "))
-                // Join access rights into a comma-separated string
-        )).toList();
+        // Map collaborator boards to DTO and handle collaborator data
+        List<CollabsBoardResDTO> collaboratorBoardDTOs = collaboratorBoards.stream().map(board -> {
+            // Find the specific collaborator for the board
+            Collaborator collaborator = collaborators.stream()
+                    .filter(c -> c.getBoard().getId().equals(board.getId()))
+                    .findFirst().orElse(null);
+
+            return new CollabsBoardResDTO(
+                    board.getId(), board.getName(),
+                    new OwnerBoardCollabDTORes(userRepository.findById(board.getOwnerId()).orElseThrow(() ->
+                            new ItemNotFoundException("Owner Not Found")).getName()),
+                    collaborator.getAccessRight(),
+                    collaborator.getInvitationStatus()
+            );
+        }).toList();
 
         return new BoardAllDTORes(personalBoardDTOs, collaboratorBoardDTOs);
     }
