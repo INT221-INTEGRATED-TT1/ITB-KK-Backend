@@ -53,34 +53,22 @@ public class BoardService {
         // get collab boards
         List<Board> collaboratorBoards = boardRepository.findBoardsByUserOid(oid);
 
-        List<Collaborator> acceptedCollaborators = collaboratorRepository.findByLocalUserOid(oid).stream()
-                .filter(c -> c.getInvitationStatus() == InvitationStatus.ACCEPTED)
-                .toList();
+        List<Collaborator> collaborators = collaboratorRepository.findByLocalUserOid(oid);
 
         // Map personal boards to BoardResDTO
         List<PersonalBoardResDTO> personalBoardDTOs = personalBoards.stream()
-                .map(board -> new PersonalBoardResDTO(board.getId(), board.getName(),
-                        board.getVisibility(),
+                .map(board -> new PersonalBoardResDTO(board.getId(), board.getName(), board.getVisibility(),
                         new OwnerBoardDTORes(user.getOid(), user.getName()))).toList();
 
-        List<CollabsBoardResDTO> collaboratorBoardDTOs = collaboratorBoards.stream()
-                .filter(board -> acceptedCollaborators.stream()
-                        .anyMatch(collab -> collab.getBoard().getId().equals(board.getId())))
-                .map(board -> new CollabsBoardResDTO(
-                        board.getId(),
-                        board.getName(),
-                        new OwnerBoardCollabDTORes(
-                                userRepository.findById(board.getOwnerId())
-                                        .orElseThrow(() -> new ItemNotFoundException("Owner Not Found"))
-                                        .getName()
-                        ),
-                        acceptedCollaborators.stream()
+        List<CollabsBoardResDTO> collaboratorBoardDTOs = collaboratorBoards.stream().map(board ->
+                new CollabsBoardResDTO(board.getId(), board.getName(),
+                        new OwnerBoardCollabDTORes(userRepository.findById(board.getOwnerId()).orElseThrow(() ->
+                                new ItemNotFoundException("Owner Not Found")).getName()), collaborators.stream()
                                 .filter(c -> c.getBoard().getId().equals(board.getId()))
                                 .map(Collaborator::getAccessRight)
                                 .collect(Collectors.joining(", "))
-//                        // Join access rights into a comma-separated string
-                ))
-                .toList();
+                // Join access rights into a comma-separated string
+        )).toList();
 
         return new BoardAllDTORes(personalBoardDTOs, collaboratorBoardDTOs);
     }
@@ -91,9 +79,7 @@ public class BoardService {
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
         Optional<Collaborator> collaboratorOpt = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid);
 
-        boolean isCollaboratorAccepted = collaboratorOpt
-                .map(collaborator -> InvitationStatus.ACCEPTED.equals(collaborator.getInvitationStatus()))
-                .orElse(false);
+        boolean isCollaboratorAccepted = collaboratorOpt.map(collaborator -> InvitationStatus.ACCEPTED.equals(collaborator.getInvitationStatus())).orElse(false);
 
 
         // check if is owner of the board or is Collaborator of the board can access board
