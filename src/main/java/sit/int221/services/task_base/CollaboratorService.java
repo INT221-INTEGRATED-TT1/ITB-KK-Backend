@@ -1,6 +1,7 @@
 package sit.int221.services.task_base;
 
 import io.jsonwebtoken.Claims;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,8 @@ public class CollaboratorService {
     @Autowired
     AuthorizationService authorizationService;
 
+
+    // fix to use listMapper or
     public List<CollaboratorDTORes> getAllCollaborators(Claims claims, String boardId) {
         Board board = authorizationService.getBoardId(boardId);
         validateAccess(claims, board);
@@ -276,6 +279,7 @@ public class CollaboratorService {
         collabDTO.setEmail(localUser.getEmail());
         // set fields from collaborator
         collabDTO.setAccessRight(collaborator.getAccessRight());
+        collabDTO.setInvitationStatus(collaborator.getInvitationStatus());
         collabDTO.setAddedOn(collaborator.getAddedOn());
         return collabDTO;
     }

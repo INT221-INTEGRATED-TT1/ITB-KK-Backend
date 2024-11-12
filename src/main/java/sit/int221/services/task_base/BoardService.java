@@ -55,6 +55,8 @@ public class BoardService {
 
         List<Collaborator> collaborators = collaboratorRepository.findByLocalUserOid(oid);
 
+
+        // fix to use listMapper or
         // Map personal boards to BoardResDTO
         List<PersonalBoardResDTO> personalBoardDTOs = personalBoards.stream()
                 .map(board -> new PersonalBoardResDTO(board.getId(), board.getName(), board.getVisibility(),
