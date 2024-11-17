@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sit.int221.dtos.response.FileUploadResponse;
 import sit.int221.services.FileService;
 import sit.int221.services.itbkk_shared.AuthorizationService;
 
@@ -21,7 +22,6 @@ import java.util.List;
 public class FileController {
     @Autowired
     private FileService fileService;
-
     @Autowired
     private AuthorizationService authorizationService;
 

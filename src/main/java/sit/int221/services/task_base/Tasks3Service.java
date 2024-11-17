@@ -27,9 +27,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 @Data
 @Service
 public class Tasks3Service {
@@ -79,7 +81,7 @@ public class Tasks3Service {
             List<Tasks3> allTasksSorted = tasks3Repository.findAllByBoard(board, sort);
             if (filterStatuses.length > 0) {
                 List<String> filterStatusList = Arrays.asList(filterStatuses);
-                allTasksSorted =  allTasksSorted.stream().filter(tasks3 -> filterStatusList.contains(tasks3.getStatuses3().getName())).toList();
+                allTasksSorted = allTasksSorted.stream().filter(tasks3 -> filterStatusList.contains(tasks3.getStatuses3().getName())).toList();
             }
             return allTasksSorted.stream()
                     .map(task -> {
@@ -118,7 +120,7 @@ public class Tasks3Service {
         List<Tasks3> allTasksSorted = tasks3Repository.findAllByBoard(board, sort);
         if (filterStatuses.length > 0) {
             List<String> filterStatusList = Arrays.asList(filterStatuses);
-            allTasksSorted =  allTasksSorted.stream().filter(tasks3 -> filterStatusList.contains(tasks3.getStatuses3().getName())).toList();
+            allTasksSorted = allTasksSorted.stream().filter(tasks3 -> filterStatusList.contains(tasks3.getStatuses3().getName())).toList();
         }
         return allTasksSorted.stream()
                 .map(task -> {
@@ -201,10 +203,32 @@ public class Tasks3Service {
         if (oid.equals(board.getOwnerId()) || collaborator.isPresent() && collaborator.get().getAccessRight().equals("WRITE")) {
             Tasks3 tasks3Delete = tasks3Repository.findById(taskId).orElseThrow(() -> new ItemNotFoundException("Task id " + taskId + " not found"));
             checkTasksThatBelongsToBoard(tasks3Delete, boardId);
+            deleteAttachmentsForTask(board.getId(), tasks3Delete.getId());
             tasks3Repository.deleteById(tasks3Delete.getId());
             return tasks3Delete;
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not authorized to create a task on this board");
+        }
+    }
+
+    private void deleteAttachmentsForTask(String boardId, Integer taskId) {
+        Path taskStorageLocation = this.fileStorageLocation.resolve(boardId).resolve(String.valueOf(taskId));
+        try {
+            // Delete all files in the task's attachment directory
+            if (Files.exists(taskStorageLocation)) {
+                Files.walk(taskStorageLocation)
+                        .sorted(Comparator.reverseOrder()) // Delete files first, then directories
+                        .forEach(file -> {
+                            try {
+                                Files.delete(file); // Delete the file
+                            } catch (IOException e) {
+                                // Log the error if any file cannot be deleted
+                                throw new RuntimeException("Failed to delete attachment: " + file, e);
+                            }
+                        });
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException("Failed to delete attachments for taskId: " + taskId, ex);
         }
     }
 
