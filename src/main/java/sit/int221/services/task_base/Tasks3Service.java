@@ -1,28 +1,40 @@
 package sit.int221.services.task_base;
 
 import io.jsonwebtoken.Claims;
+import lombok.Data;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.dtos.request.NewTask3DTO;
+import sit.int221.dtos.response.TaskListDTO;
 import sit.int221.entities.enums.InvitationStatus;
 import sit.int221.entities.task_base.*;
 import sit.int221.exceptions.ItemNotFoundException;
 import sit.int221.exceptions.StatusNotExistException;
 import sit.int221.exceptions.TaskNotFoundException;
+import sit.int221.properties.FileStorageProperties;
 import sit.int221.repositories.task_base.BoardRepository;
 import sit.int221.repositories.task_base.CollaboratorRepository;
 import sit.int221.repositories.task_base.Tasks3Repository;
+import sit.int221.services.ListMapper;
 import sit.int221.services.itbkk_shared.AuthorizationService;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
+import java.util.stream.Collectors;
+@Data
 @Service
 public class Tasks3Service {
+    private Path fileStorageLocation;
+
     @Autowired
     Tasks3Repository tasks3Repository;
     @Autowired
@@ -33,10 +45,26 @@ public class Tasks3Service {
     CollaboratorRepository collaboratorRepository;
     @Autowired
     AuthorizationService authorizationService;
+    @Autowired
+    ListMapper listMapper;
+    @Autowired
+    ModelMapper modelMapper;
 
+    @Autowired
+    public void FileService(FileStorageProperties fileStorageProperties) {
+        this.fileStorageLocation = Paths.get(fileStorageProperties
+                .getUploadDir()).toAbsolutePath().normalize();
+        try {
+            if (!Files.exists(this.fileStorageLocation)) {
+                Files.createDirectories(this.fileStorageLocation);
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException(
+                    "Could not create the directory where the uploaded files will be stored.", ex);
+        }
+    }
 
-    // need to fix allow access by board's collaborator as well #Checked
-    public List<Tasks3> getFilterTasksAndSorted(Claims claims, String sortBy, String[] filterStatuses, String direction, String boardId) {
+    public List<TaskListDTO> getFilterTasksAndSorted(Claims claims, String sortBy, String[] filterStatuses, String direction, String boardId) {
         Sort sort = direction.equalsIgnoreCase("ASC") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Board board = authorizationService.getBoardId(boardId);
 
@@ -51,23 +79,56 @@ public class Tasks3Service {
             List<Tasks3> allTasksSorted = tasks3Repository.findAllByBoard(board, sort);
             if (filterStatuses.length > 0) {
                 List<String> filterStatusList = Arrays.asList(filterStatuses);
-                return allTasksSorted.stream().filter(tasks3 -> filterStatusList.contains(tasks3.getStatuses3().getName())).toList();
+                allTasksSorted =  allTasksSorted.stream().filter(tasks3 -> filterStatusList.contains(tasks3.getStatuses3().getName())).toList();
             }
-            return allTasksSorted;
+            return allTasksSorted.stream()
+                    .map(task -> {
+                        TaskListDTO dto = modelMapper.map(task, TaskListDTO.class);
+                        int attachmentCount = countAttachment(board.getId(), task.getId());
+                        // If no attachments, set the count to "-". -1 -> "-" on FE
+                        dto.setAttachmentCount(attachmentCount > 0 ? attachmentCount : -1);
+                        return dto;
+                    })
+                    .collect(Collectors.toList());
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access tasks: board visibility is PRIVATE or You are not collaborator");
         }
     }
 
-    public List<Tasks3> getFilterTasksAndSorted(String sortBy, String[] filterStatuses, String direction, String boardId) {
+    private int countAttachment(String boardId, Integer taskId) {
+        Path taskStorageLocation = fileStorageLocation
+                .resolve(boardId)
+                .resolve(String.valueOf(taskId));
+        try {
+            if (Files.exists(taskStorageLocation)) {
+                // Count only the regular files in the directory
+                return (int) Files.list(taskStorageLocation)
+                        .filter(Files::isRegularFile) // Filter for regular files
+                        .count();
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException("Error counting attachments for taskId: " + taskId, ex);
+        }
+        return 0; // No attachments
+    }
+
+    public List<TaskListDTO> getFilterTasksAndSorted(String sortBy, String[] filterStatuses, String direction, String boardId) {
         Sort sort = direction.equalsIgnoreCase("ASC") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Board board = authorizationService.getBoardId(boardId);
         List<Tasks3> allTasksSorted = tasks3Repository.findAllByBoard(board, sort);
         if (filterStatuses.length > 0) {
             List<String> filterStatusList = Arrays.asList(filterStatuses);
-            return allTasksSorted.stream().filter(tasks3 -> filterStatusList.contains(tasks3.getStatuses3().getName())).toList();
+            allTasksSorted =  allTasksSorted.stream().filter(tasks3 -> filterStatusList.contains(tasks3.getStatuses3().getName())).toList();
         }
-        return allTasksSorted;
+        return allTasksSorted.stream()
+                .map(task -> {
+                    TaskListDTO dto = modelMapper.map(task, TaskListDTO.class);
+                    int attachmentCount = countAttachment(board.getId(), task.getId());
+                    // If no attachments, set the count to "-". -1 -> "-" on FE
+                    dto.setAttachmentCount(attachmentCount > 0 ? attachmentCount : -1);
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     public Tasks3 findTask3ById(Claims claims, String boardId, Integer taskId) {

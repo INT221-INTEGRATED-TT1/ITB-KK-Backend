@@ -45,7 +45,7 @@ public class Tasks3 {
     @Column(name = "updated_on", nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssX")
     @UpdateTimestamp
-    private Timestamp updated;
+    private Timestamp updatedOn;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
