@@ -77,4 +77,7 @@ public class Tasks3Controller {
         Claims claims = authorizationService.validateToken(token);
         return tasks3Service.removeTask3ById(claims, boardId, taskId);
     }
+
+//    @PostMapping("/{boardId}/tasks/{taskId}/attactments")
+//    public
 }

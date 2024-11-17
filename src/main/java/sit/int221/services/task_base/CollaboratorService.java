@@ -145,8 +145,9 @@ public class CollaboratorService {
 
             collaboratorRepository.save(newCollaborator);
 
-            emailService.sendEmail("itbkkttone@gmail.com",
-//                    newCollab.getEmail(),
+            emailService.sendEmail(
+//                    "itbkkttone@gmail.com",
+                    newCollab.getEmail(),
                     name,
                     newCollab.getAccessRight(),
                     board.getName(),

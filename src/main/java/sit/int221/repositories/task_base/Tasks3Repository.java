@@ -17,4 +17,7 @@ public interface Tasks3Repository extends JpaRepository<Tasks3, Integer> {
     @Query("UPDATE Tasks3 t SET t.statuses3.id = :newStatus WHERE t.statuses3.id = :oldStatus")
     void transferStatusAllBy(Integer newStatus, Integer oldStatus);
 
+    Tasks3 findTasks3ByBoardIdAndId(String boardId, Integer taskId);
+
+
 }
