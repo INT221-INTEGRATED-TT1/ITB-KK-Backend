@@ -4,6 +4,7 @@ package sit.int221.configs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -15,7 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import sit.int221.filters.JwtAuthFilter;
-import sit.int221.services.JwtUserDetailsService;
+import sit.int221.services.itbkk_shared.JwtUserDetailsService;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -33,15 +34,11 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeRequests(authorize -> authorize
-                        .requestMatchers("/login", "/error").permitAll()
-//                        .requestMatchers("/v3/boards/**").permitAll()
-//                        .requestMatchers("/v2/tasks/**").permitAll()
-//                        .requestMatchers(("/users/**")).permitAll()
-//                        .requestMatchers("/v2/statuses/**").permitAll()
-                        .anyRequest().authenticated())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                        .requestMatchers("/login", "/token", "sendEmail", "/error").permitAll()
+                        .requestMatchers(HttpMethod.GET).permitAll() // Allow all GET requests for everyone
+                        .anyRequest().hasAnyAuthority("ROLE_OWNER","ROLE_COLLABORATOR_WRITE")) // All other requests require ROLE_OWNER OR ROLE_COLLABORATOR_WRITE
                 .httpBasic(withDefaults());
-//                        .anyRequest().permitAll());
+        httpSecurity.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
 

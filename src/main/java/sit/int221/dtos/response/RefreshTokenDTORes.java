@@ -3,7 +3,6 @@ package sit.int221.dtos.response;
 import lombok.Data;
 
 @Data
-public class AccessTokenDTORes {
+public class RefreshTokenDTORes {
     private String access_token;
-    private String refresh_token;
 }
