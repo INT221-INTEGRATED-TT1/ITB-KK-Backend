@@ -201,7 +201,7 @@ public class Statuses3Service {
         String oid = (String) claims.get("oid");
         Optional<Collaborator> collaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(boardId, oid);
 
-        if (oid.equals(board.getOwnerId()) || collaborator.isPresent() && collaborator.get().getAccessRight().equals("WRITE")) {
+        if (oid.equals(board.getOwnerId()) || collaborator.isPresent() && collaborator.get().getAccessRight().equals("WRITE") ) {
             Statuses3 statuses3Id = statuses3Repository.findById(oldStatus).orElseThrow(() -> new StatusNotFoundException("Status id " + oldStatus + " not found"));
             checkStatusesThatBelongsToBoard(statuses3Id, board.getId());
             findStatusByOnlyId(oldStatus);
