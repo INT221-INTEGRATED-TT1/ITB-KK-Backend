@@ -3,6 +3,7 @@ package sit.int221.services;
 import io.jsonwebtoken.Claims;
 import lombok.Data;
 import lombok.Getter;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -43,6 +44,9 @@ public class FileService {
     private Tasks3Repository tasks3Repository;
 //    @Value("${spring.servlet.multipart.max-request-size}")
 //    private int MAX_FILES;
+
+    @Autowired
+    ModelMapper modelMapper;
 
 
     @Autowired
@@ -224,5 +228,26 @@ public class FileService {
             // If the user is not authorized to delete, throw a 403 error
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not authorized to delete file from this task");
         }
+    }
+
+    public List<String> getFileNameInDirectory(String boardId, Integer taskId){
+        Path _PATH_task = this.fileStorageLocation.resolve(boardId).resolve(String.valueOf(taskId));
+        try {
+            // Ensure the directory exists
+            if (!Files.exists(_PATH_task) || !Files.isDirectory(_PATH_task)) {
+                throw new IOException("The directory does not exist or is not a directory: " + _PATH_task.toString());
+            }
+
+            // List all file names in the directory
+            return Files.list(_PATH_task)
+                    .filter(Files::isRegularFile) // Filter only regular files
+                    .map(path -> path.getFileName().toString()) // Get the file name as a string
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to retrieve file names from directory: " + _PATH_task, e);
+        }
+
+
     }
 }

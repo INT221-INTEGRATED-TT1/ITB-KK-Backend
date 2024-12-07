@@ -1,6 +1,7 @@
 package sit.int221.controllers;
 
 import io.jsonwebtoken.Claims;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
@@ -9,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sit.int221.dtos.response.FileNameResDTO;
 import sit.int221.dtos.response.FileUploadResponse;
 import sit.int221.services.FileService;
 import sit.int221.services.itbkk_shared.AuthorizationService;
@@ -25,6 +27,9 @@ public class FileController {
     @Autowired
     private AuthorizationService authorizationService;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @PostMapping("/{boardId}/tasks/{taskId}/attachments")
     public ResponseEntity<Object> fileUpload(@RequestHeader("Authorization") String token,
                                              @PathVariable String boardId,
@@ -33,6 +38,24 @@ public class FileController {
         Claims claims = authorizationService.validateToken(token);
         List<String> uploadedFiles = fileService.store(claims, boardId, taskId, file);
         return ResponseEntity.ok("You successfully uploaded " + uploadedFiles);
+    }
+
+    @GetMapping("/{boardId}/tasks/{taskId}/attachments")
+    public ResponseEntity<Object> getFileFromTask(@PathVariable String boardId, @PathVariable Integer taskId) {
+        try {
+            // Fetch file names using the service method
+            List<String> fileNames = fileService.getFileNameInDirectory(boardId, taskId);
+
+
+            // Return the file names as a response
+            return ResponseEntity.ok(modelMapper.map(
+                    new FileNameResDTO(fileNames),
+                    FileNameResDTO.class
+            ));
+        } catch (Exception e) {
+            // Handle errors and return an appropriate response
+            return ResponseEntity.status(500).body("Failed to retrieve files: " + e.getMessage());
+        }
     }
 
 
