@@ -31,6 +31,7 @@ build/
 /database/mysql-lib/*
 ### VS Code ###
 .vscode/
+.attachments/*
 
 /src/main/resources/application.properties
 .mysecret
