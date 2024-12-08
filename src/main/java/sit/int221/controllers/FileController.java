@@ -4,10 +4,7 @@ import io.jsonwebtoken.Claims;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sit.int221.dtos.response.FileNameResDTO;
@@ -41,10 +38,11 @@ public class FileController {
     }
 
     @GetMapping("/{boardId}/tasks/{taskId}/attachments")
-    public ResponseEntity<Object> getFileFromTask(@PathVariable String boardId, @PathVariable Integer taskId) {
-        try {
+    public ResponseEntity<Object> getFileFromTask(@RequestHeader("Authorization") String token, @PathVariable String boardId, @PathVariable Integer taskId) {
+        Claims claims = authorizationService.validateToken(token);
+
             // Fetch file names using the service method
-            List<String> fileNames = fileService.getFileNameInDirectory(boardId, taskId);
+            List<String> fileNames = fileService.getFileNameInDirectory(claims,boardId, taskId);
 
 
             // Return the file names as a response
@@ -52,10 +50,7 @@ public class FileController {
                     new FileNameResDTO(fileNames),
                     FileNameResDTO.class
             ));
-        } catch (Exception e) {
-            // Handle errors and return an appropriate response
-            return ResponseEntity.status(500).body("Failed to retrieve files: " + e.getMessage());
-        }
+
     }
 
 

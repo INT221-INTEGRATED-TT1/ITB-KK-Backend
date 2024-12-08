@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import sit.int221.entities.task_base.Board;
 import sit.int221.entities.task_base.Collaborator;
 import sit.int221.entities.task_base.Tasks3;
+import sit.int221.exceptions.UploadForbiddenException;
 import sit.int221.properties.FileStorageProperties;
 import sit.int221.repositories.task_base.CollaboratorRepository;
 import sit.int221.repositories.task_base.Tasks3Repository;
@@ -230,23 +231,45 @@ public class FileService {
         }
     }
 
-    public List<String> getFileNameInDirectory(String boardId, Integer taskId){
+    public List<String> getFileNameInDirectory(Claims claims,String boardId, Integer taskId){
+        Board board = authorizationService.getBoardId(boardId);
+        String oid = (String) claims.get("oid");
+        Optional<Collaborator> collaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(boardId, oid);
+
+        Tasks3 tasks3 = tasks3Repository.findTasks3ByBoardIdAndId(boardId, taskId);
         Path _PATH_task = this.fileStorageLocation.resolve(boardId).resolve(String.valueOf(taskId));
-        try {
-            // Ensure the directory exists
-            if (!Files.exists(_PATH_task) || !Files.isDirectory(_PATH_task)) {
-                throw new IOException("The directory does not exist or is not a directory: " + _PATH_task.toString());
+        if (tasks3 == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found for boardId " + boardId + " and taskId " + taskId);
+        }
+
+        if (oid.equals(board.getOwnerId()) ||
+                collaborator.isPresent() && collaborator.get().getAccessRight().equals("WRITE")) {
+
+            try {
+                // Ensure the directory exists
+                if (!Files.exists(_PATH_task) || !Files.isDirectory(_PATH_task)) {
+                    throw new IOException("The directory does not exist or is not a directory: " + _PATH_task.toString());
+                }
+
+                // List all file names in the directory
+                return Files.list(_PATH_task)
+                        .filter(Files::isRegularFile) // Filter only regular files
+                        .map(path -> path.getFileName().toString()) // Get the file name as a string
+                        .collect(Collectors.toList());
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Failed to retrieve file names from directory: " + _PATH_task, e);
             }
 
-            // List all file names in the directory
-            return Files.list(_PATH_task)
-                    .filter(Files::isRegularFile) // Filter only regular files
-                    .map(path -> path.getFileName().toString()) // Get the file name as a string
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to retrieve file names from directory: " + _PATH_task, e);
         }
+
+        else {
+            throw new UploadForbiddenException("Fail to upload file to this task");
+        }
+
+
+
+
 
 
     }
