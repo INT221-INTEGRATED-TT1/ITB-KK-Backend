@@ -1,14 +1,14 @@
 package sit.int221.controllers;
 
 import io.jsonwebtoken.Claims;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sit.int221.dtos.response.FileMetadataDTO;
+import sit.int221.dtos.response.FileNameResDTO;
 import sit.int221.dtos.response.FileUploadResponse;
 import sit.int221.services.FileService;
 import sit.int221.services.itbkk_shared.AuthorizationService;
@@ -25,6 +25,9 @@ public class FileController {
     @Autowired
     private AuthorizationService authorizationService;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @PostMapping("/{boardId}/tasks/{taskId}/attachments")
     public ResponseEntity<Object> fileUpload(@RequestHeader("Authorization") String token,
                                              @PathVariable String boardId,
@@ -33,6 +36,17 @@ public class FileController {
         Claims claims = authorizationService.validateToken(token);
         List<String> uploadedFiles = fileService.store(claims, boardId, taskId, file);
         return ResponseEntity.ok("You successfully uploaded " + uploadedFiles);
+    }
+
+    @GetMapping("/{boardId}/tasks/{taskId}/attachments")
+    public ResponseEntity<Object> getFileFromTask(@RequestHeader("Authorization") String token, @PathVariable String boardId, @PathVariable Integer taskId) {
+        Claims claims = authorizationService.validateToken(token);
+
+            // Fetch file names using the service method
+        List<FileMetadataDTO> fileNames = fileService.getFileMetadataInDirectory(claims,boardId, taskId);
+        List<FileMetadataDTO> fileMetadataList = fileService.getFileMetadataInDirectory(claims, boardId, taskId);
+        return ResponseEntity.ok(fileMetadataList);
+
     }
 
 
