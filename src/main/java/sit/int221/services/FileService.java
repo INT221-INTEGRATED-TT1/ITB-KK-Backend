@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import sit.int221.dtos.response.FileMetadataDTO;
 import sit.int221.entities.task_base.Board;
 import sit.int221.entities.task_base.Collaborator;
 import sit.int221.entities.task_base.Tasks3;
@@ -28,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -231,13 +233,14 @@ public class FileService {
         }
     }
 
-    public List<String> getFileNameInDirectory(Claims claims,String boardId, Integer taskId){
+    public List<FileMetadataDTO> getFileMetadataInDirectory(Claims claims, String boardId, Integer taskId) {
         Board board = authorizationService.getBoardId(boardId);
         String oid = (String) claims.get("oid");
         Optional<Collaborator> collaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(boardId, oid);
 
         Tasks3 tasks3 = tasks3Repository.findTasks3ByBoardIdAndId(boardId, taskId);
         Path _PATH_task = this.fileStorageLocation.resolve(boardId).resolve(String.valueOf(taskId));
+
         if (tasks3 == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found for boardId " + boardId + " and taskId " + taskId);
         }
@@ -251,26 +254,32 @@ public class FileService {
                     throw new IOException("The directory does not exist or is not a directory: " + _PATH_task.toString());
                 }
 
-                // List all file names in the directory
+                // List all file metadata in the directory
                 return Files.list(_PATH_task)
                         .filter(Files::isRegularFile) // Filter only regular files
-                        .map(path -> path.getFileName().toString()) // Get the file name as a string
+                        .map(path -> {
+                            try {
+                                // Get file metadata
+                                String fileName = path.getFileName().toString();
+                                long fileSize = Files.size(path); // File size in bytes
+                                Instant lastModified = Files.getLastModifiedTime(path).toInstant(); // Last modified time
+
+                                // Return as DTO
+                                return new FileMetadataDTO(fileName, fileSize, lastModified);
+                            } catch (IOException e) {
+                                throw new RuntimeException("Failed to retrieve metadata for file: " + path, e);
+                            }
+                        })
                         .collect(Collectors.toList());
+
             } catch (IOException e) {
                 e.printStackTrace();
-                throw new RuntimeException("Failed to retrieve file names from directory: " + _PATH_task, e);
+                throw new RuntimeException("Failed to retrieve file metadata from directory: " + _PATH_task, e);
             }
 
-        }
-
-        else {
+        } else {
             throw new UploadForbiddenException("Fail to upload file to this task");
         }
-
-
-
-
-
-
     }
+
 }
