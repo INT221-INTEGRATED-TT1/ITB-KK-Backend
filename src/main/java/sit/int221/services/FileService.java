@@ -251,7 +251,7 @@ public class FileService {
             try {
                 // Ensure the directory exists
                 if (!Files.exists(_PATH_task) || !Files.isDirectory(_PATH_task)) {
-                    throw new IOException("The directory does not exist or is not a directory: " + _PATH_task.toString());
+                    return new ArrayList<>();
                 }
 
                 // List all file metadata in the directory
@@ -273,7 +273,6 @@ public class FileService {
                         .collect(Collectors.toList());
 
             } catch (IOException e) {
-                e.printStackTrace();
                 throw new RuntimeException("Failed to retrieve file metadata from directory: " + _PATH_task, e);
             }
 
