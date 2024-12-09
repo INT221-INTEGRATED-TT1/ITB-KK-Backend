@@ -19,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v3/boards")
+@CrossOrigin(origins = {"http://localhost:5173", "https://intproj23.sit.kmutt.ac.th", "http://localhost:80", "https://ip23tt1.sit.kmutt.ac.th"})
 public class FileController {
     @Autowired
     private FileService fileService;
@@ -73,13 +74,16 @@ public class FileController {
         switch (extension) {
             case ".pdf":
                 headers.setContentType(MediaType.APPLICATION_PDF);
+                headers.setContentDisposition(ContentDisposition.inline().filename(file.getFilename()).build());
                 break;
             case ".png":
                 headers.setContentType(MediaType.IMAGE_PNG);
+                headers.setContentDisposition(ContentDisposition.inline().filename(file.getFilename()).build());
                 break;
             case ".jpeg":
             case "jpg":
                 headers.setContentType(MediaType.IMAGE_JPEG);
+                headers.setContentDisposition(ContentDisposition.inline().filename(file.getFilename()).build());
                 break;
             case ".gif":
             case ".jfif":

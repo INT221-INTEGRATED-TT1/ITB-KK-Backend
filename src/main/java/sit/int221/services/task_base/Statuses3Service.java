@@ -211,6 +211,7 @@ public class Statuses3Service {
             try {
                 task3Repository.transferStatusAllBy(newStatus, oldStatus);
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the specified status for task transfer does not exist.");
             }
             removeOldStatus(oldStatus);

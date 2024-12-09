@@ -81,6 +81,8 @@ public class Statuses3Controller {
 
     @DeleteMapping("/{boardId}/statuses/{oldStatusId}/{newStatusId}")
     public Statuses3 transferStatus(@RequestHeader("Authorization") String token, @PathVariable String boardId, @PathVariable Integer oldStatusId, @PathVariable Integer newStatusId) {
+        System.out.println(oldStatusId);
+        System.out.println(newStatusId);
         Claims claims = authorizationService.validateToken(token);
         return statuses3Service.updateTasksStatusAndDelete(claims, boardId, oldStatusId, newStatusId);
     }

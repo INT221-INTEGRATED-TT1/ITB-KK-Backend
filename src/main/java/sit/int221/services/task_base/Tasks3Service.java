@@ -19,6 +19,7 @@ import sit.int221.properties.FileStorageProperties;
 import sit.int221.repositories.task_base.BoardRepository;
 import sit.int221.repositories.task_base.CollaboratorRepository;
 import sit.int221.repositories.task_base.Tasks3Repository;
+import sit.int221.services.FileService;
 import sit.int221.services.ListMapper;
 import sit.int221.services.itbkk_shared.AuthorizationService;
 
@@ -51,6 +52,9 @@ public class Tasks3Service {
     ListMapper listMapper;
     @Autowired
     ModelMapper modelMapper;
+
+    @Autowired
+    FileService fileService;
 
     @Autowired
     public void FileService(FileStorageProperties fileStorageProperties) {
