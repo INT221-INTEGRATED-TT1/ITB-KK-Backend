@@ -74,7 +74,7 @@ public class BoardService {
                     new OwnerBoardCollabDTORes(userRepository.findById(board.getOwnerId()).orElseThrow(() ->
                             new ItemNotFoundException("Owner Not Found")).getName()),
                     collaborator.getAccessRight(),
-                    collaborator.getInvitationStatus()
+                    collaborator.getInvitationStatus(),collaborator.getAddedOn().toLocalDateTime()
             );
         }).toList();
 
