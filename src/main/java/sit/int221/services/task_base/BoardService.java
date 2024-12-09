@@ -59,7 +59,7 @@ public class BoardService {
         // fix to use listMapper or
         // Map personal boards to BoardResDTO
         List<PersonalBoardResDTO> personalBoardDTOs = personalBoards.stream()
-                .map(board -> new PersonalBoardResDTO(board.getId(), board.getName(), board.getVisibility(),
+                .map(board -> new PersonalBoardResDTO(board.getId(), board.getName(), board.getVisibility(), board.getCreatedOn().toLocalDateTime(),
                         new OwnerBoardDTORes(user.getOid(), user.getName()))).toList();
 
         // Map collaborator boards to DTO and handle collaborator data
