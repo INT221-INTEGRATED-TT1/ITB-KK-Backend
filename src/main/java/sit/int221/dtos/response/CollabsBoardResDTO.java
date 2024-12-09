@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import sit.int221.entities.enums.InvitationStatus;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,4 +16,5 @@ public class CollabsBoardResDTO {
     private OwnerBoardCollabDTORes owner;
     private String accessRight;
     private InvitationStatus invitationStatus;
+    private LocalDateTime createdOn;
 }
