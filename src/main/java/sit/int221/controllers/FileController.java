@@ -69,6 +69,8 @@ public class FileController {
             contentType = "application/octet-stream";
         }
 
+        System.out.println(contentType);
+
         HttpHeaders headers = new HttpHeaders();
 
         switch (extension) {
@@ -81,7 +83,7 @@ public class FileController {
                 headers.setContentDisposition(ContentDisposition.inline().filename(file.getFilename()).build());
                 break;
             case ".jpeg":
-            case "jpg":
+            case ".jpg":
                 headers.setContentType(MediaType.IMAGE_JPEG);
                 headers.setContentDisposition(ContentDisposition.inline().filename(file.getFilename()).build());
                 break;
@@ -90,6 +92,9 @@ public class FileController {
                 headers.setContentType(MediaType.IMAGE_GIF);
                 break;
             case ".txt":
+                headers.setContentDisposition(ContentDisposition.inline().filename(file.getFilename()).build());
+                headers.setContentType(MediaType.TEXT_PLAIN);
+                break;
             case ".log":
                 headers.setContentType(MediaType.TEXT_PLAIN);
                 break;
@@ -103,6 +108,12 @@ public class FileController {
             case ".xml":
                 headers.setContentType(MediaType.APPLICATION_XML);
                 break;
+            case ".rtf":
+                headers.setContentDisposition(ContentDisposition.inline().filename(file.getFilename()).build());
+                headers.setContentType(MediaType.parseMediaType("application/rtf"));
+                break;
+
+
 //            case ".zip":
 //            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 //            headers.setContentDisposition(ContentDisposition.attachment().filename(file.getFilename()).build());
