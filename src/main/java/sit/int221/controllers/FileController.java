@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import sit.int221.dtos.response.FileMetadataDTO;
 import sit.int221.dtos.response.FileNameResDTO;
 import sit.int221.dtos.response.FileUploadResponse;
+import sit.int221.entities.task_base.Board;
 import sit.int221.services.FileService;
 import sit.int221.services.itbkk_shared.AuthorizationService;
 
@@ -40,14 +41,14 @@ public class FileController {
     }
 
     @GetMapping("/{boardId}/tasks/{taskId}/attachments")
-    public ResponseEntity<Object> getFileFromTask(@RequestHeader("Authorization") String token, @PathVariable String boardId, @PathVariable Integer taskId) {
+    public ResponseEntity<Object> getFileFromTask(@RequestHeader(value = "Authorization", required = false) String token, @PathVariable String boardId, @PathVariable Integer taskId) {
+        Board board = authorizationService.getBoardId(boardId);
+        if(board.getVisibility().equalsIgnoreCase("PUBLIC")){
+            return ResponseEntity.ok(fileService.getFileMetadataInDirectory(boardId,taskId));
+        }
+        authorizationService.validateClaims(token);
         Claims claims = authorizationService.validateToken(token);
-
-            // Fetch file names using the service method
-        List<FileMetadataDTO> fileNames = fileService.getFileMetadataInDirectory(claims,boardId, taskId);
-        List<FileMetadataDTO> fileMetadataList = fileService.getFileMetadataInDirectory(claims, boardId, taskId);
-        return ResponseEntity.ok(fileMetadataList);
-
+        return ResponseEntity.ok(fileService.getFileMetadataInDirectory(claims, boardId, taskId));
     }
 
 

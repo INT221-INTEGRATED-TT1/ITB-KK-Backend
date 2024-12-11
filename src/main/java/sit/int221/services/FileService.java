@@ -119,13 +119,13 @@ public class FileService {
                 }
 
                 // Check for duplicate file names
-                if(existingFiles.contains(fileName)){
+                if (existingFiles.contains(fileName)) {
                     duplicateFilesNames.add(fileName);
                     continue;
                 }
 
                 // check maximum file size(20MB)
-                if(file.getSize()> MAX_FILE_SIZE){
+                if (file.getSize() > MAX_FILE_SIZE) {
                     notAdded_MAX_FILE_SIZE.add(fileName);
                     continue;
                 }
@@ -245,6 +245,10 @@ public class FileService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found for boardId " + boardId + " and taskId " + taskId);
         }
 
+        if(claims == null){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization not found");
+        }
+
         if (oid.equals(board.getOwnerId()) ||
                 collaborator.isPresent() && collaborator.get().getAccessRight().equals("WRITE")) {
 
@@ -277,7 +281,47 @@ public class FileService {
             }
 
         } else {
-            throw new UploadForbiddenException("Fail to upload file to this task");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access files: board visibility is PRIVATE or You are not collaborator");
+        }
+    }
+
+    public List<FileMetadataDTO> getFileMetadataInDirectory(String boardId, Integer taskId) {
+        Board board = authorizationService.getBoardId(boardId);
+
+        Tasks3 tasks3 = tasks3Repository.findTasks3ByBoardIdAndId(board.getId(), taskId);
+        Path _PATH_task = this.fileStorageLocation.resolve(board.getId()).resolve(String.valueOf(taskId));
+
+        if (tasks3 == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found for boardId " + boardId + " and taskId " + taskId);
+        }
+
+
+        try {
+            // Ensure the directory exists
+            if (!Files.exists(_PATH_task) || !Files.isDirectory(_PATH_task)) {
+                return new ArrayList<>();
+            }
+
+            // List all file metadata in the directory
+            return Files.list(_PATH_task)
+                    .filter(Files::isRegularFile) // Filter only regular files
+                    .map(path -> {
+                        try {
+                            // Get file metadata
+                            String fileName = path.getFileName().toString();
+                            long fileSize = Files.size(path); // File size in bytes
+                            Instant lastModified = Files.getLastModifiedTime(path).toInstant(); // Last modified time
+
+                            // Return as DTO
+                            return new FileMetadataDTO(fileName, fileSize, lastModified);
+                        } catch (IOException e) {
+                            throw new RuntimeException("Failed to retrieve metadata for file: " + path, e);
+                        }
+                    })
+                    .collect(Collectors.toList());
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to retrieve file metadata from directory: " + _PATH_task, e);
         }
     }
 
