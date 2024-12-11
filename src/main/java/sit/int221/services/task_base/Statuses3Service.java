@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import sit.int221.dtos.request.LimitStatusMaskReq;
 import sit.int221.dtos.request.NewStatus3DTO;
+import sit.int221.dtos.response.LimitStatusMaskRes;
 import sit.int221.dtos.response.Status3HomeCountDTO;
 import sit.int221.entities.enums.InvitationStatus;
 import sit.int221.entities.task_base.Board;
@@ -260,11 +262,11 @@ public class Statuses3Service {
         }
     }
 
-//    public LimitStatusMaskRes toggleLimitStatusMask(LimitStatusMaskReq limitStatusMaskReq) {
-//        LimitStatusMaskRes limitStatusMaskRes = new LimitStatusMaskRes();
-//        limitStatusMaskRes.setName("Limit Task Status");
-//        limitStatusMaskRes.setLimit(limitStatusMaskReq.getLimit());
-//        limitStatusMaskRes.setLimitMaximumTask(limitStatusMaskReq.getLimitMaximumTask());
-//        return limitStatusMaskRes;
-//    }
+    public LimitStatusMaskRes toggleLimitStatusMask(LimitStatusMaskReq limitStatusMaskReq) {
+        LimitStatusMaskRes limitStatusMaskRes = new LimitStatusMaskRes();
+        limitStatusMaskRes.setName("Limit Task Status");
+        limitStatusMaskRes.setLimit(limitStatusMaskReq.getLimit());
+        limitStatusMaskRes.setLimitMaximumTask(limitStatusMaskReq.getLimitMaximumTask());
+        return limitStatusMaskRes;
+    }
 }

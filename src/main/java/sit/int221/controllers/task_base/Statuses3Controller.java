@@ -5,8 +5,11 @@ import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sit.int221.dtos.request.LimitStatusMaskReq;
 import sit.int221.dtos.request.NewStatus3DTO;
+import sit.int221.dtos.response.LimitStatusMaskRes;
 import sit.int221.dtos.response.Status3DetailDTO;
 import sit.int221.dtos.response.Status3HomeCountDTO;
 import sit.int221.entities.task_base.Board;
@@ -67,11 +70,11 @@ public class Statuses3Controller {
         return modelMapper.map(updatedStatus, Status3DetailDTO.class);
     }
 
-//    @PatchMapping("/maximum-task")
-//    public ResponseEntity<Object> toggleLimitStatus(@RequestBody LimitStatusMaskReq limitStatusMaskReq){
-//        LimitStatusMaskRes limitStatusMaskRes = statusesService.toggleLimitStatusMask(limitStatusMaskReq);
-//        return ResponseEntity.ok(limitStatusMaskRes);
-//    }
+    @PatchMapping("/maximum-task")
+    public ResponseEntity<Object> toggleLimitStatus(@RequestBody LimitStatusMaskReq limitStatusMaskReq){
+        LimitStatusMaskRes limitStatusMaskRes = statuses3Service.toggleLimitStatusMask(limitStatusMaskReq);
+        return ResponseEntity.ok(limitStatusMaskRes);
+    }
 
     @DeleteMapping("/{boardId}/statuses/{statusId}")
     public Statuses3 deleteStatus(@RequestHeader("Authorization") String token, @PathVariable String boardId, @PathVariable Integer statusId) {
