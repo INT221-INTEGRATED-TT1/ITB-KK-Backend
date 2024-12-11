@@ -33,6 +33,8 @@ services:
       - MYSQL_USER=dev1
       - MYSQL_PASSWORD=dev@sit
       - MYSQL_URL=database
+    volumes:
+      - ./attachments:/backendAPI/attachments
     networks:
       - test-networks
   frontend:

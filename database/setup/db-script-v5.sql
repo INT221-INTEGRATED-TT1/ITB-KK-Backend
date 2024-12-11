@@ -30,7 +30,6 @@ CREATE TABLE `boards` (
   CONSTRAINT `users_FK` FOREIGN KEY (`owner_id`) REFERENCES `localusers` (`oid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
  
- 
 CREATE TABLE `statuses` (
   `statusId` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
@@ -59,7 +58,6 @@ CREATE TABLE `tasks3` (
   CONSTRAINT `board_FK` FOREIGN KEY (`board_id`) REFERENCES `boards` (`boardId`),
   CONSTRAINT `status_FK` FOREIGN KEY (`status_id`) REFERENCES `statuses` (`statusId`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 
 CREATE TABLE `collaborator` (
   `collabId` int NOT NULL AUTO_INCREMENT,
