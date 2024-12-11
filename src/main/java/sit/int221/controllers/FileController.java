@@ -1,14 +1,14 @@
 package sit.int221.controllers;
 
 import io.jsonwebtoken.Claims;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sit.int221.dtos.response.FileMetadataDTO;
+import sit.int221.dtos.response.FileNameResDTO;
 import sit.int221.dtos.response.FileUploadResponse;
 import sit.int221.services.FileService;
 import sit.int221.services.itbkk_shared.AuthorizationService;
@@ -19,11 +19,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v3/boards")
+@CrossOrigin(origins = {"http://localhost:5173", "https://intproj23.sit.kmutt.ac.th", "http://localhost:80", "https://ip23tt1.sit.kmutt.ac.th"})
 public class FileController {
     @Autowired
     private FileService fileService;
     @Autowired
     private AuthorizationService authorizationService;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @PostMapping("/{boardId}/tasks/{taskId}/attachments")
     public ResponseEntity<Object> fileUpload(@RequestHeader("Authorization") String token,
@@ -33,6 +37,17 @@ public class FileController {
         Claims claims = authorizationService.validateToken(token);
         List<String> uploadedFiles = fileService.store(claims, boardId, taskId, file);
         return ResponseEntity.ok("You successfully uploaded " + uploadedFiles);
+    }
+
+    @GetMapping("/{boardId}/tasks/{taskId}/attachments")
+    public ResponseEntity<Object> getFileFromTask(@RequestHeader("Authorization") String token, @PathVariable String boardId, @PathVariable Integer taskId) {
+        Claims claims = authorizationService.validateToken(token);
+
+            // Fetch file names using the service method
+        List<FileMetadataDTO> fileNames = fileService.getFileMetadataInDirectory(claims,boardId, taskId);
+        List<FileMetadataDTO> fileMetadataList = fileService.getFileMetadataInDirectory(claims, boardId, taskId);
+        return ResponseEntity.ok(fileMetadataList);
+
     }
 
 
@@ -54,24 +69,32 @@ public class FileController {
             contentType = "application/octet-stream";
         }
 
+        System.out.println(contentType);
+
         HttpHeaders headers = new HttpHeaders();
 
         switch (extension) {
             case ".pdf":
                 headers.setContentType(MediaType.APPLICATION_PDF);
+                headers.setContentDisposition(ContentDisposition.inline().filename(file.getFilename()).build());
                 break;
             case ".png":
                 headers.setContentType(MediaType.IMAGE_PNG);
+                headers.setContentDisposition(ContentDisposition.inline().filename(file.getFilename()).build());
                 break;
             case ".jpeg":
-            case "jpg":
+            case ".jpg":
                 headers.setContentType(MediaType.IMAGE_JPEG);
+                headers.setContentDisposition(ContentDisposition.inline().filename(file.getFilename()).build());
                 break;
             case ".gif":
             case ".jfif":
                 headers.setContentType(MediaType.IMAGE_GIF);
                 break;
             case ".txt":
+                headers.setContentDisposition(ContentDisposition.inline().filename(file.getFilename()).build());
+                headers.setContentType(MediaType.TEXT_PLAIN);
+                break;
             case ".log":
                 headers.setContentType(MediaType.TEXT_PLAIN);
                 break;
@@ -85,6 +108,12 @@ public class FileController {
             case ".xml":
                 headers.setContentType(MediaType.APPLICATION_XML);
                 break;
+            case ".rtf":
+                headers.setContentDisposition(ContentDisposition.inline().filename(file.getFilename()).build());
+                headers.setContentType(MediaType.parseMediaType("application/rtf"));
+                break;
+
+
 //            case ".zip":
 //            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 //            headers.setContentDisposition(ContentDisposition.attachment().filename(file.getFilename()).build());
