@@ -19,6 +19,7 @@ import javax.sql.DataSource;
         entityManagerFactoryRef = "taskBaseEntityManagerFactoryBean",
         transactionManagerRef = "taskBaseTransactionManager"
 )
+
 public class TaskBaseJPAConfiguration {
     @Bean
     LocalContainerEntityManagerFactoryBean taskBaseEntityManagerFactoryBean(EntityManagerFactoryBuilder entityManagerFactoryBuilder,

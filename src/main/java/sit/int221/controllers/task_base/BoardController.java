@@ -43,10 +43,8 @@ public class BoardController {
 
     @GetMapping("")
     public ResponseEntity<Object> getAllBoards(@RequestHeader(value = "Authorization", required = false) String token) {
-
         Claims claims = authorizationService.validateToken(token);
         return ResponseEntity.ok(boardService.getAllBoards(claims));
-
     }
 
     @GetMapping("/{boardId}")

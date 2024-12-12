@@ -46,7 +46,6 @@ public class BoardService {
         String oid = (String) claims.get("oid");
         User user = userRepository.findById(oid).orElseThrow(() -> new ItemNotFoundException("User id " + oid + " DOES NOT EXIST!!!"));
 
-
         //get personal boards
         List<Board> personalBoards = boardRepository.findAllByOwnerId(oid);
 
@@ -55,8 +54,6 @@ public class BoardService {
 
         List<Collaborator> collaborators = collaboratorRepository.findByLocalUserOid(oid);
 
-
-        // fix to use listMapper or
         // Map personal boards to BoardResDTO
         List<PersonalBoardResDTO> personalBoardDTOs = personalBoards.stream()
                 .map(board -> new PersonalBoardResDTO(board.getId(), board.getName(), board.getVisibility(), board.getCreatedOn().toLocalDateTime(),
@@ -89,8 +86,7 @@ public class BoardService {
 
         boolean isCollaboratorAccepted = collaboratorOpt.map(collaborator -> InvitationStatus.ACCEPTED.equals(collaborator.getInvitationStatus())).orElse(false);
 
-
-        // check if is owner of the board or is Collaborator of the board can access board
+        // check if its owner or collaborator of the board
         if (oid.equals(board.getOwnerId()) || isCollaboratorAccepted) {
             return getBoardResDTO(user, board);
         } else {
@@ -123,6 +119,7 @@ public class BoardService {
         if (boardDTO.getName() == null || boardDTO.getName().isEmpty() || boardDTO.getName().length() > 120) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "you must need to insert board name or board name is more than 120 character");
         }
+
 //        oid must use from localUsersDB
         newBoard.setOwnerId(oid);
         newBoard.setName(boardDTO.getName());

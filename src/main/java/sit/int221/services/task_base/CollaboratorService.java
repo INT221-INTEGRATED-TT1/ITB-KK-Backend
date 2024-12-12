@@ -288,9 +288,7 @@ public class CollaboratorService {
     private void validateAccess(Claims claims, Board board) {
         String oid = (String) claims.get("oid");
         boolean isOwner = oid.equals(board.getOwnerId());
-        // try to understand this condition
         boolean isCollaborator = collaboratorRepository.findByBoardIdAndLocalUserOid(board.getId(), oid).isPresent();
-        System.out.println("dfs" + isCollaborator);
         if (!isOwner && !isCollaborator) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access board: board visibility is PRIVATE");
         }

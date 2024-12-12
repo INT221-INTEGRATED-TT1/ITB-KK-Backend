@@ -60,6 +60,7 @@ public class JwtTokenUtil implements Serializable {
         claims.put("role", user.getRole());
         return doGenerateToken(claims, userDetails.getUsername());
     }
+
     public String generateAccessTokenByRefreshToken(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("name", user.getName());
@@ -83,6 +84,7 @@ public class JwtTokenUtil implements Serializable {
                 .signWith(signatureAlgorithm, SECRET_KEY)
                 .compact();
     }
+
     private String doGenerateRefreshToken(Map<String, Object> claims, String subject) {
         return Jwts.builder().setHeaderParam("typ", "JWT").setClaims(claims).setSubject(subject)
                 .setIssuer(JWS_ISS)

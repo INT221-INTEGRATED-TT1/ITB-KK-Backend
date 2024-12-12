@@ -24,7 +24,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-
     @Autowired
     JwtAuthFilter jwtAuthFilter;
     @Autowired

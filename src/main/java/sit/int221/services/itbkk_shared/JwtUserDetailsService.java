@@ -28,54 +28,18 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(userName);
-//        String oid = user.getOid();
-//        System.out.println(user);
-
-//        Board board = authorizationService.getBoardId(boardId);
-
-
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
         }
-
-//        Boolean board = boardRepository.findByOwnerId(oid);
-//        if(!board){
-//            throw  new ResponseStatusException(HttpStatus.FORBIDDEN, "fdf");
-//        }
 
         List<GrantedAuthority> authorities = new LinkedList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_OWNER"));
         return new AuthUser(userName, user.getPassword(), authorities);
     }
 
-//    public UserDetails setCollaboratorWriteAccess(String userName) {
-//        User user = userRepository.findByUsername(userName);
-////        String oid = user.getOid();
-////        System.out.println(user);
-//
-////        Board board = authorizationService.getBoardId(boardId);
-//
-//
-//        if (user == null) {
-//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password is incorrect");
-//        }
-//
-////        Boolean board = boardRepository.findByOwnerId(oid);
-////        if(!board){
-////            throw  new ResponseStatusException(HttpStatus.FORBIDDEN, "fdf");
-////        }
-//
-//        List<GrantedAuthority> authorities = new LinkedList<>();
-//        authorities.add(new SimpleGrantedAuthority("ROLE_COLLABORATOR_WRITE"));
-//        return new AuthUser(userName, user.getPassword(), authorities);
-//    }
-
-
-
     public User findByUserName(String username) {
         return userRepository.findByUsername(username);
     }
-
 
     public void validateInputs(String userName, String password) {
         if (userName == null || password == null || userName.isBlank() && password.isBlank()) {

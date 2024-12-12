@@ -39,17 +39,22 @@ public class AuthenticationController {
     @PostMapping("")
     public ResponseEntity<Object> login(@RequestBody @Valid JwtRequestUser jwtRequestUser) {
         try {
+            // validate inputs username and password
             jwtUserDetailsService.validateInputs(jwtRequestUser.getUserName(), jwtRequestUser.getPassword());
+            // token from username and password
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(jwtRequestUser.getUserName(), jwtRequestUser.getPassword());
 
-            // authenticate the user
+            // authenticate user with authenticationManger
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
-
+            // retrieve user details
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            // find username from entity
             User user = jwtUserDetailsService.findByUserName(userDetails.getUsername());
+
             AccessTokenDTORes accessTokenDTOres = new AccessTokenDTORes();
+
             if (!localUserService.checkLocalUser(jwtRequestUser.getUserName())) {
                 localUserService.insertLocalUser(jwtRequestUser.getUserName());
                 accessTokenDTOres.setAccess_token(jwtTokenUtil.generateToken(userDetails, user));

@@ -114,7 +114,6 @@ public class FileController {
                 headers.setContentType(MediaType.parseMediaType("application/rtf"));
                 break;
 
-
 //            case ".zip":
 //            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 //            headers.setContentDisposition(ContentDisposition.attachment().filename(file.getFilename()).build());
