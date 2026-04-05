@@ -9,7 +9,7 @@ services:
     volumes:
       - ./database/mysql-lib:/var/lib/mysql
       - ./database/my.cnf:/etc/my.cnf
-      - ./database/setup/db-script-v2.sql:/docker-entrypoint-initdb.d/db-script-v2.sql
+      - ./database/setup/db-script-v3.1.sql:/docker-entrypoint-initdb.d/db-script-v2.sql
     restart: on-failure
     networks:
     - test-networks
@@ -33,6 +33,8 @@ services:
       - MYSQL_USER=dev1
       - MYSQL_PASSWORD=dev@sit
       - MYSQL_URL=database
+    volumes:
+      - ./attachments:/backendAPI/attachments
     networks:
       - test-networks
   frontend:
@@ -47,14 +49,15 @@ services:
       dockerfile: proxy.Dockerfile
     ports:
       - "80:80"
+      - "443:443"
+
+      
     restart: 
       always
     networks:
       - default
       - test-networks
     
-  
-
 
 networks:
   test-networks:
